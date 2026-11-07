@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <defs>
+    <linearGradient id="sqBg" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#070B14" />
+      <stop offset="0.5" stop-color="#0B132B" />
+      <stop offset="1" stop-color="#0A192F" />
+    </linearGradient>
+    <linearGradient id="sqAccent" x1="50" y1="50" x2="350" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" />
+      <stop offset="0.4" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#1D4ED8" />
+    </linearGradient>
+    <linearGradient id="sqSilver" x1="350" y1="50" x2="50" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" />
+      <stop offset="0.5" stop-color="#CBD5E1" />
+      <stop offset="1" stop-color="#64748B" />
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="380" height="380" rx="64" fill="url(#sqBg)" stroke="url(#sqAccent)" stroke-width="5" />
+  <line x1="80" y1="200" x2="320" y2="200" stroke="rgba(56, 189, 248, 0.12)" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="200" y1="80" x2="200" y2="320" stroke="rgba(56, 189, 248, 0.12)" stroke-width="1" stroke-dasharray="4 4" />
+  <polygon points="200,60 330,135 330,265 200,340 70,265 70,135" fill="#0B1736" stroke="url(#sqAccent)" stroke-width="6" stroke-linejoin="round" />
+  <path d="M120 250 V145 L160 195 L200 145 V250" stroke="url(#sqSilver)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M160 145 H240 M200 145 V250" stroke="url(#sqAccent)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M200 250 L240 145 L280 250 M216 215 H264" stroke="url(#sqSilver)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="200" cy="200" r="10" fill="#38BDF8" />
+  <circle cx="200" cy="200" r="5" fill="#FFFFFF" />
+  <text x="200" y="370" text-anchor="middle" fill="#94A3B8" font-size="14" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" letter-spacing="4">MTA TECHNOLOGIES</text>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 120" fill="none">
+  <defs>
+    <linearGradient id="lhGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0284C7" />
+      <stop offset="0.5" stop-color="#2563EB" />
+      <stop offset="1" stop-color="#38BDF8" />
+    </linearGradient>
+    <linearGradient id="lhSilver" x1="0" y1="100" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#94A3B8" />
+      <stop offset="0.5" stop-color="#F8FAFC" />
+      <stop offset="1" stop-color="#CBD5E1" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(10, 10)">
+    <polygon points="50,8 88,28 88,72 50,92 12,72 12,28" fill="#0B132B" stroke="url(#lhGrad)" stroke-width="4" stroke-linejoin="round" />
+    <path d="M28 66 V34 L40 48 L52 34 V66" stroke="url(#lhSilver)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M40 34 H60 M50 34 V66" stroke="url(#lhGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M50 66 L62 34 L74 66 M54 54 H70" stroke="url(#lhSilver)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="50" cy="50" r="3.5" fill="#38BDF8" />
+  </g>
+  <text x="130" y="62" fill="#FFFFFF" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="34" letter-spacing="3">MTA <tspan fill="#38BDF8">TECHNOLOGIES</tspan></text>
+  <text x="132" y="88" fill="#94A3B8" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="700" font-size="12" letter-spacing="5">BUILDING A SMARTER TOMORROW</text>
+</svg>
