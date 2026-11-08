@@ -1,7 +1,6 @@
 # MTA TECHNOLOGIES - Official Corporate Website
 **BUILDING A SMARTER TOMORROW**  
-**المؤسس: Mohammed Taha Abdullah Dawood Abrah (محمد طه عبدالله داود عبره)**  
-**البريد الرسمي المعتمد: hoaam100@gmail.com**
+**البريد الرسمي المعتمد: mtatechnologies0@gmail.com**
 
 الموقع الرسمي الكامل لشركة **MTA TECHNOLOGIES**، مبني كـ **Static Website** فائق السرعة وخالٍ تماماً من التبعيات المعقدة أو الخوادم، وجاهز للرفع الفوري على **Cloudflare Pages** و **GitHub Pages**.
 
@@ -10,12 +9,12 @@
 ## 📁 محتويات الحزمة البرمجية (File Structure)
 
 - `index.html` : الصفحة الرئيسية مع الشعار الرسمي، الرسالة، وملخص المشاريع والمجالات.
-- `about.html` : من نحن، التعريف بالمؤسس، ورؤية ورسالة وفلسفة الشركة.
-- `projects.html` : المشاريع والمنتجات الرسمية (MTA Net Blocker, AgentPay, MTA Video Downloader, Sehhaty, MTA AI Video Studio).
+- `about.html` : نبذة عن الشركة ورؤيتها ورسالتها.
+- `projects.html` : المشاريع والمنتجات الرسمية (MTA Net Blocker, MTA AI Video Studio, MTA Video Downloader, MTA University Library Collector).
 - `innovation.html` : مجالات العمل والابتكار التقني السبعة.
 - `knowledge.html` : مركز المعرفة والمقالات الهندسية الأصلية.
 - `gallery.html` : معرض الهوية البصرية والواجهات مع عارض تكبير تفاعلي (Lightbox).
-- `contact.html` : صفحة التواصل والبريد المعتمد `hoaam100@gmail.com`.
+- `contact.html` : صفحة التواصل والبريد المعتمد `mtatechnologies0@gmail.com`.
 - `404.html` : صفحة الخطأ 404 المخصصة لشبكات الاستضافة السحابية.
 - `privacy-policy.html` : سياسة الخصوصية الشاملة مع إفصاحات Google AdSense وملفات تعريف الارتباط.
 - `terms.html` : شروط الاستخدام وحقوق الملكية الفكرية.
@@ -72,7 +71,7 @@
 ### الخطوة 1: إضافة شفرة AdSense في `<head>`
 افتح ملفات HTML (`index.html`, `about.html`, إلخ) وابحث في قسم `<head>` عن التعليق التالي:
 ```html
-<!-- GOOGLE ADSENSE INTEGRATION POINT -->
+
 ```
 قم بإلغاء التعليق واستبدل `ca-pub-XXXXXXXXXXXXXXXX` بمعرف الناشر الحقيقي الخاص بك:
 ```html
@@ -88,7 +87,7 @@ google.com, pub-YOUR_REAL_PUBLISHER_ID, DIRECT, f08c47fec0942fa0
 ### الخطوة 3: تفعيل أماكن الإعلانات المجهزة
 تم تجهيز أماكن إعلانية معلقة ونظيفة داخل الصفحات تحت تعليق:
 ```html
-<!-- CONFIGURABLE AD PLACEMENT SLOT -->
+
 ```
 يمكنك إلغاء التعليق وتحديد `data-ad-slot` الحقيقي الخاص بالوحدة الإعلانية، أو الاعتماد كلياً على ميزة **الإعلانات التلقائية (Auto Ads)** من لوحة Google AdSense.
 

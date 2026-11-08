@@ -365,3 +365,85 @@ html[lang="en"] .lightbox-close {
     max-height: 210px;
   }
 }
+
+
+/* Contact page mobile refinement - scoped to contact.html */
+@media (max-width: 768px) {
+  .contact-page .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .contact-page {
+    padding: 2.25rem 1rem 3rem !important;
+  }
+
+  .contact-page > div:first-child {
+    margin-bottom: 2rem !important;
+  }
+
+  .contact-page > div:first-child h1 {
+    font-size: 1.8rem !important;
+    line-height: 1.5;
+  }
+
+  .contact-page > div:first-child p {
+    font-size: 0.98rem !important;
+    line-height: 1.9;
+  }
+
+  .contact-page .card {
+    padding: 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .contact-page .suggestion-card {
+    width: 100%;
+    max-width: 100% !important;
+    margin: 1.5rem auto 0 !important;
+    box-sizing: border-box;
+  }
+
+  .contact-page .suggestion-card h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.6;
+  }
+
+  .contact-page .suggestion-form {
+    width: 100%;
+    gap: 1.2rem !important;
+  }
+
+  .contact-page .suggestion-form label {
+    display: block;
+    font-size: 0.98rem;
+    margin-bottom: 0.55rem !important;
+  }
+
+  .contact-page .suggestion-form input:not([type="hidden"]):not([name="_honey"]),
+  .contact-page .suggestion-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 16px !important;
+    line-height: 1.7;
+    padding: 0.95rem 1rem !important;
+    border-radius: 12px;
+  }
+
+  .contact-page .suggestion-form input:not([type="hidden"]):not([name="_honey"]) {
+    min-height: 54px;
+  }
+
+  .contact-page .suggestion-form textarea {
+    min-height: 165px;
+  }
+
+  .contact-page .suggestion-form button[type="submit"] {
+    width: 100%;
+    min-height: 54px;
+    justify-self: stretch !important;
+    font-size: 1rem;
+  }
+}

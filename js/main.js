@@ -26,13 +26,13 @@
 
   // Copy Email Helper
   window.copyEmail = function() {
-    navigator.clipboard.writeText('hoaam100@gmail.com').then(() => {
+    navigator.clipboard.writeText('mtatechnologies0@gmail.com').then(() => {
       const alertEl = document.getElementById('copied-badge');
       if (alertEl) {
         alertEl.style.display = 'inline-block';
         setTimeout(() => alertEl.style.display = 'none', 3000);
       } else {
-        alert('Email copied: hoaam100@gmail.com');
+        alert('Email copied: mtatechnologies0@gmail.com');
       }
     });
   };
