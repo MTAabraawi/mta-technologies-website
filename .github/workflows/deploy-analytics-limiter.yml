@@ -1,0 +1,29 @@
+name: Deploy MTA Analytics Rate Limiter
+
+on:
+  push:
+    branches:
+      - feature/mta-analytics
+    paths:
+      - 'workers/analytics-rate-limiter/**'
+      - '.github/workflows/deploy-analytics-limiter.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Analytics Rate Limiter
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --config workers/analytics-rate-limiter/wrangler.toml
+          wranglerVersion: '4.36.0'

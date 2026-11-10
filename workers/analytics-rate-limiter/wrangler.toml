@@ -1,0 +1,9 @@
+name = "mta-analytics-rate-limiter"
+main = "src/index.js"
+compatibility_date = "2026-11-11"
+workers_dev = false
+
+[[ratelimits]]
+name = "ANALYTICS_RATE_LIMIT"
+namespace_id = "346280183174"
+simple = { limit = 30, period = 60 }
