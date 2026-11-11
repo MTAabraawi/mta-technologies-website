@@ -1,0 +1,78 @@
+name: Add Analytics Binding to Pages Preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Update Preview binding only
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_EDIT_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+
+          API="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/mta-technologies-website"
+          BEFORE=$(mktemp)
+          PAYLOAD=$(mktemp)
+          AFTER=$(mktemp)
+          trap 'rm -f "$BEFORE" "$PAYLOAD" "$AFTER"' EXIT
+
+          test -n "$CF_API_TOKEN"
+          test -n "$CF_ACCOUNT_ID"
+
+          curl -fsS -H "Authorization: Bearer $CF_API_TOKEN" "$API" -o "$BEFORE"
+          jq -e '.success == true' "$BEFORE" >/dev/null
+
+          echo "Checking existing Production binding..."
+          jq -e '.result.deployment_configs.production.services.ANALYTICS_LIMITER.service == "mta-analytics-rate-limiter" and .result.deployment_configs.production.services.ANALYTICS_LIMITER.environment == "production"' "$BEFORE" >/dev/null
+
+          echo "Preparing Preview-only update..."
+          jq '{
+            deployment_configs: {
+              preview: (
+                (.result.deployment_configs.preview // {})
+                | .services = ((.services // {}) + {
+                    "ANALYTICS_LIMITER": {
+                      "service": "mta-analytics-rate-limiter",
+                      "environment": "production"
+                    }
+                  })
+              )
+            }
+          }' "$BEFORE" > "$PAYLOAD"
+
+          STATUS=$(curl -sS -o "$AFTER" -w '%{http_code}' \
+            -X PATCH "$API" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data-binary @"$PAYLOAD")
+
+          if [ "$STATUS" != "200" ]; then
+            echo "Cloudflare update failed: HTTP $STATUS"
+            jq '{success, errors}' "$AFTER"
+            exit 1
+          fi
+
+          jq -e '.success == true' "$AFTER" >/dev/null
+
+          echo "Verifying current configuration..."
+          curl -fsS -H "Authorization: Bearer $CF_API_TOKEN" "$API" -o "$AFTER"
+          jq -e '.success == true' "$AFTER" >/dev/null
+
+          jq -e '.result.deployment_configs.preview.services.ANALYTICS_LIMITER.service == "mta-analytics-rate-limiter" and .result.deployment_configs.preview.services.ANALYTICS_LIMITER.environment == "production"' "$AFTER" >/dev/null
+
+          diff -u \
+            <(jq -S '.result.deployment_configs.production' "$BEFORE") \
+            <(jq -S '.result.deployment_configs.production' "$AFTER")
+
+          echo "=== PREVIEW SERVICE BINDINGS ==="
+          jq '.result.deployment_configs.preview.services // {}' "$AFTER"
+          echo "=== PRODUCTION CONFIGURATION UNCHANGED ==="
+          echo "=== UPDATE VERIFIED ==="
