@@ -1,0 +1,51 @@
+name: Read Cloudflare Pages Bindings
+
+on:
+  push:
+    branches:
+      - preview/analytics-pages-api-check
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Read Pages configuration
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$CF_API_TOKEN" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "Required GitHub secrets are missing."
+            exit 1
+          fi
+
+          RESPONSE=$(mktemp)
+          trap 'rm -f "$RESPONSE"' EXIT
+
+          STATUS=$(curl -sS \
+            -o "$RESPONSE" \
+            -w '%{http_code}' \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/mta-technologies-website")
+
+          if [ "$STATUS" != "200" ]; then
+            echo "Cloudflare API returned HTTP $STATUS"
+            jq '{success, errors}' "$RESPONSE"
+            exit 1
+          fi
+
+          echo "=== PRODUCTION SERVICE BINDINGS ==="
+          jq '.result.deployment_configs.production.services // {}' "$RESPONSE"
+
+          echo "=== PREVIEW SERVICE BINDINGS ==="
+          jq '.result.deployment_configs.preview.services // {}' "$RESPONSE"
+
+          echo "=== CHECK COMPLETE ==="
