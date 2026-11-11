@@ -44,7 +44,8 @@ jobs:
                       "environment": "production"
                     }
                   })
-              )
+              ),
+              production: .result.deployment_configs.production
             }
           }' "$BEFORE" > "$PAYLOAD"
 
