@@ -1,6 +1,9 @@
 name: Add Analytics Binding to Pages Preview
 
 on:
+  push:
+    branches:
+      - preview/analytics-pages-api-check
   workflow_dispatch:
 
 permissions:
