@@ -81,7 +81,7 @@ async function handle(request, env, ctx) {
     const fileSize = Number(body?.file_size);
     const token = String(body?.file_token || "").slice(0, 200);
     const ext = filename.toLowerCase().split(".").pop();
-    const allowed = ["apk","aab","exe","msi","dmg","pkg","deb","rpm","appimage","flatpak","zip","tar","gz","wasm"];
+    const allowed = ["apk","aab","exe","msi","msix","msixbundle","dmg","pkg","deb","rpm","appimage","flatpak","snap","zip","7z","tar","gz","xz","bz2","iso","wasm"];
     const max = Number(env.MAX_UPLOAD_BYTES || 2147483648);
     if (!body || !token || !Number.isSafeInteger(fileSize) || fileSize < 1 || fileSize > max || !allowed.includes(ext)) {
       return json({ error: "Invalid filename, file size, upload token, or unsupported file type." }, 400);
@@ -143,7 +143,12 @@ async function handle(request, env, ctx) {
       return json({ error: "Uploaded part sizes do not match the declared file size or multipart minimums." }, 409);
     }
     try {
-      await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).complete(parts);
+      const existingObject = await env.FILES.head(row.multipart_key);
+      if (!existingObject) {
+        await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).complete(parts);
+      } else if (existingObject.size !== row.file_size) {
+        return json({ error: "Stored object size does not match the submitted release." }, 409);
+      }
     } catch {
       return json({ error: "Could not complete multipart upload. Verify all parts and retry." }, 400);
     }
