@@ -26,6 +26,7 @@ jobs:
           node --check js/apps.js
           node --check js/external-catalogs.js
           node --check js/developer-portal.js
+          node --check js/marketplace-availability.js
           node --check js/admin-marketplace.js
           node --check js/admin-certificates.js
           node --check js/developer-certification.js
