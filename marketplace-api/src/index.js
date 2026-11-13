@@ -57,9 +57,74 @@ async function handle(request, env, ctx) {
     }});
   }
 
+
+  // Public certificate verification: the signature is checked server-side; a QR image alone is not trusted.
+  if (url.pathname === "/v1/certificates/verify" && request.method === "GET") {
+    const serial = String(url.searchParams.get("serial") || "");
+    const supplied = String(url.searchParams.get("sig") || "");
+    const row = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,signature,signature_algorithm FROM issued_certificates WHERE serial_number=?").bind(serial).first();
+    if (!row || !supplied || !env.CERT_SIGNING_SECRET) return json({ valid: false, reason: "not_found" }, 404);
+    const payload = [row.serial_number,row.subject_name,row.credential_type,row.issued_at,row.expires_at].join("|");
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.CERT_SIGNING_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
+    const bytes = Uint8Array.from(atob(supplied.replace(/-/g,"+").replace(/_/g,"/")), ch => ch.charCodeAt(0));
+    const validSignature = await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(payload));
+    const signatureMatches = supplied === row.signature && validSignature;
+    const current = Date.now();
+    const expired = Date.parse(row.expires_at) <= current;
+    return json({ valid: signatureMatches && row.status === "active" && !expired, authentic: signatureMatches, status: expired && row.status === "active" ? "expired" : row.status, serial: row.serial_number, name: row.subject_name, credential: row.credential_type, issued_at: row.issued_at, expires_at: row.expires_at });
+  }
+
   const identity = await requireIdentity(ctx);
   if (!identity) return json({ error: "Authentication required" }, 401);
 
+
+  if (url.pathname === "/v1/certificates/requests" && request.method === "POST") {
+    const body = await request.json().catch(() => null);
+    if (!body || !String(body.full_name || "").trim() || !String(body.statement || "").trim() || !String(body.requested_category || "").trim()) return json({ error: "Name, credential category, and supporting statement are required." }, 400);
+    const id = crypto.randomUUID();
+    await env.DB.prepare("INSERT INTO certificate_requests (id,applicant_email,full_name,public_display_name,organization,portfolio_url,evidence_url,requested_category,statement) VALUES (?,?,?,?,?,?,?,?,?)")
+      .bind(id,identity.email,String(body.full_name).trim().slice(0,160),String(body.public_display_name || body.full_name).trim().slice(0,100),String(body.organization || "").slice(0,160),String(body.portfolio_url || "").slice(0,500),String(body.evidence_url || "").slice(0,500),String(body.requested_category).slice(0,60),String(body.statement).trim().slice(0,2000)).run();
+    return json({ id, status: "pending" }, 201);
+  }
+  if (url.pathname === "/v1/me/certificates" && request.method === "GET") {
+    const { results } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status FROM issued_certificates WHERE request_id IN (SELECT id FROM certificate_requests WHERE applicant_email=?) ORDER BY created_at DESC").bind(identity.email).all();
+    return json({ certificates: results });
+  }
+  if (url.pathname === "/v1/admin/certificates/requests" && request.method === "GET") {
+    if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
+    const { results } = await env.DB.prepare("SELECT * FROM certificate_requests WHERE status IN ('pending','more_info','approved') ORDER BY created_at ASC").all();
+    const { results: issued } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,issuer_email FROM issued_certificates ORDER BY created_at DESC LIMIT 500").all();
+    return json({ requests: results, issued });
+  }
+  const issueCertMatch = url.pathname.match(/^\\/v1\\/admin\\/certificates\\/requests\\/([a-f0-9-]+)\\/issue$/i);
+  if (issueCertMatch && request.method === "POST") {
+    if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
+    if (!env.CERT_SIGNING_SECRET || String(env.CERT_SIGNING_SECRET).length < 32) return json({ error: "Certificate signing secret is not configured securely." }, 503);
+    const req = await env.DB.prepare("SELECT * FROM certificate_requests WHERE id=? AND status IN ('pending','approved')").bind(issueCertMatch[1]).first();
+    if (!req) return json({ error: "Certificate request not found or not eligible." }, 404);
+    const body = await request.json().catch(() => ({}));
+    const now = new Date();
+    const issuedAt = now.toISOString();
+    const expiresAt = new Date(now.getTime() + 365*24*60*60*1000).toISOString();
+    const counter = await env.DB.prepare("UPDATE certificate_serial_counter SET last_value=last_value+1 WHERE id=1 RETURNING last_value").first();
+    if (!counter) return json({ error: "Serial counter is unavailable." }, 503);
+    const serial = "MTA-DEV-" + now.getUTCFullYear() + "-" + String(counter.last_value).padStart(6,"0");
+    const subject = req.public_display_name || req.full_name;
+    const credential = String(body.credential_type || req.requested_category || "developer").slice(0,60);
+    const payload = [serial,subject,credential,issuedAt,expiresAt].join("|");
+    const key = await crypto.subtle.importKey("raw",new TextEncoder().encode(env.CERT_SIGNING_SECRET),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
+    const raw = new Uint8Array(await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(payload)));
+    let binary = ""; for (const b of raw) binary += String.fromCharCode(b);
+    const signature = btoa(binary).replace(/\\+/g,"-").replace(/\\//g,"_").replace(/=+$/,"");
+    const id = crypto.randomUUID();
+    await env.DB.prepare("INSERT INTO issued_certificates (id,request_id,serial_number,subject_name,credential_type,issued_at,expires_at,signature,signer_key_version,issuer_email) VALUES (?,?,?,?,?,?,?,?,?,?)")
+      .bind(id,req.id,serial,subject,credential,issuedAt,expiresAt,signature,String(env.CERT_SIGNING_KEY_VERSION || "v1"),identity.email).run();
+    await env.DB.prepare("UPDATE certificate_requests SET status='issued',reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
+      .bind(identity.email,String(body.note || "").slice(0,500),req.id).run();
+    await env.DB.prepare("INSERT INTO certificate_events (id,certificate_id,actor_email,event_type,note) VALUES (?,?,?,'issued',?)")
+      .bind(crypto.randomUUID(),id,identity.email,"Initial issuance").run();
+    return json({ serial, name: subject, credential, issued_at: issuedAt, expires_at: expiresAt, signature, verify_url: env.SITE_ORIGIN + "/verify-certificate.html?serial=" + encodeURIComponent(serial) + "&sig=" + encodeURIComponent(signature) },201);
+  }
   if (url.pathname === "/v1/submissions" && request.method === "POST") {
     const body = await request.json().catch(() => null);
     if (!body || !body.app_name || !body.developer_name || !body.platform || !body.category || !body.version || !body.license_name || !body.description || body.authorization_confirmed !== true) {
