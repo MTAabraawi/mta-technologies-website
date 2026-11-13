@@ -1,0 +1,129 @@
+[
+  {
+    "id": "google-play",
+    "name": "Google Play",
+    "platforms": [
+      "Android"
+    ],
+    "url": "https://play.google.com/store/apps",
+    "mode": "official-store",
+    "redistribution": "No mirroring; link to the publisher listing."
+  },
+  {
+    "id": "huawei-appgallery",
+    "name": "Huawei AppGallery",
+    "platforms": [
+      "Android",
+      "HarmonyOS"
+    ],
+    "url": "https://appgallery.huawei.com/",
+    "mode": "official-store",
+    "redistribution": "No mirroring without publisher authorization."
+  },
+  {
+    "id": "fdroid",
+    "name": "F-Droid",
+    "platforms": [
+      "Android"
+    ],
+    "url": "https://f-droid.org/packages/",
+    "mode": "FOSS-catalog",
+    "redistribution": "Use signed repository metadata; only include compatible FOSS packages and respect inclusion policy."
+  },
+  {
+    "id": "amazon-appstore",
+    "name": "Amazon Appstore",
+    "platforms": [
+      "Android",
+      "Fire OS"
+    ],
+    "url": "https://www.amazon.com/gp/mas/get/amazonapp",
+    "mode": "official-store",
+    "redistribution": "Link to official listing."
+  },
+  {
+    "id": "samsung-galaxy-store",
+    "name": "Samsung Galaxy Store",
+    "platforms": [
+      "Android"
+    ],
+    "url": "https://galaxystore.samsung.com/",
+    "mode": "official-store",
+    "redistribution": "Link to official listing."
+  },
+  {
+    "id": "xiaomi-getapps",
+    "name": "Xiaomi GetApps",
+    "platforms": [
+      "Android"
+    ],
+    "url": "https://global.app.mi.com/",
+    "mode": "official-store",
+    "redistribution": "Link to official listing."
+  },
+  {
+    "id": "apple-app-store",
+    "name": "Apple App Store",
+    "platforms": [
+      "iOS",
+      "iPadOS",
+      "macOS"
+    ],
+    "url": "https://www.apple.com/app-store/",
+    "mode": "official-store",
+    "redistribution": "Link to official listing."
+  },
+  {
+    "id": "microsoft-store",
+    "name": "Microsoft Store",
+    "platforms": [
+      "Windows"
+    ],
+    "url": "https://apps.microsoft.com/",
+    "mode": "official-store",
+    "redistribution": "Link to official listing."
+  },
+  {
+    "id": "flathub",
+    "name": "Flathub",
+    "platforms": [
+      "Linux"
+    ],
+    "url": "https://flathub.org/",
+    "mode": "Linux-app-catalog",
+    "redistribution": "Link to publisher packages; verify each app license and Flatpak permissions."
+  },
+  {
+    "id": "snapcraft",
+    "name": "Snap Store",
+    "platforms": [
+      "Linux"
+    ],
+    "url": "https://snapcraft.io/store",
+    "mode": "Linux-app-catalog",
+    "redistribution": "Link to publisher packages; review publisher identity and package permissions."
+  },
+  {
+    "id": "debian",
+    "name": "Debian Packages",
+    "platforms": [
+      "Linux"
+    ],
+    "url": "https://packages.debian.org/",
+    "mode": "distribution-repository",
+    "redistribution": "Use package metadata and comply with Debian and upstream licenses."
+  },
+  {
+    "id": "github-releases",
+    "name": "GitHub Releases",
+    "platforms": [
+      "Android",
+      "Windows",
+      "macOS",
+      "Linux"
+    ],
+    "url": "https://github.com/",
+    "mode": "publisher-release",
+    "redistribution": "Link to releases only; check each repository license, publisher identity, and artifact integrity."
+  }
+]
