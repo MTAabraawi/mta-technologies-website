@@ -8,6 +8,7 @@
    if (!api) throw new Error(t("خدمة المتجر غير مربوطة بعد.","Marketplace API is not configured."));
    const response = await fetch(api + path, { credentials:"include", ...options });
    const data = await response.json().catch(()=>({}));
+   if (response.redirected || !(response.headers.get("content-type") || "").includes("application/json")) throw new Error(t("سجّل الدخول أولاً من زر تسجيل الدخول ثم أعد المحاولة.","Please sign in first using the sign-in button, then retry."));
    if (!response.ok) throw new Error(data.error || ("HTTP " + response.status));
    return data;
  }
@@ -36,11 +37,16 @@
      const file=el("release-file").files[0];
      if(!file) throw new Error(t("اختر ملف الإصدار أولاً.","Select a release file first."));
      if(file.size>100*1024*1024) throw new Error(t("الحد الأقصى الحالي 100 ميجابايت.","Current maximum is 100 MiB."));
-     const result=await request("/v1/submissions",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+     let result;
+     if(body.submission_id){ result={id:body.submission_id}; }
+     else {
+       result=await request("/v1/submissions",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+       form.elements.submission_id.value=result.id;
+     }
      const upload=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/file",{method:"PUT",credentials:"include",headers:{"x-file-name":file.name},body:file});
      const up=await upload.json().catch(()=>({})); if(!upload.ok) throw new Error(up.error||"Upload failed");
      msg("submission-message",t("تم استلام الطلب والملف، وهما بانتظار المراجعة.","Submission and file received; awaiting review."));
-     form.reset(); const mine=await request("/v1/me/submissions"); renderMine(mine.submissions||[]);
+     form.reset(); form.elements.submission_id.value=""; const mine=await request("/v1/me/submissions"); renderMine(mine.submissions||[]);
    } catch(e) { msg("submission-message",e.message); }
    finally { button.disabled=false; }
  });
