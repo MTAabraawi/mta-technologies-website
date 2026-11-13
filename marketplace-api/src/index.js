@@ -228,14 +228,15 @@ async function handle(request, env, ctx) {
   if (reviewMatch && request.method === "PATCH") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const body = await request.json().catch(() => null);
-    if (!body || !["approved","rejected","removed"].includes(body.status)) return json({ error: "Invalid review status." }, 400);
+    if (!body || !["approved","rejected","removed","changes_requested"].includes(body.status)) return json({ error: "Invalid review status." }, 400);
+    if (body.status === "changes_requested" && !String(body.note || "").trim()) return json({ error: "A clear revision request is required." }, 400);
     if (body.status === "approved" && (body.rights_verified !== true || body.malware_scan_passed !== true)) {
       return json({ error: "Approval requires explicit rights verification and a completed malware scan." }, 400);
     }
     const row = await env.DB.prepare("SELECT id,object_key,multipart_upload_id,multipart_key FROM submissions WHERE id=?").bind(reviewMatch[1]).first();
     if (!row) return json({ error: "Submission not found." }, 404);
     if (body.status === "approved" && !row.object_key) return json({ error: "A release file is required before approval." }, 400);
-    if (body.status !== "approved") {
+    if (body.status !== "approved" && body.status !== "changes_requested") {
       if (row.multipart_upload_id && row.multipart_key) {
         try { await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).abort(); } catch {}
       }
@@ -250,8 +251,9 @@ async function handle(request, env, ctx) {
       await env.FILES.delete(row.object_key);
       await env.DB.prepare("UPDATE submissions SET object_key=? WHERE id=?").bind(publicKey,row.id).run();
     }
-    await env.DB.prepare("UPDATE submissions SET status=?,reviewer_email=?,review_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
-      .bind(body.status, identity.email, String(body.note || "").slice(0,1000), reviewMatch[1]).run();
+    const storedStatus = body.status === "changes_requested" ? "pending" : body.status;
+    await env.DB.prepare("UPDATE submissions SET status=?,reviewer_email=?,review_note=?,revision_requested_at=CASE WHEN ?=1 THEN strftime('%Y-%m-%dT%H:%M:%fZ','now') ELSE revision_requested_at END,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
+      .bind(storedStatus, identity.email, String(body.note || "").slice(0,1000), body.status === "changes_requested" ? 1 : 0, reviewMatch[1]).run();
     return json({ id: reviewMatch[1], status: body.status });
   }
   return json({ error: "Not found" }, 404);
