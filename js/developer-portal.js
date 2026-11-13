@@ -36,15 +36,30 @@
      const fd=new FormData(form); const body=Object.fromEntries(fd.entries()); body.authorization_confirmed=fd.get("authorization_confirmed")==="on";
      const file=el("release-file").files[0];
      if(!file) throw new Error(t("اختر ملف الإصدار أولاً.","Select a release file first."));
-     if(file.size>100*1024*1024) throw new Error(t("الحد الأقصى الحالي 100 ميجابايت.","Current maximum is 100 MiB."));
+     if(file.size>2*1024*1024*1024) throw new Error(t("الحد الأقصى الحالي 2 جيجابايت.","Current maximum is 2 GiB."));
      let result;
      if(body.submission_id){ result={id:body.submission_id}; }
      else {
        result=await request("/v1/submissions",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
        form.elements.submission_id.value=result.id;
      }
-     const upload=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/file",{method:"PUT",credentials:"include",headers:{"x-file-name":file.name},body:file});
-     const up=await upload.json().catch(()=>({})); if(!upload.ok) throw new Error(up.error||"Upload failed");
+     const fileToken=[file.name,file.size,file.lastModified].join(":");
+     const init=await request("/v1/submissions/"+encodeURIComponent(result.id)+"/multipart",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({file_name:file.name,file_size:file.size,file_token:fileToken})});
+     const partSize=init.part_size||8388608;
+     const completed=new Set((init.parts||[]).map(part=>part.partNumber));
+     const totalParts=Math.ceil(file.size/partSize);
+     for(let partNumber=1;partNumber<=totalParts;partNumber++){
+       if(completed.has(partNumber)) continue;
+       const start=(partNumber-1)*partSize;
+       const chunk=file.slice(start,Math.min(start+partSize,file.size));
+       const response=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/multipart/"+partNumber,{method:"PUT",credentials:"include",headers:{"x-upload-id":init.upload_id},body:chunk});
+       const part=await response.json().catch(()=>({}));
+       if(response.redirected || !(response.headers.get("content-type")||"").includes("application/json")) throw new Error(t("انتهت جلسة الدخول. سجّل الدخول ثم أعد المحاولة لاستكمال الرفع.","Your sign-in session expired. Sign in again and retry to resume the upload."));
+       if(!response.ok) throw new Error(part.error||("Upload part "+partNumber+" failed"));
+       completed.add(partNumber);
+       msg("submission-message",t("جارٍ رفع الجزء ","Uploading part ")+partNumber+"/"+totalParts);
+     }
+     await request("/v1/submissions/"+encodeURIComponent(result.id)+"/multipart/complete",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({upload_id:init.upload_id})});
      msg("submission-message",t("تم استلام الطلب والملف، وهما بانتظار المراجعة.","Submission and file received; awaiting review."));
      form.reset(); form.elements.submission_id.value=""; const mine=await request("/v1/me/submissions"); renderMine(mine.submissions||[]);
    } catch(e) { msg("submission-message",e.message); }
