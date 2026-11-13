@@ -110,6 +110,16 @@ async function handle(request, env, ctx) {
       .bind(crypto.randomUUID(),row.id,identity.email,"status_"+body.status,String(body.note||"").slice(0,500)).run();
     return json({ serial: certStatusMatch[1], status: body.status });
   }
+
+  const certRequestMatch = url.pathname.match(/^\/v1\/admin\/certificates\/requests\/([a-f0-9-]+)$/i);
+  if (certRequestMatch && request.method === "PATCH") {
+    if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
+    const body = await request.json().catch(() => null);
+    if (!body || !["rejected","more_info"].includes(body.status) || !String(body.note || "").trim()) return json({ error: "Choose a valid review action and provide a note." }, 400);
+    const result = await env.DB.prepare("UPDATE certificate_requests SET status=?,reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND status IN ('pending','more_info')").bind(body.status,identity.email,String(body.note).slice(0,1000),certRequestMatch[1]).run();
+    if (!result.meta?.changes) return json({ error: "Request not found or already processed." }, 404);
+    return json({ id: certRequestMatch[1], status: body.status });
+  }
   const issueCertMatch = url.pathname.match(/^\/v1\/admin\/certificates\/requests\/([a-f0-9-]+)\/issue$/i);
   if (issueCertMatch && request.method === "POST") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
