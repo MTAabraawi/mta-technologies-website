@@ -1,0 +1,28 @@
+name: Marketplace code validation
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [mta-website-upgrade]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Pages Functions dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Validate JavaScript syntax
+        run: |
+          node --check marketplace-api/src/index.js
+          node --check functions/api/_middleware.js
+          node --check 'functions/api/[[path]].js'
+          node --check js/apps.js
+          node --check js/developer-portal.js
+          node --check js/admin-marketplace.js
