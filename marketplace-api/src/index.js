@@ -88,7 +88,7 @@ async function handle(request, env, ctx) {
     return json({ id, status: "pending" }, 201);
   }
   if (url.pathname === "/v1/me/certificates" && request.method === "GET") {
-    const { results } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status FROM issued_certificates WHERE request_id IN (SELECT id FROM certificate_requests WHERE applicant_email=?) ORDER BY created_at DESC").bind(identity.email).all();
+    const { results } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,signature FROM issued_certificates WHERE request_id IN (SELECT id FROM certificate_requests WHERE applicant_email=?) ORDER BY created_at DESC").bind(identity.email).all();
     return json({ certificates: results });
   }
   if (url.pathname === "/v1/admin/certificates/requests" && request.method === "GET") {
