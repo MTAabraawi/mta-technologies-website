@@ -142,7 +142,7 @@ async function handle(request, env, ctx) {
     const key = await crypto.subtle.importKey("raw",new TextEncoder().encode(env.CERT_SIGNING_SECRET),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
     const raw = new Uint8Array(await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(payload)));
     let binary = ""; for (const b of raw) binary += String.fromCharCode(b);
-    const signature = btoa(binary).replace(/\\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    const signature = btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
     const id = crypto.randomUUID();
     await env.DB.prepare("INSERT INTO issued_certificates (id,request_id,serial_number,subject_name,credential_type,issued_at,expires_at,signature,signer_key_version,issuer_email) VALUES (?,?,?,?,?,?,?,?,?,?)")
       .bind(id,req.id,serial,subject,credential,issuedAt,expiresAt,signature,String(env.CERT_SIGNING_KEY_VERSION || "v1"),identity.email).run();
