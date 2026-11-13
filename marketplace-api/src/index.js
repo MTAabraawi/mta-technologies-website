@@ -160,6 +160,16 @@ async function handle(request, env, ctx) {
     return json({ id, status: "pending", message: "Submission saved. Upload the release file to continue." }, 201);
   }
 
+
+  const reviseMatch = url.pathname.match(/^\/v1\/submissions\/([a-f0-9-]+)\/revise$/i);
+  if (reviseMatch && request.method === "PATCH") {
+    const body = await request.json().catch(() => null);
+    if (!body || !body.app_name || !body.developer_name || !body.platform || !body.category || !body.version || !body.license_name || !body.description || body.authorization_confirmed !== true) return json({ error: "Complete all required fields and confirm distribution rights." }, 400);
+    const result = await env.DB.prepare("UPDATE submissions SET app_name=?,developer_name=?,platform=?,category=?,version=?,license_name=?,source_url=?,description=?,status='pending',updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND owner_email=? AND status='pending'")
+      .bind(String(body.app_name).slice(0,120),String(body.developer_name).slice(0,120),String(body.platform).slice(0,40),String(body.category).slice(0,60),String(body.version).slice(0,40),String(body.license_name).slice(0,100),String(body.source_url||"").slice(0,500),String(body.description).slice(0,4000),reviseMatch[1],identity.email).run();
+    if (!result.meta?.changes) return json({ error: "Submission cannot be revised or was not found." }, 404);
+    return json({ id: reviseMatch[1], status: "pending" });
+  }
   const multipartStartMatch = url.pathname.match(/^\/v1\/submissions\/([a-f0-9-]+)\/multipart$/i);
   if (multipartStartMatch && request.method === "POST") {
     const id = multipartStartMatch[1];
@@ -289,7 +299,7 @@ async function handle(request, env, ctx) {
   }
 
   if (url.pathname === "/v1/me/submissions" && request.method === "GET") {
-    const { results } = await env.DB.prepare("SELECT id,app_name,platform,version,status,created_at,updated_at,review_note FROM submissions WHERE owner_email=? ORDER BY created_at DESC").bind(identity.email).all();
+    const { results } = await env.DB.prepare("SELECT id,app_name,developer_name,platform,category,version,license_name,source_url,description,status,created_at,updated_at,review_note FROM submissions WHERE owner_email=? ORDER BY created_at DESC").bind(identity.email).all();
     return json({ submissions: results });
   }
 
