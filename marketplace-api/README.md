@@ -1,45 +1,33 @@
-# MTA Marketplace API (deployment scaffold)
+# MTA Marketplace API
 
-This Worker is the backend foundation for developer accounts, submissions, file storage, moderation, and approved direct downloads. It is **not live** until the Cloudflare resources and Access application below are created and the Worker is deployed.
+The canonical production runtime is **Cloudflare Pages Functions** on the existing website origin:
+- `functions/api/_middleware.js` validates Cloudflare Access only for protected API paths.
+- `functions/api/[[path]].js` adapts `/api/*` requests to this API module.
+- `marketplace-api/src/index.js` contains the API handlers.
+- `marketplace-api/schema.sql` defines D1 tables.
+- `marketplace-api/DEPLOYMENT.md` contains the full dashboard setup and verification checklist.
 
-## Architecture
-- Cloudflare Pages: public bilingual website.
-- Cloudflare Worker: API and download gateway.
-- D1: app metadata, ownership, submission/review status.
-- Private R2 bucket: uploaded files. New uploads remain under `quarantine/`.
-- Cloudflare Access: authenticates registered developer/admin identities. Configure Google/GitHub identity providers for external developers. Protect only authenticated API paths (`/v1/submissions*`, `/v1/me/*`, and `/v1/admin/*`) so public catalogue and download routes remain public. Set the Worker Access audience and team issuer values exactly as shown by Cloudflare.
-- Admin review: only addresses in the `ADMIN_EMAILS` secret can view the queue or approve/reject submissions.
+## Storage and security
+- D1 stores developer submissions and review state.
+- A private R2 bucket stores files. New files remain in `quarantine/`.
+- Cloudflare Access authenticates developer and administrator requests. The Pages Access plugin verifies the Access JWT and the API consumes the verified identity payload.
+- Only the configured `ADMIN_EMAILS` addresses can access moderation endpoints.
+- Public downloads are possible only for rows marked `approved`.
+- The admin review API requires explicit `rights_verified: true` and `malware_scan_passed: true` before approval.
 
-## Provisioning
-1. Create a D1 database named `mta-marketplace`; apply `schema.sql`.
-2. Create a **private** R2 bucket named `mta-marketplace-files`.
-3. Create a Worker from this directory and set the D1/R2 bindings in `wrangler.toml`.
-4. Replace the Access placeholders. Configure an Access application for the API hostname and allow external developer identities. Do not expose the Worker API before JWT validation and identity-provider policies are configured.
-5. Add the secret `ADMIN_EMAILS` containing the official administrator email address(es), comma-separated.
-6. Deploy the Worker and configure CORS with the exact public site origin.
-7. Connect the front-end submission form to this API only after the Worker health check, Access login, D1, and R2 upload have been tested.
+## Endpoints
+- `GET /api/health`
+- `GET /api/v1/apps`
+- `GET /api/v1/download/:id`
+- `POST /api/v1/submissions`
+- `PUT /api/v1/submissions/:id/file` (100 MiB maximum)
+- `GET /api/v1/me/submissions`
+- `GET /api/v1/admin/submissions`
+- `GET /api/v1/admin/submissions/:id/file` (admin-only private quarantine download for scanning)
+- `PATCH /api/v1/admin/submissions/:id`
 
-## API outline
-- `GET /health`: health check.
-- `GET /v1/apps`: approved public catalogue.
-- `POST /v1/submissions`: authenticated developer creates a metadata submission.
-- `PUT /v1/submissions/:id/file`: owner uploads a release binary (100 MiB default).
-- `GET /v1/me/submissions`: developer sees their own submission status.
-- `GET /v1/admin/submissions`: admin-only moderation queue.
-- `PATCH /v1/admin/submissions/:id`: admin approves, rejects, or removes a submission. Approval requires both `rights_verified: true` and `malware_scan_passed: true` in the request body.
-- `GET /v1/download/:id`: public direct download, but only for approved entries.
+## Required external setup
+No Cloudflare resources are created by a Git commit. Follow [DEPLOYMENT.md](./DEPLOYMENT.md) to create D1 and private R2, bind them to Pages Functions, configure Access, and set the admin allow-list.
 
-See [SOURCES.md](./SOURCES.md) for the initial source catalogue and redistribution rules.
-
-## Mandatory safety and legal review
-- Uploads are private and not downloadable while awaiting review.
-- The reviewer must verify the submitter's authority, the redistribution license/permission, official source, version, platform, and file identity.
-- Run malware scanning and inspect package signatures/hashes before approval. The reviewer must explicitly send both `rights_verified: true` and `malware_scan_passed: true`. This starter does not include a malware-scanning engine; approval must not be automated.
-- Reject pirated, cracked, repackaged without permission, malicious, deceptive, or rights-infringing software.
-- Keep a takedown/report channel and promptly disable disputed files pending investigation.
-- Never claim that an app is “verified safe” merely because it passed a basic file-type check.
-
-## Important implementation notes
-- The initial upload endpoint accepts a single request body and is capped at 100 MiB by default. Large desktop installers need a multipart/resumable upload implementation before the limit is raised.
-- The Access JWT must contain an email claim and the configured audience. Use Cloudflare's official Access application configuration and never put API secrets in browser code.
-- This scaffold does not create Cloudflare resources, configure DNS, or deploy itself.
+## Important
+There is no malware-scanning engine included in this repository. A reviewer must scan the binary with an appropriate security tool and verify redistribution rights before approval. The current upload endpoint supports one request up to 100 MiB; resumable multipart uploads are needed for larger installers.
