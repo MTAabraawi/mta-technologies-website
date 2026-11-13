@@ -42,7 +42,7 @@ Create a Self-hosted Access application for the existing website hostname. Prote
 - `www.mtahqq.dpdns.org/api/v1/me/*`
 - `www.mtahqq.dpdns.org/api/v1/admin/*`
 
-Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The admin route must additionally be restricted to the administrator identity policy; the Worker independently checks `ADMIN_EMAILS`.
+Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The same Access application authenticates developer and administrator requests. The API independently checks `ADMIN_EMAILS` on every admin endpoint, so a normal signed-in developer cannot moderate or inspect other users' submissions.
 
 The Access Pages plugin validates the JWT assertion and exposes its verified payload to the Pages Function. The API uses only that verified payload. Do not replace it with an unverified email header.
 
@@ -69,7 +69,8 @@ Run these checks after deployment:
 6. A non-admin cannot access `/api/v1/admin/submissions`.
 7. The administrator can review the request. Approval is rejected unless both rights verification and malware-scan checkboxes are selected.
 8. Only after approval does `GET /api/v1/download/:id` return the file.
-9. Test a rejected listing, a missing file, a too-large file, and a removed listing.
+9. Test a rejected listing, a missing file, a too-large file, and a removed listing. Confirm the admin queue can remove a previously approved listing and that its R2 object is deleted.
+10. Add Cloudflare rate-limiting/WAF rules for repeated submission and upload attempts where your plan supports them. Monitor Worker/Pages logs and storage usage.
 
 ## 9. Operational/legal safeguards still required
 - This repository does not include a malware scanning engine. Do not approve real applications until a scanning provider or isolated manual scanning workflow is connected and the reviewer has inspected its result.
