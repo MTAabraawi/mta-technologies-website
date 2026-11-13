@@ -794,3 +794,19 @@ html[lang="en"] .lightbox-close {
 .onepublish-security{display:flex;justify-content:space-between;align-items:center;gap:2rem;padding:2rem;border:1px solid var(--border-color);border-radius:14px;background:var(--bg-surface)}
 .onepublish-security p{max-width:760px}
 @media(max-width:800px){.onepublish-hero-inner{grid-template-columns:1fr;gap:1rem}.onepublish-flow{min-height:260px;order:-1}.onepublish-hub{width:125px;height:125px;font-size:1.4rem}.onepublish-ring{width:230px;height:230px}.onepublish-node{width:43px;height:43px}.onepublish-steps,.onepublish-connectors{grid-template-columns:1fr}.onepublish-security{align-items:flex-start;flex-direction:column}}
+
+
+/* MTA official distribution directory and credential console */
+.store-directory-section{padding-top:4rem;padding-bottom:4rem}
+.store-directory-section h2{font-size:clamp(1.6rem,3vw,2.5rem);margin:.6rem 0}
+.store-directory-section p{color:var(--text-secondary);line-height:2}
+.store-directory-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin:1.5rem 0}
+.store-directory-grid a{display:flex;flex-direction:column;gap:.4rem;padding:1.1rem 1.2rem;border:1px solid var(--border-color);border-radius:12px;background:var(--bg-surface);color:var(--text-primary);font-weight:750;text-decoration:none;transition:border-color .2s,transform .2s}
+.store-directory-grid a:hover{border-color:#38bdf8;transform:translateY(-2px)}
+.store-directory-grid a span{font-size:.7rem;color:var(--text-secondary);font-weight:500}
+#verification-status{margin:1.2rem 0;padding:1rem;border:1px solid var(--border-color);border-radius:10px;font-weight:800;line-height:1.8}
+#verification-details{display:grid;grid-template-columns:minmax(110px,.5fr) 1fr;gap:.6rem;margin:1rem 0}
+#verification-details dt{color:var(--text-secondary);font-size:.8rem}
+#verification-details dd{margin:0;overflow-wrap:anywhere;font-weight:650}
+@media(max-width:760px){.store-directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.store-directory-grid{grid-template-columns:1fr}}
