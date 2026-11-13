@@ -25,7 +25,19 @@
      const title=document.createElement("h3"); title.textContent=item.app_name; card.append(title);
      const meta=document.createElement("div"); meta.className="submission-meta"; meta.textContent=[item.platform,item.version,new Date(item.created_at).toLocaleDateString()].join(" · "); card.append(meta);
      const status=document.createElement("span"); status.className="status-pill status-"+item.status; status.textContent=({pending:t("بانتظار الملف","Awaiting file"),pending_review:t("قيد المراجعة","Under review"),approved:t("معتمد","Approved"),rejected:t("مرفوض","Rejected"),removed:t("محذوف","Removed")})[item.status] || item.status; card.append(status);
-     if(item.review_note){const note=document.createElement("p");note.className="muted";note.textContent=item.review_note;card.append(note);}
+     if(item.review_note){const note=document.createElement("p");note.className="muted";note.textContent=t("ملاحظة المراجع: ","Reviewer note: ")+item.review_note;card.append(note);}
+     if(item.status==="pending" && item.review_note){
+       const revise=document.createElement("button");revise.className="btn btn-outline";revise.type="button";revise.textContent=t("تعديل الطلب وإعادة الرفع","Edit submission and re-upload");
+       revise.addEventListener("click",()=>{
+         const form=el("submission-form");
+         for(const key of ["app_name","developer_name","platform","category","version","license_name","source_url","description"]){if(form.elements[key])form.elements[key].value=item[key]||"";}
+         form.elements.authorization_confirmed.checked=true;
+         form.elements.submission_id.value=item.id;
+         msg("submission-message",t("عدّل البيانات واختر ملف الإصدار الجديد ثم أرسل الطلب.","Edit the details, choose the replacement release file, and submit."));
+         form.scrollIntoView({behavior:"smooth",block:"start"});
+       });
+       card.append(revise);
+     }
      root.append(card);
    }
  }
@@ -38,8 +50,10 @@
      if(!file) throw new Error(t("اختر ملف الإصدار أولاً.","Select a release file first."));
      if(file.size>2*1024*1024*1024) throw new Error(t("الحد الأقصى الحالي 2 جيجابايت.","Current maximum is 2 GiB."));
      let result;
-     if(body.submission_id){ result={id:body.submission_id}; }
-     else {
+     if(body.submission_id){
+       result=await request("/v1/submissions/"+encodeURIComponent(body.submission_id)+"/revise",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+       result={id:body.submission_id};
+     } else {
        result=await request("/v1/submissions",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
        form.elements.submission_id.value=result.id;
      }
