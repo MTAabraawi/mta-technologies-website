@@ -10,7 +10,7 @@ The canonical production runtime is **Cloudflare Pages Functions** on the existi
 ## Storage and security
 - D1 stores developer submissions and review state.
 - A private R2 bucket stores files. New files remain in `quarantine/`.
-- Cloudflare Access authenticates developer and administrator requests. The Pages Access plugin verifies the Access JWT and the API consumes the verified identity payload.
+- Cloudflare Access authenticates developer and administrator requests. The Pages middleware verifies the Access JWT signature, issuer, audience, and expiry with Cloudflare's JWKS, then passes the verified identity payload to the API.
 - Only the configured `ADMIN_EMAILS` addresses can access moderation endpoints.
 - Public downloads are possible only for rows marked `approved`.
 - The admin review API requires explicit `rights_verified: true` and `malware_scan_passed: true` before approval.
