@@ -118,6 +118,21 @@ async function handle(request, env, ctx) {
     const { results } = await env.DB.prepare("SELECT * FROM submissions WHERE status IN ('pending','pending_review') ORDER BY created_at").all();
     return json({ submissions: results });
   }
+  const adminFileMatch = url.pathname.match(/^\\/v1\\/admin\\/submissions\\/([a-f0-9-]+)\\/file$/i);
+  if (adminFileMatch && request.method === "GET") {
+    if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
+    const row = await env.DB.prepare("SELECT file_name, object_key FROM submissions WHERE id=?").bind(adminFileMatch[1]).first();
+    if (!row?.object_key) return json({ error: "File not found" }, 404);
+    const object = await env.FILES.get(row.object_key);
+    if (!object) return json({ error: "File not found" }, 404);
+    return new Response(object.body, { headers: {
+      "content-type": "application/octet-stream",
+      "content-length": String(object.size),
+      "content-disposition": 'attachment; filename="' + safeName(row.file_name) + '"',
+      "x-content-type-options": "nosniff",
+      "cache-control": "no-store"
+    }});
+  }
   const reviewMatch = url.pathname.match(/^\/v1\/admin\/submissions\/([a-f0-9-]+)$/i);
   if (reviewMatch && request.method === "PATCH") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
