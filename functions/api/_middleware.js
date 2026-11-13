@@ -92,12 +92,13 @@ async function verifyAccessJwt(token, domain, expectedAudience) {
     ["verify"]
   );
 
-  return crypto.subtle.verify(
+  const valid = await crypto.subtle.verify(
     "RSASSA-PKCS1-v1_5",
     publicKey,
     decodeBase64Url(parts[2]),
     new TextEncoder().encode(`${parts[0]}.${parts[1]}`)
   );
+  return valid ? payload : null;
 }
 
 export async function onRequest(context) {
@@ -118,8 +119,10 @@ export async function onRequest(context) {
   if (!token) return jsonError("Cloudflare Access authentication is required.", 401);
 
   try {
-    const valid = await verifyAccessJwt(token, domain, audience);
-    if (!valid) return jsonError("Cloudflare Access token is invalid or expired.", 401);
+    const payload = await verifyAccessJwt(token, domain, audience);
+    if (!payload) return jsonError("Cloudflare Access token is invalid or expired.", 401);
+    context.data = context.data || {};
+    context.data.cloudflareAccess = { JWT: { payload } };
   } catch {
     return jsonError("Unable to verify Cloudflare Access authentication.", 503);
   }
