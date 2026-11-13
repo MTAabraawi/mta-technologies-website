@@ -32,6 +32,7 @@ async function accessIdentity(request, env) {
     const issuer = env.ACCESS_TEAM_DOMAIN.replace(/\/$/, "");
     if (claims.iss !== issuer || !Array.isArray(claims.aud) || !claims.aud.includes(env.ACCESS_AUD)) return null;
     if (typeof claims.exp !== "number" || claims.exp <= Date.now()/1000) return null;
+    if (typeof claims.nbf === "number" && claims.nbf > Date.now()/1000 + 60) return null;
     if (typeof claims.iat === "number" && claims.iat > Date.now()/1000 + 60) return null;
     const certs = await fetch(issuer + "/cdn-cgi/access/certs");
     if (!certs.ok) return null;
@@ -103,9 +104,27 @@ async function handle(request, env) {
     const allowed = ["apk","aab","exe","msi","dmg","pkg","deb","rpm","appimage","zip","tar","gz","wasm"];
     if (!allowed.includes(ext)) return json({ error: "Unsupported file type." }, 415);
     const key = "quarantine/" + id + "/" + crypto.randomUUID() + "-" + filename;
-    await env.FILES.put(key, request.body, { httpMetadata: { contentType: "application/octet-stream" }, customMetadata: { submissionId: id, uploader: identity.email } });
+    let actualSize = 0;
+    const limitedBody = request.body.pipeThrough(new TransformStream({
+      transform(chunk, controller) {
+        actualSize += chunk.byteLength;
+        if (actualSize > max) throw new Error("UPLOAD_TOO_LARGE");
+        controller.enqueue(chunk);
+      }
+    }));
+    try {
+      await env.FILES.put(key, limitedBody, { httpMetadata: { contentType: "application/octet-stream" }, customMetadata: { submissionId: id, uploader: identity.email } });
+    } catch (error) {
+      await env.FILES.delete(key);
+      if (actualSize > max) return json({ error: "File exceeds the upload limit." }, 413);
+      throw error;
+    }
+    if (actualSize === 0 || actualSize !== size) {
+      await env.FILES.delete(key);
+      return json({ error: "Uploaded size does not match the declared file size." }, 400);
+    }
     await env.DB.prepare("UPDATE submissions SET file_name=?,file_size=?,object_key=?,status='pending_review',updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
-      .bind(filename, size, key, id).run();
+      .bind(filename, actualSize, key, id).run();
     return json({ id, status: "pending_review", message: "File received and held for security and rights review." });
   }
 
