@@ -165,7 +165,7 @@ async function handle(request, env, ctx) {
   if (reviseMatch && request.method === "PATCH") {
     const body = await request.json().catch(() => null);
     if (!body || !body.app_name || !body.developer_name || !body.platform || !body.category || !body.version || !body.license_name || !body.description || body.authorization_confirmed !== true) return json({ error: "Complete all required fields and confirm distribution rights." }, 400);
-    const result = await env.DB.prepare("UPDATE submissions SET app_name=?,developer_name=?,platform=?,category=?,version=?,license_name=?,source_url=?,description=?,status='pending',updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND owner_email=? AND status='pending'")
+    const result = await env.DB.prepare("UPDATE submissions SET app_name=?,developer_name=?,platform=?,category=?,version=?,license_name=?,source_url=?,description=?,review_note=NULL,revision_requested_at=NULL,status='pending',updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND owner_email=? AND status='pending'")
       .bind(String(body.app_name).slice(0,120),String(body.developer_name).slice(0,120),String(body.platform).slice(0,40),String(body.category).slice(0,60),String(body.version).slice(0,40),String(body.license_name).slice(0,100),String(body.source_url||"").slice(0,500),String(body.description).slice(0,4000),reviseMatch[1],identity.email).run();
     if (!result.meta?.changes) return json({ error: "Submission cannot be revised or was not found." }, 404);
     return json({ id: reviseMatch[1], status: "pending" });
