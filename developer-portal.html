@@ -3,8 +3,19 @@
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>بوابة المطورين | MTA TECHNOLOGIES</title><meta name="description" content="بوابة المطورين لإرسال التطبيقات ورفع الإصدارات ومتابعة مراجعتها في متجر MTA TECHNOLOGIES.">
 <link rel="canonical" href="https://www.mtahqq.dpdns.org/developer-portal.html"><link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/apps.css"><link rel="stylesheet" href="css/marketplace.css"><script src="marketplace-config.js"></script>
-</head><body>
-<header><div class="container nav-bar"><a href="index.html" class="brand-link"><img src="images/mta-logo-horizontal.png" alt="MTA TECHNOLOGIES" class="brand-logo-img"></a><nav><ul class="nav-links"><li><a href="apps.html">متجر التطبيقات / Apps</a></li><li><a class="active" href="developer-portal.html">بوابة المطورين / Developers</a></li><li><a href="contact.html">Contact</a></li></ul></nav><div class="nav-actions"><button class="control-btn" onclick="toggleTheme()">🌓</button><button class="control-btn" onclick="toggleLanguage()">EN / عربي</button></div></div></header>
+</head><body class="mta-corporate-page">
+<header class="corp-header"><div class="container corp-header-inner">
+<a href="index.html" class="corp-logo"><img src="images/mta-logo-horizontal.png" alt="MTA TECHNOLOGIES"></a>
+<nav class="corp-page-nav" aria-label="Primary navigation">
+<a href="about.html"><span class="ar-only">من نحن</span><span class="en-only">About</span></a>
+<a href="projects.html"><span class="ar-only">المشاريع</span><span class="en-only">Projects</span></a>
+<a href="innovation.html"><span class="ar-only">الابتكار</span><span class="en-only">Innovation</span></a>
+<a href="apps.html"><span class="ar-only">المتجر</span><span class="en-only">Marketplace</span></a>
+<a href="developer-portal.html"><span class="ar-only">للمطورين</span><span class="en-only">Developers</span></a>
+<a href="contact.html"><span class="ar-only">تواصل</span><span class="en-only">Contact</span></a>
+</nav>
+<div class="corp-header-actions"><a href="apps.html" class="corp-store-link"><span class="ar-only">استكشف التطبيقات</span><span class="en-only">Explore Apps</span></a><button class="control-btn" onclick="toggleLanguage()" aria-label="Switch language">EN / عربي</button><button class="control-btn" onclick="toggleTheme()" aria-label="Toggle theme">◐</button></div>
+</div></header>
 <main class="container marketplace-shell">
 <div class="marketplace-heading"><span class="apps-eyebrow">MTA MARKETPLACE · DEVELOPER CENTER</span><h1><span class="ar-only">بوابة المطورين</span><span class="en-only">Developer portal</span></h1><p><span class="ar-only">قدّم تطبيقك، ارفع ملف الإصدار، وتابع حالة المراجعة من مكان واحد.</span><span class="en-only">Submit your app, upload a release, and track its review status in one place.</span></p></div>
 <div id="portal-setup" class="notice notice-warning" hidden><strong><span class="ar-only">البوابة لم تُفعّل بعد</span><span class="en-only">Portal setup is incomplete</span></strong><p><span class="ar-only">لم يتم نشر واجهة API وربط تسجيل الدخول والتخزين بعد. يمكنك معاينة الواجهة، لكن إرسال الطلبات والرفع لن يعمل حتى إكمال إعداد Cloudflare.</span><span class="en-only">The API, authentication, and storage have not been deployed and connected yet. You can preview this interface, but submissions and uploads will not work until Cloudflare setup is complete.</span></p></div>
@@ -25,5 +36,11 @@
 <section class="card portal-card"><h2><span class="ar-only">طلباتي وحالة المراجعة</span><span class="en-only">My submissions</span></h2><button class="btn btn-outline" id="refresh-submissions" type="button"><span class="ar-only">تحديث القائمة</span><span class="en-only">Refresh list</span></button><div id="my-submissions" class="submission-list"><p class="muted"><span class="ar-only">سجّل الدخول لعرض طلباتك.</span><span class="en-only">Sign in to view your submissions.</span></p></div></section>
 </div>
 <p class="policy-hint"><a href="marketplace-policy.html"><span class="ar-only">راجع سياسة التراخيص وحقوق التوزيع قبل الرفع.</span><span class="en-only">Review licensing and redistribution requirements before uploading.</span></a></p>
-</main><footer><div class="container"><div class="footer-bottom"><span>© 2026 MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
+</main><footer class="corp-footer"><div class="container">
+<div class="corp-footer-main">
+<div class="corp-footer-brand"><img src="images/mta-logo-horizontal.png" alt="MTA TECHNOLOGIES"><p><span class="ar-only">نبني حلولاً تقنية ومنتجات رقمية عملية، ونطوّر منظومة تربط التطبيقات بالمطورين والمستخدمين.</span><span class="en-only">We build practical technology solutions and digital products, connecting applications, developers, and users.</span></p><a href="mailto:mtatechnologies0@gmail.com">mtatechnologies0@gmail.com</a></div>
+<div><h3><span class="ar-only">الشركة</span><span class="en-only">Company</span></h3><a href="about.html">About / من نحن</a><a href="projects.html">Projects / المشاريع</a><a href="innovation.html">Innovation / الابتكار</a><a href="contact.html">Contact / التواصل</a></div>
+<div><h3><span class="ar-only">المنظومة</span><span class="en-only">Ecosystem</span></h3><a href="apps.html">Marketplace / المتجر</a><a href="developer-portal.html">Developer Portal / المطورون</a><a href="marketplace-policy.html">Marketplace Policy</a></div>
+<div><h3><span class="ar-only">السياسات</span><span class="en-only">Legal</span></h3><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a><a href="cookies.html">Cookies</a></div>
+</div><div class="corp-footer-bottom"><span>© 2026 MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
 <script src="js/main.js"></script><script src="js/developer-portal.js"></script></body></html>
