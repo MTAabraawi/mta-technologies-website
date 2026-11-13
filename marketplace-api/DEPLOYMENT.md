@@ -132,3 +132,27 @@ Still blocked / not configured:
 - `CERT_SIGNING_SECRET` is not configured; certificate issuance must remain disabled until a high-entropy secret is added to the Preview secret store.
 - No Preview deployment has yet consumed these new settings. Run the full API integration tests only after a Preview deployment with DB and FILES bindings is available.
 - Production bindings, variables, and deployment have not been changed.
+
+
+## 14. Free-only launch decision (2026-11-13)
+
+The project owner has approved a **free-only operating model**. Do not add a payment method, accept a paid subscription, or enable metered billing for R2 or Cloudflare One without separate explicit approval.
+
+- D1 `mta-marketplace` and its eight-table schema are configured in Preview. The Preview `DB` binding and the three documented Preview variables are saved.
+- R2 activation was inspected and stopped at the account checkout because Cloudflare requires a payment method and billing authorization before activating the R2 subscription. No payment method was added, no subscription was accepted, and no bucket was created.
+- The Zero Trust dashboard was inspected. A team exists, but no Access application or application policies are configured for `www.mtahqq.dpdns.org`. The dashboard showed no selected Cloudflare One plan. Do not select a paid plan. The team domain/AUD values must not be guessed or replaced with placeholders.
+- The Preview hostname is currently intercepted by a Cloudflare Access login page, so anonymous Preview health/catalogue checks cannot reach the Pages Functions.
+- Until a no-cost authentication path is configured and verified, developer/admin API workflows must be treated as unavailable. Do not invite developers or claim that submissions, uploads, or moderation are live.
+- Binary upload, quarantine, direct download, and file-based approval depend on the `FILES` R2 binding. These features remain unavailable. Do not deploy an interface that claims direct uploads are active.
+- The public catalogue should use official publisher/store URLs and only list third-party binaries when redistribution rights are documented. Do not mirror APK/EXE/IPA files to the website in the free-only phase.
+- `CERT_SIGNING_SECRET` remains unset. Certificate issuance and signature verification remain disabled until the secret is safely configured in the Preview secret store and tested.
+- Production Pages bindings, environment variables, Access policies, and deployments have not been changed.
+
+### Remaining launch gates
+
+1. Resolve Preview Access sign-in using a user-authenticated browser session, then verify `/api/health` and `/api/v1/apps` return JSON.
+2. Configure an Access application and developer/admin policies only if Cloudflare offers a genuinely no-cost activation path that does not require payment authorization; otherwise keep the portal disabled.
+3. Either retain link-only submissions and adjust the portal/API accordingly, or defer developer submissions until private file storage is available. Do not leave a false impression that uploads work.
+4. Keep binary upload/download routes unavailable until a private storage binding exists and malware/rights review procedures are operational.
+5. Configure certificate signing only after an owner-managed secret is added; never put the secret in GitHub source or chat.
+6. Run authenticated end-to-end tests before inviting external developers. Production remains untouched until separately approved.
