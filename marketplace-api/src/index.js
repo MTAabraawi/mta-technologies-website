@@ -124,6 +124,9 @@ async function handle(request, env) {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const body = await request.json().catch(() => null);
     if (!body || !["approved","rejected","removed"].includes(body.status)) return json({ error: "Invalid review status." }, 400);
+    if (body.status === "approved" && (body.rights_verified !== true || body.malware_scan_passed !== true)) {
+      return json({ error: "Approval requires explicit rights verification and a completed malware scan." }, 400);
+    }
     const row = await env.DB.prepare("SELECT id,object_key FROM submissions WHERE id=?").bind(reviewMatch[1]).first();
     if (!row) return json({ error: "Submission not found." }, 404);
     if (body.status === "approved" && !row.object_key) return json({ error: "A release file is required before approval." }, 400);
