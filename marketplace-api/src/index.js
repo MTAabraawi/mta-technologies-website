@@ -97,7 +97,7 @@ async function handle(request, env, ctx) {
     const { results: issued } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,issuer_email FROM issued_certificates ORDER BY created_at DESC LIMIT 500").all();
     return json({ requests: results, issued });
   }
-  const issueCertMatch = url.pathname.match(/^\\/v1\\/admin\\/certificates\\/requests\\/([a-f0-9-]+)\\/issue$/i);
+  const issueCertMatch = url.pathname.match(/^\/v1\/admin\/certificates\/requests\/([a-f0-9-]+)\/issue$/i);
   if (issueCertMatch && request.method === "POST") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     if (!env.CERT_SIGNING_SECRET || String(env.CERT_SIGNING_SECRET).length < 32) return json({ error: "Certificate signing secret is not configured securely." }, 503);
@@ -116,7 +116,7 @@ async function handle(request, env, ctx) {
     const key = await crypto.subtle.importKey("raw",new TextEncoder().encode(env.CERT_SIGNING_SECRET),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
     const raw = new Uint8Array(await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(payload)));
     let binary = ""; for (const b of raw) binary += String.fromCharCode(b);
-    const signature = btoa(binary).replace(/\\+/g,"-").replace(/\\//g,"_").replace(/=+$/,"");
+    const signature = btoa(binary).replace(/\\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
     const id = crypto.randomUUID();
     await env.DB.prepare("INSERT INTO issued_certificates (id,request_id,serial_number,subject_name,credential_type,issued_at,expires_at,signature,signer_key_version,issuer_email) VALUES (?,?,?,?,?,?,?,?,?,?)")
       .bind(id,req.id,serial,subject,credential,issuedAt,expiresAt,signature,String(env.CERT_SIGNING_KEY_VERSION || "v1"),identity.email).run();
