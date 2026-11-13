@@ -118,7 +118,7 @@ async function handle(request, env, ctx) {
     let parts = [];
     try { parts = JSON.parse(row.multipart_parts || "[]"); } catch {}
     parts = parts.filter(part => part.partNumber !== partNumber);
-    parts.push({ partNumber, etag: uploadedPart.etag });
+    parts.push({ partNumber, etag: uploadedPart.etag, size: bytes.byteLength });
     parts.sort((a, b) => a.partNumber - b.partNumber);
     await env.DB.prepare("UPDATE submissions SET multipart_parts=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
       .bind(JSON.stringify(parts), id).run();
@@ -135,8 +135,12 @@ async function handle(request, env, ctx) {
     let parts = [];
     try { parts = JSON.parse(row.multipart_parts || "[]"); } catch {}
     parts.sort((a, b) => a.partNumber - b.partNumber);
-    if (!parts.length || parts.some((part, index) => part.partNumber !== index + 1 || typeof part.etag !== "string")) {
+    if (!parts.length || parts.some((part, index) => part.partNumber !== index + 1 || typeof part.etag !== "string" || !Number.isInteger(part.size) || part.size < 1 || part.size > 8388608)) {
       return json({ error: "Upload is incomplete. Retry missing parts before completing." }, 409);
+    }
+    const uploadedBytes = parts.reduce((sum, part) => sum + part.size, 0);
+    if (uploadedBytes !== row.file_size || parts.slice(0, -1).some(part => part.size < 5242880)) {
+      return json({ error: "Uploaded part sizes do not match the declared file size or multipart minimums." }, 409);
     }
     try {
       await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).complete(parts);
