@@ -20,7 +20,10 @@ The canonical production runtime is **Cloudflare Pages Functions** on the existi
 - `GET /api/v1/apps`
 - `GET /api/v1/download/:id`
 - `POST /api/v1/submissions`
-- `PUT /api/v1/submissions/:id/file` (100 MiB maximum)
+- `POST /api/v1/submissions/:id/multipart` (start/resume)
+- `PUT /api/v1/submissions/:id/multipart/:partNumber` (8 MiB chunks)
+- `POST /api/v1/submissions/:id/multipart/complete` (complete upload)
+- `PUT /api/v1/submissions/:id/file` (legacy single request, 100 MiB maximum)
 - `GET /api/v1/me/submissions`
 - `GET /api/v1/admin/submissions`
 - `GET /api/v1/admin/submissions/:id/file` (admin-only private quarantine download for scanning)
@@ -30,4 +33,4 @@ The canonical production runtime is **Cloudflare Pages Functions** on the existi
 No Cloudflare resources are created by a Git commit. Follow [DEPLOYMENT.md](./DEPLOYMENT.md) to create D1 and private R2, bind them to Pages Functions, configure Access, and set the admin allow-list.
 
 ## Important
-There is no malware-scanning engine included in this repository. A reviewer must scan the binary with an appropriate security tool and verify redistribution rights before approval. The current upload endpoint supports one request up to 100 MiB; resumable multipart uploads are needed for larger installers.
+There is no malware-scanning engine included in this repository. A reviewer must scan the binary with an appropriate security tool and verify redistribution rights before approval. The developer portal uses resumable 8 MiB multipart uploads up to the configured 2 GiB release cap. The legacy single-request endpoint is capped at 100 MiB.
