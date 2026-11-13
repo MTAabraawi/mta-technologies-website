@@ -26,3 +26,8 @@ jobs:
           node --check js/apps.js
           node --check js/developer-portal.js
           node --check js/admin-marketplace.js
+          node --check js/admin-certificates.js
+          node --check js/developer-certification.js
+          node --check js/verify-certificate.js
+          node --check js/credential-card.js
+          node -e "JSON.parse(require('fs').readFileSync('data/store-directory.json','utf8')); JSON.parse(require('fs').readFileSync('data/curated-apps.json','utf8'));"
