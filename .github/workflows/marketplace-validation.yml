@@ -32,3 +32,5 @@ jobs:
           node --check js/verify-certificate.js
           node --check js/credential-card.js
           node -e "JSON.parse(require('fs').readFileSync('data/store-directory.json','utf8')); JSON.parse(require('fs').readFileSync('data/curated-apps.json','utf8'));"
+      - name: Validate fresh D1 schema
+        run: python -c "import sqlite3,pathlib; db=sqlite3.connect(':memory:'); db.executescript(pathlib.Path('marketplace-api/schema.sql').read_text()); print('D1 schema applied successfully')"
