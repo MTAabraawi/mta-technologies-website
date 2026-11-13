@@ -17,21 +17,28 @@
      for(const item of data.submissions){
        const card=document.createElement("article");card.className="submission-item";
        const h=document.createElement("h3");h.textContent=item.app_name;card.append(h);
+       const currentStatus=document.createElement("span");currentStatus.className="status-pill status-"+item.status;currentStatus.textContent=item.status;card.append(currentStatus);
        const p=document.createElement("p");p.className="submission-meta";p.textContent=[item.developer_name,item.platform,item.version,item.license_name,item.owner_email].join(" · ");card.append(p);
        const desc=document.createElement("p");desc.className="muted";desc.textContent=item.description;card.append(desc);
        if(item.source_url){const a=document.createElement("a");a.href=item.source_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=t("فتح مصدر التطبيق","Open app source");card.append(a);}
        if(item.file_name){const f=document.createElement("p");f.className="muted";f.textContent=item.file_name+" · "+Math.ceil((item.file_size||0)/1024/1024)+" MiB";card.append(f);const fileLink=document.createElement("a");fileLink.href=api+"/v1/admin/submissions/"+encodeURIComponent(item.id)+"/file";fileLink.textContent=t("تنزيل الملف للفحص اليدوي","Download file for manual scanning");fileLink.target="_blank";fileLink.rel="noopener noreferrer";card.append(fileLink);}
-       const rights=document.createElement("label");rights.className="check-label";const rc=document.createElement("input");rc.type="checkbox";rights.append(rc,document.createTextNode(t("تم التحقق من حقوق التوزيع","Redistribution rights verified")));card.append(rights);
-       const malware=document.createElement("label");malware.className="check-label";const mc=document.createElement("input");mc.type="checkbox";malware.append(mc,document.createTextNode(t("اجتاز فحص البرمجيات الضارة","Malware scan passed")));card.append(malware);
        const actions=document.createElement("div");actions.className="admin-actions";
-       const approve=document.createElement("button");approve.className="btn btn-primary";approve.textContent=t("اعتماد ونشر","Approve & publish");approve.disabled=!item.object_key;
-       approve.addEventListener("click",()=>review(item.id,"approved",{rights_verified:rc.checked,malware_scan_passed:mc.checked}));
-       const reject=document.createElement("button");reject.className="btn btn-outline";reject.textContent=t("رفض","Reject");reject.addEventListener("click",()=>review(item.id,"rejected",{}));
-       actions.append(approve,reject);card.append(actions);root.append(card);
+       if(item.status==="approved"){
+         const remove=document.createElement("button");remove.className="btn btn-outline";remove.textContent=t("إزالة من المتجر","Remove listing");remove.addEventListener("click",()=>review(item.id,"removed",{}));actions.append(remove);
+       } else {
+         const rights=document.createElement("label");rights.className="check-label";const rc=document.createElement("input");rc.type="checkbox";rights.append(rc,document.createTextNode(t("تم التحقق من حقوق التوزيع","Redistribution rights verified")));card.append(rights);
+         const malware=document.createElement("label");malware.className="check-label";const mc=document.createElement("input");mc.type="checkbox";malware.append(mc,document.createTextNode(t("اجتاز فحص البرمجيات الضارة","Malware scan passed")));card.append(malware);
+         const approve=document.createElement("button");approve.className="btn btn-primary";approve.textContent=t("اعتماد ونشر","Approve & publish");approve.disabled=!item.object_key;
+         approve.addEventListener("click",()=>review(item.id,"approved",{rights_verified:rc.checked,malware_scan_passed:mc.checked}));
+         const reject=document.createElement("button");reject.className="btn btn-outline";reject.textContent=t("رفض","Reject");reject.addEventListener("click",()=>review(item.id,"rejected",{}));
+         actions.append(approve,reject);
+       }
+       card.append(actions);root.append(card);
      }
    } catch(e){el("admin-message").textContent=e.message;}
  }
  async function review(id,status,checks){
+   if(status==="removed" && !window.confirm(t("هل تريد إزالة هذا التطبيق من المتجر وحذف ملفه المنشور؟","Remove this app from the store and delete its published file?"))) return;
    const note=window.prompt(t("أدخل ملاحظة المراجعة (اختياري):","Enter a review note (optional):"))||"";
    try{await request("/v1/admin/submissions/"+encodeURIComponent(id),{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({status,note,...checks})});el("admin-message").textContent=t("تم تحديث حالة الطلب.","Submission status updated.");load();}
    catch(e){el("admin-message").textContent=e.message;}
