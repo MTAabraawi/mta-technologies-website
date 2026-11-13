@@ -101,7 +101,7 @@ google.com, pub-YOUR_REAL_PUBLISHER_ID, DIRECT, f08c47fec0942fa0
 The website now includes a cross-platform application directory for MTA products and third-party developers, with a developer submission portal and moderation interface. The marketplace backend is implemented as Cloudflare Pages Functions on the same origin:
 
 - `apps.html` — searchable application directory (Android, iOS, Windows, macOS, Linux, Web).
-- `developer-portal.html` — developer sign-in, metadata submission, release upload, and status tracking.
+- `developer-portal.html` — developer sign-in, metadata submission, resumable release upload (up to the configured 2 GiB cap), and status tracking.
 - `admin-marketplace.html` — administrator moderation interface (server-side allow-list enforced).
 - `marketplace-policy.html` — licensing, redistribution, and takedown policy.
 - `functions/api/` — Pages Functions routing and Cloudflare Access middleware.
