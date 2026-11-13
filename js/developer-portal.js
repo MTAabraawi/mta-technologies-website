@@ -33,14 +33,13 @@
    event.preventDefault(); const form=event.currentTarget; const button=form.querySelector('button[type="submit"]'); button.disabled=true;
    try {
      const fd=new FormData(form); const body=Object.fromEntries(fd.entries()); body.authorization_confirmed=fd.get("authorization_confirmed")==="on";
-     const result=await request("/v1/submissions",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
      const file=el("release-file").files[0];
-     if(file){
-       if(file.size>100*1024*1024) throw new Error(t("الحد الأقصى الحالي 100 ميجابايت.","Current maximum is 100 MiB."));
-       const upload=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/file",{method:"PUT",credentials:"include",headers:{"x-file-name":file.name},body:file});
-       const up=await upload.json().catch(()=>({})); if(!upload.ok) throw new Error(up.error||"Upload failed");
-       msg("submission-message",t("تم استلام الطلب والملف، وهما بانتظار المراجعة.","Submission and file received; awaiting review."));
-     } else msg("submission-message",t("تم حفظ الطلب. أرسل ملف الإصدار لاحقاً أو أعد تقديمه عند تفعيل الرفع.","Submission saved. Upload the release file when available."));
+     if(!file) throw new Error(t("اختر ملف الإصدار أولاً.","Select a release file first."));
+     if(file.size>100*1024*1024) throw new Error(t("الحد الأقصى الحالي 100 ميجابايت.","Current maximum is 100 MiB."));
+     const result=await request("/v1/submissions",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+     const upload=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/file",{method:"PUT",credentials:"include",headers:{"x-file-name":file.name},body:file});
+     const up=await upload.json().catch(()=>({})); if(!upload.ok) throw new Error(up.error||"Upload failed");
+     msg("submission-message",t("تم استلام الطلب والملف، وهما بانتظار المراجعة.","Submission and file received; awaiting review."));
      form.reset(); const mine=await request("/v1/me/submissions"); renderMine(mine.submissions||[]);
    } catch(e) { msg("submission-message",e.message); }
    finally { button.disabled=false; }
