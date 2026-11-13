@@ -94,8 +94,21 @@ async function handle(request, env, ctx) {
   if (url.pathname === "/v1/admin/certificates/requests" && request.method === "GET") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const { results } = await env.DB.prepare("SELECT * FROM certificate_requests WHERE status IN ('pending','more_info','approved') ORDER BY created_at ASC").all();
-    const { results: issued } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,issuer_email FROM issued_certificates ORDER BY created_at DESC LIMIT 500").all();
+    const { results: issued } = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,issuer_email FROM issued_certificates ORDER BY created_at DESC").all();
     return json({ requests: results, issued });
+  }
+
+  const certStatusMatch = url.pathname.match(/^\\/v1\\/admin\\/certificates\\/([A-Z0-9-]+)$/i);
+  if (certStatusMatch && request.method === "PATCH") {
+    if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
+    const body = await request.json().catch(() => null);
+    if (!body || !["suspended","revoked","active"].includes(body.status)) return json({ error: "Invalid credential status." }, 400);
+    const row = await env.DB.prepare("SELECT id,status FROM issued_certificates WHERE serial_number=?").bind(certStatusMatch[1]).first();
+    if (!row) return json({ error: "Credential not found." }, 404);
+    await env.DB.prepare("UPDATE issued_certificates SET status=? WHERE id=?").bind(body.status,row.id).run();
+    await env.DB.prepare("INSERT INTO certificate_events (id,certificate_id,actor_email,event_type,note) VALUES (?,?,?,?,?)")
+      .bind(crypto.randomUUID(),row.id,identity.email,"status_"+body.status,String(body.note||"").slice(0,500)).run();
+    return json({ serial: certStatusMatch[1], status: body.status });
   }
   const issueCertMatch = url.pathname.match(/^\/v1\/admin\/certificates\/requests\/([a-f0-9-]+)\/issue$/i);
   if (issueCertMatch && request.method === "POST") {
