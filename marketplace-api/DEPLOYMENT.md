@@ -80,3 +80,38 @@ Run these checks after deployment:
 - Establish backup/retention and data-deletion procedures for developer accounts and submission metadata.
 - Start with small test uploads. The developer portal uses resumable 8 MiB R2 multipart chunks and supports releases up to the configured 2 GiB cap. The legacy single-request endpoint remains capped at 100 MiB. R2 incomplete multipart sessions expire automatically after seven days; changing the selected file starts a fresh upload session.
 - No production upload or download is active until the Pages Functions, D1, R2, and Access configuration above is completed and tested.
+
+
+## 10. Developer credentials and issuance
+
+The credential subsystem adds:
+- `POST /api/v1/certificates/requests` — authenticated applicant request.
+- `GET /api/v1/me/certificates` — applicant's own issued credentials.
+- `GET /api/v1/admin/certificates/requests` — admin-only review queue and issued serial inventory.
+- `POST /api/v1/admin/certificates/requests/:id/issue` — admin-only issuance.
+- `GET /api/v1/certificates/verify?serial=...` — public status and signature verification.
+
+Before enabling issuance, configure `CERT_SIGNING_SECRET` as a high-entropy random secret of at least 32 characters in the Pages Functions secret store, never in source code or client-side variables. Configure `CERT_SIGNING_KEY_VERSION=v1`. Keep an offline, access-controlled recovery copy and define a key-rotation/revocation procedure. If the secret is exposed, stop issuance and rotate it; old credentials must be re-signed or revoked under a controlled migration.
+
+Serials are assigned server-side from the D1 counter. The HMAC-SHA256 signature covers serial, display name, credential type, issue time, and expiry. The verification endpoint checks the stored signature and current status. A QR code must point to the official verification URL; do not encode a static image as proof. QR verification is only meaningful when the online record is active.
+
+The current implementation issues credentials for one year. Admin issuance is an explicit action and requires a reviewed request. Add identity verification and evidence checks to the manual operating procedure before issuing credentials. These credentials are an MTA-issued private-company credential, not a government license, university degree, or legally regulated professional license.
+
+The admin certificate console is `/admin-certificates.html` and is not a security boundary by itself. Protect it with Cloudflare Access and retain the server-side `ADMIN_EMAILS` check. Never place applicant identity documents in public R2 storage.
+
+## 11. Revision requests
+
+The admin review endpoint accepts `changes_requested` with a required reviewer note. The API stores the request as pending, removes the old quarantined artifact, and exposes the note through `GET /api/v1/me/submissions`. The developer must upload a replacement artifact before the app can be approved.
+
+## 12. App catalog and third-party distribution
+
+The marketplace directory links to official stores and repositories. Listing a store or application is not permission to mirror its binaries. F-Droid main-repository apps must satisfy its FOSS inclusion policy; use its signed repository metadata for trust decisions. For other stores, prefer official listing links unless the publisher grants redistribution permission or the applicable license clearly permits it. Keep a record of license, copyright notices, source URL, version, SHA-256, signing certificate fingerprint, and redistribution basis for every hosted artifact.
+
+## 13. Additional launch gates
+
+- Apply the updated `marketplace-api/schema.sql` to the D1 database exactly once as a controlled migration; back up existing data first.
+- Set `CERT_SIGNING_SECRET` and `CERT_SIGNING_KEY_VERSION` in Pages secrets before certificate issuance.
+- Confirm that `admin-marketplace.html` and `admin-certificates.html` are protected by Cloudflare Access, and that server-side allowlists deny non-admin users.
+- Test revision requests, re-upload, issuance, serial uniqueness, expired credentials, revoked credentials, invalid signatures, and unauthorized access.
+- Generate the QR code from the official verification URL in the final printable credential renderer. Do not treat the stamp or signature image as a security control.
+- Add an actual malware scanning integration or a documented isolated scanning procedure before approving third-party binaries.
