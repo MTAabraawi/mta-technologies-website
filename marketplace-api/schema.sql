@@ -82,3 +82,62 @@ CREATE TABLE IF NOT EXISTS publish_job_events (
 
 CREATE INDEX IF NOT EXISTS idx_publish_job_events_job
 ON publish_job_events(publish_job_id, created_at ASC);
+
+
+-- Review workflow: revision requests keep the release in quarantine until resubmitted.
+-- The reviewer note is shown to the developer; private moderation notes must not be stored here.
+ALTER TABLE submissions ADD COLUMN revision_requested_at TEXT;
+ALTER TABLE submissions ADD COLUMN rights_checked_at TEXT;
+ALTER TABLE submissions ADD COLUMN malware_scan_reference TEXT;
+
+CREATE TABLE IF NOT EXISTS certificate_requests (
+  id TEXT PRIMARY KEY,
+  applicant_email TEXT NOT NULL,
+  full_name TEXT NOT NULL,
+  public_display_name TEXT NOT NULL,
+  organization TEXT,
+  portfolio_url TEXT,
+  evidence_url TEXT,
+  requested_category TEXT NOT NULL DEFAULT 'developer',
+  statement TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected','more_info','issued')),
+  reviewer_email TEXT,
+  reviewer_note TEXT,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_certificate_requests_status ON certificate_requests(status,created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_certificate_requests_owner ON certificate_requests(applicant_email,created_at DESC);
+
+CREATE TABLE IF NOT EXISTS certificate_serial_counter (
+  id INTEGER PRIMARY KEY CHECK(id=1),
+  last_value INTEGER NOT NULL DEFAULT 0
+);
+INSERT OR IGNORE INTO certificate_serial_counter(id,last_value) VALUES(1,0);
+
+CREATE TABLE IF NOT EXISTS issued_certificates (
+  id TEXT PRIMARY KEY,
+  request_id TEXT NOT NULL UNIQUE REFERENCES certificate_requests(id),
+  serial_number TEXT NOT NULL UNIQUE,
+  subject_name TEXT NOT NULL,
+  credential_type TEXT NOT NULL,
+  issued_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','suspended','revoked','expired')),
+  signature TEXT NOT NULL,
+  signature_algorithm TEXT NOT NULL DEFAULT 'HMAC-SHA256',
+  signer_key_version TEXT NOT NULL,
+  issuer_email TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_issued_certificates_status ON issued_certificates(status,expires_at);
+CREATE INDEX IF NOT EXISTS idx_issued_certificates_serial ON issued_certificates(serial_number);
+
+CREATE TABLE IF NOT EXISTS certificate_events (
+  id TEXT PRIMARY KEY,
+  certificate_id TEXT NOT NULL REFERENCES issued_certificates(id),
+  actor_email TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  note TEXT,
+  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
