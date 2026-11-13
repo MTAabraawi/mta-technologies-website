@@ -1,17 +1,17 @@
 # Production deployment — MTA Marketplace on Cloudflare Pages
 
-The production integration uses **Pages Functions on the same website origin** at `/api/*`. This avoids cross-origin browser authentication and keeps the existing static site and Pages project. The API module is in `marketplace-api/src/index.js`; the Pages adapter is in `functions/api/[[path]].js`; Access JWT validation middleware is in `functions/api/_middleware.js`. The Pages Access plugin dependency is declared in the root `package.json`.
+The production integration uses **Pages Functions on the same website origin** at `/api/*`. This avoids cross-origin browser authentication and keeps the existing static site and Pages project. The API module is in `marketplace-api/src/index.js`; the Pages adapter is in `functions/api/[[path]].js`; Access JWT validation middleware is in `functions/api/_middleware.js`. Cloudflare Access JWTs are verified in the Pages middleware with Web Crypto and Cloudflare's published signing keys; no Access plugin dependency is required.
 
-Cloudflare Pages Functions are deployed with the Pages project when the root `functions/` directory is included in the project build. See the official Pages Functions guide and Access plugin documentation:
+Cloudflare Pages Functions are deployed with the Pages project when the root `functions/` directory is included in the project build. See the official Pages Functions guide and Cloudflare Access JWT documentation:
 - https://developers.cloudflare.com/pages/functions/get-started/
-- https://developers.cloudflare.com/pages/functions/plugins/cloudflare-access/
+- https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/validating-json/
 
 ## 1. Deploy the code safely
 1. Keep the current Cloudflare Pages project connected to this GitHub repository.
 2. Keep its existing production branch set to `main`. Do not change it to the development branch.
 3. Review PR #1 and merge it only after approving the changes. Until then, this code is not part of production.
 4. Confirm the Pages build output includes the repository root and that the root `functions/` folder is not excluded.
-5. The Pages deployment should bundle the dependency in the root `package.json`. No static-site build command is required for the existing plain HTML website; retain the project's currently working build settings.
+5. No static-site build command or npm runtime dependency is required for the existing plain HTML website and native Web Crypto middleware; retain the project's currently working build settings.
 
 ## 2. Create D1
 1. In Cloudflare Dashboard → Workers & Pages → D1 SQL Database → Create.
@@ -44,7 +44,7 @@ Create a Self-hosted Access application for the existing website hostname. Prote
 
 Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The same Access application authenticates developer and administrator requests. The API independently checks `ADMIN_EMAILS` on every admin endpoint, so a normal signed-in developer cannot moderate or inspect other users' submissions.
 
-The Access Pages plugin validates the JWT assertion and exposes its verified payload to the Pages Function. The API uses only that verified payload. Do not replace it with an unverified email header.
+The Pages middleware validates the `Cf-Access-Jwt-Assertion` (or `CF_Authorization` cookie) signature, issuer, audience, expiry, and key ID using Cloudflare's published JWKS. The API trusts the verified JWT payload placed in the Pages request context. Do not replace it with an unverified email header.
 
 ## 6. Set administrator allow-list
 In Pages project → Settings → Functions → Environment variables, add:
