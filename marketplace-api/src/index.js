@@ -98,7 +98,7 @@ async function handle(request, env) {
     if (!row || !["pending","pending_review"].includes(row.status)) return json({ error: "Submission not found or upload is closed." }, 404);
     const size = Number(request.headers.get("content-length") || 0);
     const max = Number(env.MAX_UPLOAD_BYTES || 104857600);
-    if (!request.body || !size || size > max) return json({ error: "File is empty, size is unknown, or the upload limit was exceeded." }, 413);
+    if (!request.body || size > max) return json({ error: "File is empty or the declared upload limit was exceeded." }, 413);
     const filename = safeName(request.headers.get("x-file-name"));
     const ext = filename.toLowerCase().split(".").pop();
     const allowed = ["apk","aab","exe","msi","dmg","pkg","deb","rpm","appimage","zip","tar","gz","wasm"];
@@ -119,7 +119,7 @@ async function handle(request, env) {
       if (actualSize > max) return json({ error: "File exceeds the upload limit." }, 413);
       throw error;
     }
-    if (actualSize === 0 || actualSize !== size) {
+    if (actualSize === 0 || (size > 0 && actualSize !== size)) {
       await env.FILES.delete(key);
       return json({ error: "Uploaded size does not match the declared file size." }, 400);
     }
