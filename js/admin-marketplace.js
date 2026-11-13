@@ -6,6 +6,7 @@
  async function request(path,options={}) {
    if(!api) throw new Error(t("لم يتم ربط API بعد.","Marketplace API is not configured."));
    const r=await fetch(api+path,{credentials:"include",...options}); const d=await r.json().catch(()=>({}));
+   if(r.redirected || !(r.headers.get("content-type")||"").includes("application/json")) throw new Error(t("سجّل الدخول عبر Cloudflare Access ثم أعد تحميل الصفحة.","Sign in through Cloudflare Access, then reload this page."));
    if(!r.ok) throw new Error(d.error||("HTTP "+r.status)); return d;
  }
  async function load(){
