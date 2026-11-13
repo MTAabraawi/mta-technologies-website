@@ -94,3 +94,17 @@ google.com, pub-YOUR_REAL_PUBLISHER_ID, DIRECT, f08c47fec0942fa0
 ---
 
 جميع الحقوق محفوظة © 2026 شركة MTA TECHNOLOGIES.
+
+
+## MTA Apps Marketplace
+
+The website now includes a cross-platform application directory for MTA products and third-party developers, with a developer submission portal and moderation interface. The marketplace backend is implemented as Cloudflare Pages Functions on the same origin:
+
+- `apps.html` — searchable application directory (Android, iOS, Windows, macOS, Linux, Web).
+- `developer-portal.html` — developer sign-in, metadata submission, release upload, and status tracking.
+- `admin-marketplace.html` — administrator moderation interface (server-side allow-list enforced).
+- `marketplace-policy.html` — licensing, redistribution, and takedown policy.
+- `functions/api/` — Pages Functions routing and Cloudflare Access middleware.
+- `marketplace-api/` — API handlers, D1 schema, source catalogue, and deployment instructions.
+
+**Production activation is not automatic from a Git commit.** Follow `marketplace-api/DEPLOYMENT.md` to create and bind the D1 database and private R2 bucket, configure Cloudflare Access and environment variables, then verify the health endpoint and test a harmless upload before inviting developers. No uploaded binary becomes public until it has been reviewed and approved.
