@@ -32,7 +32,7 @@ In Pages project → Settings → Functions → Environment variables, set for P
 - `SITE_ORIGIN` = `https://www.mtahqq.dpdns.org`
 - `ACCESS_TEAM_DOMAIN` = `https://YOUR-TEAM.cloudflareaccess.com`
 - `ACCESS_AUD` = the audience tag of the Access application protecting the developer/admin API paths
-- `MAX_UPLOAD_BYTES` = `104857600` (100 MiB)
+- `MAX_UPLOAD_BYTES` = `2147483648` (2 GiB maximum per submitted release)
 
 Use your actual Cloudflare Zero Trust team domain and Access AUD. Do not commit credentials or API tokens to GitHub. Redeploy after changing bindings or variables.
 
@@ -64,18 +64,19 @@ Run these checks after deployment:
 1. `GET /api/health` returns `ok: true`.
 2. `GET /api/v1/apps` returns an empty `apps` list initially (plus any manually approved entries).
 3. Unauthenticated `GET /api/v1/me/submissions` is blocked by Access.
-4. A developer can sign in, create a submission, upload a small harmless test file, and see `pending_review`.
-5. The uploaded object is private in R2 and cannot be fetched from the public catalogue or download endpoint.
-6. A non-admin cannot access `/api/v1/admin/submissions`.
-7. The administrator can review the request. Approval is rejected unless both rights verification and malware-scan checkboxes are selected.
-8. Only after approval does `GET /api/v1/download/:id` return the file.
-9. Test a rejected listing, a missing file, a too-large file, and a removed listing. Confirm the admin queue can remove a previously approved listing and that its R2 object is deleted.
-10. Add Cloudflare rate-limiting/WAF rules for repeated submission and upload attempts where your plan supports them. Monitor Worker/Pages logs and storage usage.
+4. A developer can sign in, create a submission, upload a small harmless test file using the resumable 8 MiB multipart flow, and see `pending_review`.
+5. Interrupt a multi-part test upload and retry with the same selected file; already completed parts should be reused.
+6. The completed uploaded object is private in R2 and cannot be fetched from the public catalogue or download endpoint.
+7. A non-admin cannot access `/api/v1/admin/submissions`.
+8. The administrator can review the request. Approval is rejected unless both rights verification and malware-scan checkboxes are selected.
+9. Only after approval does `GET /api/v1/download/:id` return the file.
+10. Test a rejected listing, a missing file, a too-large file, and a removed listing. Confirm the admin queue can remove a previously approved listing and that its R2 object is deleted.
+11. Add Cloudflare rate-limiting/WAF rules for repeated submission and upload attempts where your plan supports them. Monitor Worker/Pages logs and storage usage.
 
 ## 9. Operational/legal safeguards still required
 - This repository does not include a malware scanning engine. Do not approve real applications until a scanning provider or isolated manual scanning workflow is connected and the reviewer has inspected its result.
 - Verify redistribution rights, exact license text, trademarks, bundled assets, source-code obligations, publisher identity, version, and file provenance.
 - Add a takedown intake and an operational response process. Remove disputed files from public availability while investigating.
 - Establish backup/retention and data-deletion procedures for developer accounts and submission metadata.
-- Start with small test uploads. The current endpoint caps a single upload at 100 MiB; implement resumable/multipart uploads before supporting large desktop installers.
+- Start with small test uploads. The developer portal uses resumable 8 MiB R2 multipart chunks and supports releases up to the configured 2 GiB cap. The legacy single-request endpoint remains capped at 100 MiB. R2 incomplete multipart sessions expire automatically after seven days; changing the selected file starts a fresh upload session.
 - No production upload or download is active until the Pages Functions, D1, R2, and Access configuration above is completed and tested.
