@@ -11,9 +11,10 @@
    if (!response.ok) throw new Error(data.error || ("HTTP " + response.status));
    return data;
  }
- el("portal-login-btn").addEventListener("click", async () => {
-   try { const r = await request("/v1/me/submissions"); msg("portal-identity",t("تم التحقق من الدخول.","Signed in successfully.") + " " + (r.email || "")); renderMine(r.submissions || []); }
-   catch(e) { msg("portal-identity",e.message); }
+ el("portal-login-btn").addEventListener("click", () => {
+   if (!api) { msg("portal-identity",t("خدمة المتجر غير مربوطة بعد.","Marketplace API is not configured.")); return; }
+   window.open(api + "/v1/me/submissions", "_blank", "noopener");
+   msg("portal-identity",t("أكمل تسجيل الدخول في الصفحة الجديدة، ثم ارجع واضغط تحديث الطلبات.","Complete sign-in in the new tab, then return and refresh your submissions."));
  });
  function renderMine(items) {
    const root=el("my-submissions"); root.replaceChildren();
@@ -36,7 +37,7 @@
      const file=el("release-file").files[0];
      if(file){
        if(file.size>100*1024*1024) throw new Error(t("الحد الأقصى الحالي 100 ميجابايت.","Current maximum is 100 MiB."));
-       const upload=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/file",{method:"PUT",credentials:"include",headers:{"x-file-name":file.name,"content-length":String(file.size)},body:file});
+       const upload=await fetch(api+"/v1/submissions/"+encodeURIComponent(result.id)+"/file",{method:"PUT",credentials:"include",headers:{"x-file-name":file.name},body:file});
        const up=await upload.json().catch(()=>({})); if(!upload.ok) throw new Error(up.error||"Upload failed");
        msg("submission-message",t("تم استلام الطلب والملف، وهما بانتظار المراجعة.","Submission and file received; awaiting review."));
      } else msg("submission-message",t("تم حفظ الطلب. أرسل ملف الإصدار لاحقاً أو أعد تقديمه عند تفعيل الرفع.","Submission saved. Upload the release file when available."));
