@@ -53,7 +53,7 @@ async function handle(request, env, ctx) {
       "content-length": String(object.size),
       "content-disposition": 'attachment; filename="' + safeName(row.file_name) + '"',
       "x-content-type-options": "nosniff",
-      "cache-control": "public, max-age=300"
+      "cache-control": "no-store"
     }});
   }
 
@@ -96,7 +96,9 @@ async function handle(request, env, ctx) {
     }));
     try {
       const storePromise = env.FILES.put(key, fixed.readable, { httpMetadata: { contentType: "application/octet-stream" }, customMetadata: { submissionId: id, uploader: identity.email } });
-      await Promise.all([countedBody.pipeTo(fixed.writable), storePromise]);
+      const outcomes = await Promise.allSettled([countedBody.pipeTo(fixed.writable), storePromise]);
+      const failure = outcomes.find(result => result.status === "rejected");
+      if (failure) throw failure.reason;
     } catch (error) {
       await env.FILES.delete(key);
       if (actualSize > max) return json({ error: "File exceeds the upload limit." }, 413);
