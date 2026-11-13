@@ -34,10 +34,6 @@ async function requireIdentity(ctx) {
 function isAdmin(identity, env) {
   return (env.ADMIN_EMAILS || "").split(",").map(x => x.trim().toLowerCase()).filter(Boolean).includes(identity.email);
 }
-async function requireIdentity(request, env) {
-  const identity = await accessIdentity(request, env);
-  return identity;
-}
 async function handle(request, env, ctx) {
   const url = new URL(request.url);
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(request, env) });
@@ -133,6 +129,10 @@ async function handle(request, env, ctx) {
     const row = await env.DB.prepare("SELECT id,object_key FROM submissions WHERE id=?").bind(reviewMatch[1]).first();
     if (!row) return json({ error: "Submission not found." }, 404);
     if (body.status === "approved" && !row.object_key) return json({ error: "A release file is required before approval." }, 400);
+    if (body.status !== "approved" && row.object_key) {
+      await env.FILES.delete(row.object_key);
+      await env.DB.prepare("UPDATE submissions SET object_key=NULL,file_name=NULL,file_size=NULL WHERE id=?").bind(row.id).run();
+    }
     if (body.status === "approved" && row.object_key.startsWith("quarantine/")) {
       const source = await env.FILES.get(row.object_key);
       if (!source) return json({ error: "Quarantined file is missing." }, 409);
