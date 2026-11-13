@@ -67,12 +67,14 @@
       for(const item of items){
         let node;
         if(source==="F-Droid"){
-          const id=item.packageName || item.package_name || item.id || item.package || "";
-          const name=item.name || item.localizedName || item.title || id;
+          const href=item.url || (item.packageName || item.package_name || item.id || item.package
+            ? "https://f-droid.org/packages/"+encodeURIComponent(item.packageName || item.package_name || item.id || item.package)+"/"
+            : "https://f-droid.org/");
+          const packageId=(href.match(/\\/packages\\/([^/?#]+)/)||[])[1] || "";
+          const name=item.name || item.localizedName || item.title || packageId;
           const developer=item.authorName || item.author || item.developer || "";
-          const version=item.suggestedVersionName || item.versionName || item.version || "";
-          const href=id ? "https://f-droid.org/packages/"+encodeURIComponent(id)+"/" : "https://f-droid.org/";
-          node=card(source,name,developer,[id,version].filter(Boolean).join(" · "),href);
+          const detail=[item.summary || item.description || "",packageId,item.suggestedVersionName || item.versionName || item.version || ""].filter(Boolean).join(" · ");
+          node=card(source,name,developer,detail,href);
         } else {
           const href=item.trackViewUrl || "https://www.apple.com/app-store/";
           node=card(source,item.trackName,item.sellerName || item.artistName,[item.primaryGenreName,item.version].filter(Boolean).join(" · "),href);
