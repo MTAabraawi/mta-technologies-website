@@ -119,7 +119,7 @@ async function handle(request, env, ctx) {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const body = await request.json().catch(() => null);
     if (!body || !["approved","rejected","more_info"].includes(body.status) || (body.status !== "approved" && !String(body.note || "").trim())) return json({ error: "Choose a valid review action; a note is required for rejection or more information." }, 400);
-    const result = await env.DB.prepare("UPDATE certificate_requests SET status=?,reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND status IN ('pending','more_info')").bind(body.status,identity.email,String(body.note).slice(0,1000),certRequestMatch[1]).run();
+    const result = await env.DB.prepare("UPDATE certificate_requests SET status=?,reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND status IN ('pending','more_info')").bind(body.status,identity.email,String(body.note || "").slice(0,1000),certRequestMatch[1]).run();
     if (!result.meta?.changes) return json({ error: "Request not found or already processed." }, 404);
     return json({ id: certRequestMatch[1], status: body.status });
   }
