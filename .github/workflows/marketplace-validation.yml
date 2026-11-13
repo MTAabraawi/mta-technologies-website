@@ -2,7 +2,7 @@ name: Marketplace code validation
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, mta-website-upgrade]
   push:
     branches: [mta-website-upgrade]
 
@@ -24,6 +24,7 @@ jobs:
           node --check functions/api/_middleware.js
           node --check 'functions/api/[[path]].js'
           node --check js/apps.js
+          node --check js/external-catalogs.js
           node --check js/developer-portal.js
           node --check js/admin-marketplace.js
           node --check js/admin-certificates.js
