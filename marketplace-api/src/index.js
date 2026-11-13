@@ -98,7 +98,7 @@ async function handle(request, env, ctx) {
     return json({ requests: results, issued });
   }
 
-  const certStatusMatch = url.pathname.match(/^\\/v1\\/admin\\/certificates\\/([A-Z0-9-]+)$/i);
+  const certStatusMatch = url.pathname.match(/^\/v1\/admin\/certificates\/([A-Z0-9-]+)$/i);
   if (certStatusMatch && request.method === "PATCH") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const body = await request.json().catch(() => null);
