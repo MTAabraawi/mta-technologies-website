@@ -189,3 +189,10 @@ A client-side availability guard was added to the developer portal, credential r
 - Do not invite developers or announce the portal as operational.
 - Preview code and configuration may continue to be validated without changing Production.
 - Production deployment, PR merge, production bindings, and production variables remain untouched. The owner must separately authorize publication after all launch gates are cleared.
+
+
+### Latest frontend deployment verification
+
+- The latest branch commit at the time of validation is `5dcd2a23a29bc6981155fc44b99c79042be0e8f6`; GitHub Actions run #133 completed successfully: https://github.com/MTAabraawi/mta-technologies-website/actions/runs/43511584311.
+- The source branch contains the explicit disabled attributes on developer submission and credential request controls, plus the availability guard script and the false-by-default portal feature flag.
+- A live read-only visit to the previously used Preview hostname served older portal markup that did not match the current GitHub branch. The alternate hostname based on the full branch name returned Cloudflare Pages "Deployment Not Found". Therefore the latest frontend deployment could not be verified in a live Preview. Do not claim that the newest UI commit is deployed or tested until a matching Preview deployment is available.
