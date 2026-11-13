@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, mta-website-upgrade]
   push:
-    branches: [mta-website-upgrade]
+    branches: [mta-website-upgrade, feature/external-app-catalogs]
 
 jobs:
   validate:
