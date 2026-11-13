@@ -19,7 +19,7 @@
  el("load-certs")?.addEventListener("click",async()=>{
   const root=el("my-certs");root.replaceChildren();
   try{const data=await call("/v1/me/certificates");if(!data.certificates.length){root.textContent=t("لا توجد بطاقات صادرة لحسابك.","No credentials have been issued to your account.");return;}
-   for(const item of data.certificates){const card=document.createElement("article");card.className="submission-item";const title=document.createElement("h3");title.textContent=item.subject_name;const serial=document.createElement("p");serial.textContent=item.serial_number+" · "+item.status;const dates=document.createElement("p");dates.textContent=item.issued_at+" → "+item.expires_at;card.append(title,serial,dates);root.append(card);}
+   for(const item of data.certificates){const card=document.createElement("article");card.className="submission-item";const title=document.createElement("h3");title.textContent=item.subject_name;const serial=document.createElement("p");serial.textContent=item.serial_number+" · "+item.status;const dates=document.createElement("p");dates.textContent=item.issued_at+" → "+item.expires_at;const print=document.createElement("a");print.href="credential-card.html?serial="+encodeURIComponent(item.serial_number);print.textContent=t("عرض وطباعة البطاقة","View and print card");card.append(title,serial,dates,print);root.append(card);}
   }catch(error){root.textContent=error.message;}
  });
  el("cert-verify")?.addEventListener("submit",async event=>{
