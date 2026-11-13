@@ -309,6 +309,10 @@ async function handle(request, env, ctx) {
       if (row.object_key) await env.FILES.delete(row.object_key);
       await env.DB.prepare("UPDATE submissions SET object_key=NULL,file_name=NULL,file_size=NULL,multipart_upload_id=NULL,multipart_key=NULL,multipart_token=NULL,multipart_parts='[]' WHERE id=?").bind(row.id).run();
     }
+    if (body.status === "changes_requested" && row.object_key) {
+      await env.FILES.delete(row.object_key);
+      await env.DB.prepare("UPDATE submissions SET object_key=NULL,file_name=NULL,file_size=NULL WHERE id=?").bind(row.id).run();
+    }
     if (body.status === "approved" && row.object_key.startsWith("quarantine/")) {
       const source = await env.FILES.get(row.object_key);
       if (!source) return json({ error: "Quarantined file is missing." }, 409);
