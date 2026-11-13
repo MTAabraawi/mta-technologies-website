@@ -115,7 +115,7 @@ async function handle(request, env, ctx) {
   if (certRequestMatch && request.method === "PATCH") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const body = await request.json().catch(() => null);
-    if (!body || !["rejected","more_info"].includes(body.status) || !String(body.note || "").trim()) return json({ error: "Choose a valid review action and provide a note." }, 400);
+    if (!body || !["approved","rejected","more_info"].includes(body.status) || (body.status !== "approved" && !String(body.note || "").trim())) return json({ error: "Choose a valid review action; a note is required for rejection or more information." }, 400);
     const result = await env.DB.prepare("UPDATE certificate_requests SET status=?,reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND status IN ('pending','more_info')").bind(body.status,identity.email,String(body.note).slice(0,1000),certRequestMatch[1]).run();
     if (!result.meta?.changes) return json({ error: "Request not found or already processed." }, 404);
     return json({ id: certRequestMatch[1], status: body.status });
@@ -124,7 +124,7 @@ async function handle(request, env, ctx) {
   if (issueCertMatch && request.method === "POST") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     if (!env.CERT_SIGNING_SECRET || String(env.CERT_SIGNING_SECRET).length < 32) return json({ error: "Certificate signing secret is not configured securely." }, 503);
-    const req = await env.DB.prepare("SELECT * FROM certificate_requests WHERE id=? AND status IN ('pending','approved')").bind(issueCertMatch[1]).first();
+    const req = await env.DB.prepare("SELECT * FROM certificate_requests WHERE id=? AND status='approved'").bind(issueCertMatch[1]).first();
     if (!req) return json({ error: "Certificate request not found or not eligible." }, 404);
     const body = await request.json().catch(() => ({}));
     const now = new Date();
