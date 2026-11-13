@@ -78,28 +78,31 @@ async function handle(request, env, ctx) {
     if (!row || !["pending","pending_review"].includes(row.status)) return json({ error: "Submission not found or upload is closed." }, 404);
     const size = Number(request.headers.get("content-length") || 0);
     const max = Number(env.MAX_UPLOAD_BYTES || 104857600);
-    if (!request.body || size > max) return json({ error: "File is empty or the declared upload limit was exceeded." }, 413);
+    if (!request.body || !size) return json({ error: "A known file size is required for secure streaming uploads." }, 411);
+    if (size > max) return json({ error: "File exceeds the upload limit." }, 413);
     const filename = safeName(request.headers.get("x-file-name"));
     const ext = filename.toLowerCase().split(".").pop();
     const allowed = ["apk","aab","exe","msi","dmg","pkg","deb","rpm","appimage","zip","tar","gz","wasm"];
     if (!allowed.includes(ext)) return json({ error: "Unsupported file type." }, 415);
     const key = "quarantine/" + id + "/" + crypto.randomUUID() + "-" + filename;
     let actualSize = 0;
-    const limitedBody = request.body.pipeThrough(new TransformStream({
+    const fixed = new FixedLengthStream(size);
+    const countedBody = request.body.pipeThrough(new TransformStream({
       transform(chunk, controller) {
         actualSize += chunk.byteLength;
-        if (actualSize > max) throw new Error("UPLOAD_TOO_LARGE");
+        if (actualSize > max || actualSize > size) throw new Error("UPLOAD_SIZE_MISMATCH");
         controller.enqueue(chunk);
       }
     }));
     try {
-      await env.FILES.put(key, limitedBody, { httpMetadata: { contentType: "application/octet-stream" }, customMetadata: { submissionId: id, uploader: identity.email } });
+      const storePromise = env.FILES.put(key, fixed.readable, { httpMetadata: { contentType: "application/octet-stream" }, customMetadata: { submissionId: id, uploader: identity.email } });
+      await Promise.all([countedBody.pipeTo(fixed.writable), storePromise]);
     } catch (error) {
       await env.FILES.delete(key);
       if (actualSize > max) return json({ error: "File exceeds the upload limit." }, 413);
-      throw error;
+      return json({ error: "Upload stream failed or file size did not match its declared length." }, 400);
     }
-    if (actualSize === 0 || (size > 0 && actualSize !== size)) {
+    if (actualSize === 0 || actualSize !== size) {
       await env.FILES.delete(key);
       return json({ error: "Uploaded size does not match the declared file size." }, 400);
     }
