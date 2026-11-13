@@ -118,7 +118,7 @@ async function handle(request, env, ctx) {
 
   if (url.pathname === "/v1/admin/submissions" && request.method === "GET") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
-    const { results } = await env.DB.prepare("SELECT * FROM submissions WHERE status IN ('pending','pending_review') ORDER BY created_at").all();
+    const { results } = await env.DB.prepare("SELECT * FROM submissions WHERE status IN ('pending','pending_review','approved') ORDER BY status, created_at DESC").all();
     return json({ submissions: results });
   }
   const adminFileMatch = url.pathname.match(/^\/v1\/admin\/submissions\/([a-f0-9-]+)\/file$/i);
