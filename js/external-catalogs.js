@@ -5,7 +5,7 @@
   const section = document.createElement("section");
   section.className = "container external-catalogs";
   section.id = "external-catalog-search";
-  section.innerHTML = \`
+  section.innerHTML = `
     <div class="apps-section-heading">
       <span class="apps-eyebrow">CONNECTED APP CATALOGS</span>
       <h2><span class="ar-only">ابحث في كتالوجات التطبيقات العالمية</span><span class="en-only">Search global app catalogs</span></h2>
@@ -22,7 +22,7 @@
     </div>
     <div id="external-catalog-status" class="external-catalog-status" role="status" aria-live="polite"><span class="ar-only">أدخل اسم التطبيق لبدء البحث في المصادر المتصلة.</span><span class="en-only">Enter an app name to search connected sources.</span></div>
     <div class="external-results-grid" id="external-catalog-results"></div>
-    <p class="external-catalog-footnote"><span class="ar-only">هذه واجهات بحث وبيانات تعريفية فقط. لا تتحقق نتائج البحث وحدها من سلامة ملفات APK أو صحة التوقيع، ولا تمنح MTA حق إعادة الاستضافة. لا نرفع أو نستضيف أي ملف من هذه المصادر.</span><span class="en-only">These are search and metadata integrations only. Search results do not verify APK integrity or signatures and do not grant MTA redistribution rights. No files from these catalogs are uploaded or mirrored.</span></p>\`;
+    <p class="external-catalog-footnote"><span class="ar-only">هذه واجهات بحث وبيانات تعريفية فقط. لا تتحقق نتائج البحث وحدها من سلامة ملفات APK أو صحة التوقيع، ولا تمنح MTA حق إعادة الاستضافة. لا نرفع أو نستضيف أي ملف من هذه المصادر.</span><span class="en-only">These are search and metadata integrations only. Search results do not verify APK integrity or signatures and do not grant MTA redistribution rights. No files from these catalogs are uploaded or mirrored.</span></p>`;
   const storeSection = document.querySelector(".store-directory-section");
   if (storeSection) storeSection.before(section);
   const form = section.querySelector("#external-catalog-form");
