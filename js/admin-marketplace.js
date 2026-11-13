@@ -30,8 +30,9 @@
          const malware=document.createElement("label");malware.className="check-label";const mc=document.createElement("input");mc.type="checkbox";malware.append(mc,document.createTextNode(t("اجتاز فحص البرمجيات الضارة","Malware scan passed")));card.append(malware);
          const approve=document.createElement("button");approve.className="btn btn-primary";approve.textContent=t("اعتماد ونشر","Approve & publish");approve.disabled=!item.object_key;
          approve.addEventListener("click",()=>review(item.id,"approved",{rights_verified:rc.checked,malware_scan_passed:mc.checked}));
-         const reject=document.createElement("button");reject.className="btn btn-outline";reject.textContent=t("رفض","Reject");reject.addEventListener("click",()=>review(item.id,"rejected",{}));
-         actions.append(approve,reject);
+         const revise=document.createElement("button");revise.className="btn btn-outline";revise.textContent=t("طلب تعديل","Request changes");revise.addEventListener("click",()=>review(item.id,"changes_requested",{}));
+         const reject=document.createElement("button");reject.className="btn btn-outline";reject.textContent=t("رفض نهائي","Reject");reject.addEventListener("click",()=>review(item.id,"rejected",{}));
+         actions.append(approve,revise,reject);
        }
        card.append(actions);root.append(card);
      }
@@ -39,7 +40,8 @@
  }
  async function review(id,status,checks){
    if(status==="removed" && !window.confirm(t("هل تريد إزالة هذا التطبيق من المتجر وحذف ملفه المنشور؟","Remove this app from the store and delete its published file?"))) return;
-   const note=window.prompt(t("أدخل ملاحظة المراجعة (اختياري):","Enter a review note (optional):"))||"";
+   const note=window.prompt(status==="changes_requested"?t("اكتب التعديلات المطلوبة بوضوح:","Describe the required changes clearly:"):t("أدخل ملاحظة المراجعة (اختياري):","Enter a review note (optional):"))||"";
+   if(status==="changes_requested" && !note.trim()) return;
    try{await request("/v1/admin/submissions/"+encodeURIComponent(id),{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({status,note,...checks})});el("admin-message").textContent=t("تم تحديث حالة الطلب.","Submission status updated.");load();}
    catch(e){el("admin-message").textContent=e.message;}
  }
