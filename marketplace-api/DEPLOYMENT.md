@@ -156,3 +156,36 @@ The project owner has approved a **free-only operating model**. Do not add a pay
 4. Keep binary upload/download routes unavailable until a private storage binding exists and malware/rights review procedures are operational.
 5. Configure certificate signing only after an owner-managed secret is added; never put the secret in GitHub source or chat.
 6. Run authenticated end-to-end tests before inviting external developers. Production remains untouched until separately approved.
+
+
+## 15. Verified Preview status (2026-11-14)
+
+The owner requested completion of the remaining work while keeping production unpublished. The following read-only checks were run against the current Preview deployment:
+
+- `GET /api/health` returned HTTP 200 with `{"ok":true,"service":"MTA Marketplace API"}`.
+- `GET /api/v1/apps` returned HTTP 200 with `{"apps":[]}`.
+- `GET /api/v1/me/submissions` returned `{"error":"Marketplace authentication is not configured."}`.
+- `GET /api/v1/admin/submissions` returned the same authentication-configuration error. The browser did not show a sign-in page for these two routes; the Pages middleware rejected the requests because `ACCESS_TEAM_DOMAIN` and/or `ACCESS_AUD` are not configured.
+
+These results establish that the public health and catalogue routes work in Preview, but they do **not** establish that developer or administrator authentication works. The API must not accept submissions until an actual Access application, policy, issuer domain, and audience are configured and JWT verification is tested.
+
+### Safe frontend availability gate
+
+A client-side availability guard was added to the developer portal, credential request page, and both admin consoles. It disables submission, upload, moderation, and issuance controls while `window.MTA_MARKETPLACE_PORTAL_ENABLED` is false. The value is deliberately false in `marketplace-config.js`. This is a user-interface safety measure only; server-side Access/JWT and administrator checks remain mandatory. Do not set the flag to true until the server-side services have been configured and end-to-end tests pass.
+
+### Remaining external blockers — not bypassed
+
+- **Private binary storage:** R2 bucket `mta-marketplace-files` and the `FILES` binding do not exist. Account activation previously required a payment method/checkout. The owner approved free-only operation and has not authorized billing; do not activate R2 or substitute a public bucket.
+- **Access authentication:** protected endpoints currently return `Marketplace authentication is not configured.`. The actual Access team domain and app audience are not available in Pages Preview variables. Never guess them, use placeholders, or weaken the JWT middleware.
+- **Credential signing:** `CERT_SIGNING_SECRET` is unset. Issuance and signature validation must remain disabled until an owner-managed random secret (at least 32 characters) is entered directly in the Cloudflare Pages secret store. Never put it in GitHub, source files, logs, or chat.
+- **Malware review:** no scanning engine is included. Do not approve third-party binary releases until an isolated manual scanning procedure or a real scanning integration is in place.
+- **External store publishing:** provider APIs and signed agreements are not connected. MTA ONE-PUBLISH must remain a planning/workflow feature and must not claim that it publishes automatically to stores.
+
+### Safe operating mode before launch
+
+- Keep the public catalogue link-based and direct users to official publisher/store pages.
+- Do not host or mirror third-party binaries without documented redistribution rights and private quarantine/review capability.
+- Keep developer submissions, uploads, admin moderation, and credential issuance disabled in the frontend and protected on the server.
+- Do not invite developers or announce the portal as operational.
+- Preview code and configuration may continue to be validated without changing Production.
+- Production deployment, PR merge, production bindings, and production variables remain untouched. The owner must separately authorize publication after all launch gates are cleared.
