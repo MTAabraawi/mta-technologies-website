@@ -1,6 +1,6 @@
 # Production deployment — MTA Marketplace on Cloudflare Pages
 
-The production integration uses **Pages Functions on the same website origin** at `/api/*`. This avoids cross-origin browser authentication and keeps the existing static site and Pages project. The API module is in `marketplace-api/src/index.js`; the Pages adapter is in `functions/api/[[path]].js`.
+The production integration uses **Pages Functions on the same website origin** at `/api/*`. This avoids cross-origin browser authentication and keeps the existing static site and Pages project. The API module is in `marketplace-api/src/index.js`; the Pages adapter is in `functions/api/[[path]].js`; Access JWT validation middleware is in `functions/api/_middleware.js`. The Pages Access plugin dependency is declared in the root `package.json`.
 
 Cloudflare Pages Functions are deployed with the Pages project when the root `functions/` directory is included in the project build. See the official Pages Functions guide and Access plugin documentation:
 - https://developers.cloudflare.com/pages/functions/get-started/
@@ -44,7 +44,7 @@ Create a Self-hosted Access application for the existing website hostname. Prote
 
 Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The admin route must additionally be restricted to the administrator identity policy; the Worker independently checks `ADMIN_EMAILS`.
 
-The Access Pages plugin validates the JWT assertion and exposes its verified payload to the Pages Function. Do not replace it with an unverified email header.
+The Access Pages plugin validates the JWT assertion and exposes its verified payload to the Pages Function. The API uses only that verified payload. Do not replace it with an unverified email header.
 
 ## 6. Set administrator allow-list
 In Pages project → Settings → Functions → Environment variables, add:
