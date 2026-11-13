@@ -754,3 +754,11 @@ html[lang="en"] .lightbox-close {
 @media(max-width:1050px){.corp-page-nav{gap:.6rem}.corp-page-nav a{font-size:.64rem}.corp-header-inner{gap:.6rem}.corp-logo img{max-width:145px}}
 @media(max-width:820px){.corp-page-nav{display:none}.corp-header-inner{min-height:70px}}
 @media(max-width:680px){.corp-header-actions{gap:.3rem}.corp-header-actions .control-btn{padding:.42rem .5rem;font-size:.62rem}.corp-store-link{font-size:.62rem;padding:.5rem .6rem}}
+
+
+@media(max-width:820px){
+ .corp-header-inner{flex-wrap:wrap;padding-top:.55rem;padding-bottom:.45rem}
+ .corp-page-nav{display:flex;order:3;width:100%;overflow-x:auto;justify-content:flex-start;padding:.35rem 0 .45rem;scrollbar-width:none}
+ .corp-page-nav::-webkit-scrollbar{display:none}
+ .corp-page-nav a{font-size:.67rem;padding:.25rem .2rem}
+}
