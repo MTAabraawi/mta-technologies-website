@@ -116,3 +116,19 @@ The marketplace directory links to official stores and repositories. Listing a s
 - Test revision requests, re-upload, issuance, serial uniqueness, expired credentials, revoked credentials, invalid signatures, and unauthorized access.
 - Generate the QR code from the official verification URL in the final printable credential renderer. Do not treat the stamp or signature image as a security control.
 - Add an actual malware scanning integration or a documented isolated scanning procedure before approving third-party binaries.
+
+## Current integration work (Preview only)
+
+The following setup has been completed in the Cloudflare account for the development/Preview environment only:
+- D1 database `mta-marketplace` created (ID: `28ebbdba-6fb8-481d-bbc4-d21ccc25d0ea`).
+- The schema in `schema.sql` was applied successfully; eight tables are present: `submissions`, `store_connections`, `publish_jobs`, `publish_job_events`, `certificate_requests`, `certificate_serial_counter`, `issued_certificates`, and `certificate_events`.
+- Pages Preview D1 binding `DB` points to `mta-marketplace`.
+- Preview variables saved: `SITE_ORIGIN`, `ADMIN_EMAILS`, and `MAX_UPLOAD_BYTES`.
+- Existing `ANALYTICS_LIMITER` binding was preserved.
+
+Still blocked / not configured:
+- R2 is not activated on the account; the private bucket `mta-marketplace-files` has not been created. Do not activate an account subscription or add billing details without the account owner's explicit confirmation.
+- Cloudflare Access team domain and audience tag are not configured/verified in Preview. Do not expose protected APIs until Access is configured and the JWT middleware is verified.
+- `CERT_SIGNING_SECRET` is not configured; certificate issuance must remain disabled until a high-entropy secret is added to the Preview secret store.
+- No Preview deployment has yet consumed these new settings. Run the full API integration tests only after a Preview deployment with DB and FILES bindings is available.
+- Production bindings, variables, and deployment have not been changed.
