@@ -20,32 +20,16 @@ function safeName(value) {
 function validEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value || "");
 }
-async function accessIdentity(request, env) {
-  const token = request.headers.get("Cf-Access-Jwt-Assertion");
-  if (!token || !env.ACCESS_TEAM_DOMAIN || !env.ACCESS_AUD) return null;
-  const parts = token.split(".");
-  if (parts.length !== 3) return null;
+async function requireIdentity(ctx) {
   try {
-    const decode = (s) => JSON.parse(atob(s.replace(/-/g, "+").replace(/_/g, "/")));
-    const header = decode(parts[0]), claims = decode(parts[1]);
-    if (header.alg !== "RS256" || !header.kid) return null;
-    const issuer = env.ACCESS_TEAM_DOMAIN.replace(/\/$/, "");
-    if (claims.iss !== issuer || !Array.isArray(claims.aud) || !claims.aud.includes(env.ACCESS_AUD)) return null;
-    if (typeof claims.exp !== "number" || claims.exp <= Date.now()/1000) return null;
-    if (typeof claims.nbf === "number" && claims.nbf > Date.now()/1000 + 60) return null;
-    if (typeof claims.iat === "number" && claims.iat > Date.now()/1000 + 60) return null;
-    const certs = await fetch(issuer + "/cdn-cgi/access/certs");
-    if (!certs.ok) return null;
-    const jwks = await certs.json();
-    const jwk = (jwks.keys || []).find(k => k.kid === header.kid);
-    if (!jwk) return null;
-    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
-    const signature = Uint8Array.from(atob(parts[2].replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
-    const data = new TextEncoder().encode(parts[0] + "." + parts[1]);
-    if (!await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, signature, data)) return null;
-    const email = String(claims.email || "").toLowerCase();
+    const payload = ctx?.access
+      ? await ctx.access.getIdentity()
+      : ctx?.data?.cloudflareAccess?.JWT?.payload;
+    const email = String(payload?.email || "").trim().toLowerCase();
     return validEmail(email) ? { email } : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 function isAdmin(identity, env) {
   return (env.ADMIN_EMAILS || "").split(",").map(x => x.trim().toLowerCase()).filter(Boolean).includes(identity.email);
@@ -54,7 +38,7 @@ async function requireIdentity(request, env) {
   const identity = await accessIdentity(request, env);
   return identity;
 }
-async function handle(request, env) {
+async function handle(request, env, ctx) {
   const url = new URL(request.url);
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(request, env) });
   if (url.pathname === "/health" && request.method === "GET") return json({ ok: true, service: "MTA Marketplace API" });
@@ -77,7 +61,7 @@ async function handle(request, env) {
     }});
   }
 
-  const identity = await requireIdentity(request, env);
+  const identity = await requireIdentity(ctx);
   if (!identity) return json({ error: "Authentication required" }, 401);
 
   if (url.pathname === "/v1/submissions" && request.method === "POST") {
@@ -164,10 +148,10 @@ async function handle(request, env) {
   return json({ error: "Not found" }, 404);
 }
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const headers = cors(request, env);
     try {
-      const response = await handle(request, env);
+      const response = await handle(request, env, ctx);
       const merged = new Headers(response.headers);
       for (const [key, value] of Object.entries(headers)) merged.set(key, value);
       return new Response(response.body, { status: response.status, statusText: response.statusText, headers: merged });
