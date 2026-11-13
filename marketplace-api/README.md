@@ -7,7 +7,7 @@ This Worker is the backend foundation for developer accounts, submissions, file 
 - Cloudflare Worker: API and download gateway.
 - D1: app metadata, ownership, submission/review status.
 - Private R2 bucket: uploaded files. New uploads remain under `quarantine/`.
-- Cloudflare Access: authenticates registered developer/admin identities. Configure Google/GitHub identity providers for external developers and protect the API hostname with an Access application. Set the Worker Access audience and team issuer values exactly as shown by Cloudflare.
+- Cloudflare Access: authenticates registered developer/admin identities. Configure Google/GitHub identity providers for external developers. Protect only authenticated API paths (`/v1/submissions*`, `/v1/me/*`, and `/v1/admin/*`) so public catalogue and download routes remain public. Set the Worker Access audience and team issuer values exactly as shown by Cloudflare.
 - Admin review: only addresses in the `ADMIN_EMAILS` secret can view the queue or approve/reject submissions.
 
 ## Provisioning
@@ -26,13 +26,15 @@ This Worker is the backend foundation for developer accounts, submissions, file 
 - `PUT /v1/submissions/:id/file`: owner uploads a release binary (100 MiB default).
 - `GET /v1/me/submissions`: developer sees their own submission status.
 - `GET /v1/admin/submissions`: admin-only moderation queue.
-- `PATCH /v1/admin/submissions/:id`: admin approves, rejects, or removes a submission.
+- `PATCH /v1/admin/submissions/:id`: admin approves, rejects, or removes a submission. Approval requires both `rights_verified: true` and `malware_scan_passed: true` in the request body.
 - `GET /v1/download/:id`: public direct download, but only for approved entries.
+
+See [SOURCES.md](./SOURCES.md) for the initial source catalogue and redistribution rules.
 
 ## Mandatory safety and legal review
 - Uploads are private and not downloadable while awaiting review.
 - The reviewer must verify the submitter's authority, the redistribution license/permission, official source, version, platform, and file identity.
-- Run malware scanning and inspect package signatures/hashes before approval. This starter does not include a malware-scanning engine; approval must not be automated.
+- Run malware scanning and inspect package signatures/hashes before approval. The reviewer must explicitly send both `rights_verified: true` and `malware_scan_passed: true`. This starter does not include a malware-scanning engine; approval must not be automated.
 - Reject pirated, cracked, repackaged without permission, malicious, deceptive, or rights-infringing software.
 - Keep a takedown/report channel and promptly disable disputed files pending investigation.
 - Never claim that an app is “verified safe” merely because it passed a basic file-type check.
