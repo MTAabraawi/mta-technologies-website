@@ -232,12 +232,15 @@ async function handle(request, env, ctx) {
     if (body.status === "approved" && (body.rights_verified !== true || body.malware_scan_passed !== true)) {
       return json({ error: "Approval requires explicit rights verification and a completed malware scan." }, 400);
     }
-    const row = await env.DB.prepare("SELECT id,object_key FROM submissions WHERE id=?").bind(reviewMatch[1]).first();
+    const row = await env.DB.prepare("SELECT id,object_key,multipart_upload_id,multipart_key FROM submissions WHERE id=?").bind(reviewMatch[1]).first();
     if (!row) return json({ error: "Submission not found." }, 404);
     if (body.status === "approved" && !row.object_key) return json({ error: "A release file is required before approval." }, 400);
-    if (body.status !== "approved" && row.object_key) {
-      await env.FILES.delete(row.object_key);
-      await env.DB.prepare("UPDATE submissions SET object_key=NULL,file_name=NULL,file_size=NULL WHERE id=?").bind(row.id).run();
+    if (body.status !== "approved") {
+      if (row.multipart_upload_id && row.multipart_key) {
+        try { await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).abort(); } catch {}
+      }
+      if (row.object_key) await env.FILES.delete(row.object_key);
+      await env.DB.prepare("UPDATE submissions SET object_key=NULL,file_name=NULL,file_size=NULL,multipart_upload_id=NULL,multipart_key=NULL,multipart_token=NULL,multipart_parts='[]' WHERE id=?").bind(row.id).run();
     }
     if (body.status === "approved" && row.object_key.startsWith("quarantine/")) {
       const source = await env.FILES.get(row.object_key);
