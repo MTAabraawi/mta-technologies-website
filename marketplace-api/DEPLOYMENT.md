@@ -41,8 +41,9 @@ Create a Self-hosted Access application for the existing website hostname. Prote
 - `www.mtahqq.dpdns.org/api/v1/submissions*`
 - `www.mtahqq.dpdns.org/api/v1/me/*`
 - `www.mtahqq.dpdns.org/api/v1/admin/*`
+- `www.mtahqq.dpdns.org/api/v1/certificates/requests*`
 
-Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The same Access application authenticates developer and administrator requests. The API independently checks `ADMIN_EMAILS` on every admin endpoint, so a normal signed-in developer cannot moderate or inspect other users' submissions.
+Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The same Access application authenticates developer and administrator requests, including developer credential applications. Public certificate verification remains unauthenticated by design. The API independently checks `ADMIN_EMAILS` on every admin endpoint, so a normal signed-in developer cannot moderate or inspect other users' submissions.
 
 The Pages middleware validates the `Cf-Access-Jwt-Assertion` (or `CF_Authorization` cookie) signature, issuer, audience, expiry, and key ID using Cloudflare's published JWKS. The API trusts the verified JWT payload placed in the Pages request context. Do not replace it with an unverified email header.
 
