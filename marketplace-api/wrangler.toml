@@ -1,18 +1,5 @@
-name = "mta-marketplace-api"
-main = "src/index.js"
-compatibility_date = "2026-11-13"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "mta-marketplace"
-database_id = "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
-
-[[r2_buckets]]
-binding = "FILES"
-bucket_name = "mta-marketplace-files"
-
-[vars]
-SITE_ORIGIN = "https://www.mtahqq.dpdns.org"
-ACCESS_TEAM_DOMAIN = "https://REPLACE_WITH_YOUR_TEAM.cloudflareaccess.com"
-ACCESS_AUD = "REPLACE_WITH_CLOUDFLARE_ACCESS_APPLICATION_AUD"
-MAX_UPLOAD_BYTES = "104857600"
+# Reference configuration for optional standalone Worker development only.
+# Production deployment for this repository uses Cloudflare Pages Functions:
+# functions/api/[[path]].js and functions/api/_middleware.js.
+# Do not deploy this file as a separate production Worker without adapting
+# the routing and Access configuration described in DEPLOYMENT.md.
