@@ -447,3 +447,116 @@ html[lang="en"] .lightbox-close {
     font-size: 1rem;
   }
 }
+
+/* Marketplace-first homepage redesign */
+.market-home { background: var(--bg-primary); }
+.market-home .market-topbar {
+  position: relative; top: auto; z-index: 2;
+  background: rgba(7,11,20,.72);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(14px);
+}
+[data-theme="light"] .market-home .market-topbar { background: rgba(255,255,255,.85); }
+.market-topbar-inner { min-height: 76px; display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.market-brand img { display:block; width:auto; max-width:210px; max-height:48px; object-fit:contain; }
+.market-tools { display:flex; gap:.6rem; align-items:center; }
+.market-hero { position:relative; overflow:hidden; padding:clamp(3.5rem,8vw,7rem) 0 3.5rem; }
+.market-hero:before { content:""; position:absolute; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle,rgba(37,99,235,.19),transparent 68%); top:-250px; inset-inline-start:-180px; pointer-events:none; }
+.market-hero .container { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr); align-items:center; gap:3rem; position:relative; }
+.market-hero-copy { max-width:760px; }
+.market-eyebrow,.market-kicker { color:var(--accent-blue); font-size:.78rem; font-weight:800; letter-spacing:.04em; }
+.market-eyebrow { display:inline-flex; padding:.45rem .85rem; border:1px solid rgba(56,189,248,.28); border-radius:99px; background:rgba(56,189,248,.08); margin-bottom:1.35rem; }
+.market-hero h1 { font-size:clamp(2.1rem,5vw,4rem); line-height:1.35; font-weight:900; letter-spacing:-.04em; margin-bottom:1.15rem; }
+.market-hero h1 em { color:var(--accent-blue); font-style:normal; }
+.market-hero-copy>p { max-width:650px; color:var(--text-secondary); line-height:2; font-size:1.02rem; margin-bottom:1.6rem; }
+.market-search { display:flex; align-items:center; gap:.7rem; max-width:620px; min-height:60px; padding:.45rem .55rem .45rem 1rem; background:var(--bg-surface); border:1px solid var(--border-color); border-radius:15px; box-shadow:0 15px 45px rgba(0,0,0,.12); }
+.market-search>span { font-size:1.7rem; color:var(--accent-blue); line-height:1; }
+.market-search input { min-width:0; flex:1; color:var(--text-primary); background:transparent; border:0; outline:0; font:inherit; font-size:.88rem; }
+.market-search input::placeholder { color:var(--text-muted); }
+.market-search button { border:0; border-radius:10px; padding:.7rem 1.2rem; color:white; background:var(--accent-cobalt); font:inherit; font-size:.82rem; font-weight:800; cursor:pointer; }
+.market-hero-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1.15rem; }
+.market-hero-mark { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; border:1px solid var(--border-color); border-radius:28px; background:linear-gradient(145deg,rgba(14,22,41,.9),rgba(7,11,20,.35)); box-shadow:0 25px 70px rgba(0,0,0,.2); }
+.market-hero-mark img { width:100%; max-width:420px; height:auto; object-fit:contain; }
+.market-hero-mark span { color:var(--text-muted); font:700 .65rem 'Plus Jakarta Sans',sans-serif; letter-spacing:.2em; margin-top:1rem; text-align:center; }
+.market-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; padding-top:1rem; }
+.shortcut-card { display:flex; align-items:center; gap:1rem; min-width:0; padding:1.25rem; border:1px solid var(--border-color); border-radius:17px; background:var(--bg-surface); color:var(--text-primary); text-decoration:none; transition:transform .2s,border-color .2s,background .2s; }
+.shortcut-card:hover { transform:translateY(-3px); border-color:var(--border-hover); }
+.shortcut-primary { background:linear-gradient(125deg,rgba(37,99,235,.18),var(--bg-surface)); border-color:rgba(56,189,248,.3); }
+.shortcut-icon { display:grid; place-items:center; flex:0 0 48px; height:48px; border-radius:14px; background:rgba(56,189,248,.1); color:var(--accent-blue); font-size:1.5rem; }
+.shortcut-card>span:nth-child(2) { display:flex; flex-direction:column; min-width:0; gap:.25rem; }
+.shortcut-card strong { font-size:.95rem; }
+.shortcut-card small { color:var(--text-muted); font-size:.72rem; line-height:1.6; }
+.shortcut-card>b { margin-inline-start:auto; color:var(--accent-blue); font-size:1.2rem; }
+.market-section { padding-top:5rem; }
+.market-section-heading { display:flex; justify-content:space-between; align-items:end; gap:1rem; margin-bottom:1.5rem; }
+.market-section-heading h2,.developer-banner h2,.about-strip h2 { font-size:clamp(1.5rem,3vw,2.15rem); line-height:1.45; font-weight:900; margin:.35rem 0; }
+.market-section-heading p,.developer-banner p,.about-strip p { color:var(--text-secondary); font-size:.88rem; line-height:1.9; }
+.market-text-link { color:var(--accent-blue); text-decoration:none; font-weight:800; font-size:.82rem; white-space:nowrap; padding-bottom:.35rem; }
+.platform-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.8rem; }
+.platform-grid a { display:flex; flex-direction:column; align-items:flex-start; gap:.45rem; padding:1.15rem; border:1px solid var(--border-color); border-radius:15px; background:var(--bg-surface); color:var(--text-primary); text-decoration:none; transition:border-color .2s,transform .2s; }
+.platform-grid a:hover { border-color:var(--border-hover); transform:translateY(-3px); }
+.platform-grid a>span { color:var(--accent-blue); font-size:1.5rem; }
+.platform-grid strong { font:800 .95rem 'Plus Jakarta Sans',sans-serif; }
+.platform-grid small { color:var(--text-muted); font-size:.68rem; line-height:1.6; }
+.featured-app-card { display:flex; align-items:center; gap:1.5rem; padding:1.5rem; border:1px solid var(--border-color); border-radius:20px; background:linear-gradient(110deg,var(--bg-surface),rgba(37,99,235,.08)); }
+.app-symbol { display:grid; place-content:center; flex:0 0 88px; height:88px; border-radius:22px; text-align:center; color:white; font:800 .75rem 'Plus Jakarta Sans',sans-serif; line-height:1.35; background:linear-gradient(145deg,#2563EB,#0B1120); border:1px solid rgba(56,189,248,.45); box-shadow:0 12px 35px rgba(37,99,235,.2); }
+.app-symbol b { font-size:1.5rem; letter-spacing:.06em; }
+.featured-app-copy { flex:1; min-width:0; }
+.app-status { color:var(--accent-blue); font-size:.72rem; font-weight:800; }
+.featured-app-copy h3 { font:800 1.4rem 'Plus Jakarta Sans',sans-serif; margin:.3rem 0 .45rem; }
+.featured-app-copy p { color:var(--text-secondary); font-size:.84rem; line-height:1.9; }
+.app-meta { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.85rem; }
+.app-meta span { padding:.28rem .55rem; border-radius:7px; background:rgba(148,163,184,.09); color:var(--text-muted); font:600 .65rem 'Plus Jakarta Sans',sans-serif; }
+.developer-banner,.about-strip { display:flex; align-items:center; justify-content:space-between; gap:2rem; padding:2rem; border:1px solid var(--border-color); border-radius:20px; background:var(--bg-surface); }
+.developer-banner { background:linear-gradient(115deg,rgba(37,99,235,.15),var(--bg-surface)); }
+.developer-banner>div,.about-strip>div { max-width:760px; }
+.about-strip { margin-bottom:5rem; }
+.market-footer { margin-top:2rem; padding:3.5rem 0 1.5rem; background:#050811; border-top:1px solid var(--border-color); color:var(--text-secondary); }
+.market-footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:2rem; }
+.market-footer-grid>div { display:flex; flex-direction:column; align-items:flex-start; gap:.65rem; }
+.market-footer-grid h3 { color:var(--text-primary); font-size:.88rem; margin-bottom:.4rem; }
+.market-footer-grid a { color:var(--text-secondary); text-decoration:none; font-size:.78rem; }
+.market-footer-grid a:hover { color:var(--accent-blue); }
+.market-footer-brand img { max-width:190px; max-height:48px; object-fit:contain; margin-bottom:.4rem; }
+.market-footer-brand p { max-width:330px; font-size:.78rem; line-height:1.9; margin-bottom:.3rem; }
+.market-footer-brand a { color:var(--accent-blue); }
+.market-footer-bottom { display:flex; justify-content:space-between; gap:1rem; flex-wrap:wrap; border-top:1px solid var(--border-color); margin-top:2.5rem; padding-top:1.2rem; color:var(--text-muted); font:600 .67rem 'Plus Jakarta Sans',sans-serif; }
+@media(max-width:900px) {
+ .market-hero .container { grid-template-columns:1fr; }
+ .market-hero-mark { display:none; }
+ .platform-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .market-footer-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:650px) {
+ .market-topbar-inner { min-height:66px; }
+ .market-brand img { max-width:155px; max-height:40px; }
+ .market-tools { gap:.35rem; }
+ .market-tools .control-btn { padding:.42rem .55rem; font-size:.68rem; }
+ .market-hero { padding:3.2rem 0 2.2rem; }
+ .market-hero h1 { font-size:2rem; }
+ .market-hero-copy>p { font-size:.88rem; }
+ .market-search { min-height:54px; gap:.45rem; }
+ .market-search input { font-size:.75rem; }
+ .market-search button { padding:.65rem .8rem; }
+ .market-shortcuts { grid-template-columns:1fr; gap:.65rem; }
+ .shortcut-card { padding:1rem; }
+ .market-section { padding-top:3.6rem; }
+ .market-section-heading { align-items:flex-start; }
+ .market-section-heading h2 { font-size:1.45rem; }
+ .market-section-heading p { font-size:.78rem; }
+ .market-text-link { font-size:.7rem; }
+ .platform-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
+ .platform-grid a { padding:.9rem; }
+ .featured-app-card { align-items:flex-start; flex-wrap:wrap; gap:1rem; padding:1.1rem; }
+ .app-symbol { flex-basis:65px; height:65px; border-radius:16px; }
+ .app-symbol b { font-size:1.15rem; }
+ .featured-app-copy { flex-basis:calc(100% - 85px); }
+ .featured-app-copy h3 { font-size:1.1rem; }
+ .featured-app-copy p { font-size:.76rem; }
+ .featured-app-card>.btn { width:100%; }
+ .developer-banner,.about-strip { align-items:flex-start; flex-direction:column; padding:1.35rem; gap:1rem; }
+ .developer-banner>.btn,.about-strip>.btn { width:100%; }
+ .market-footer-grid { grid-template-columns:1fr 1fr; gap:1.8rem 1rem; }
+ .market-footer-brand { grid-column:1/-1; }
+ .market-footer-bottom { font-size:.6rem; }
+}
