@@ -71,13 +71,90 @@ async function handle(request, env, ctx) {
     return json({ id, status: "pending", message: "Submission saved. Upload the release file to continue." }, 201);
   }
 
+  const multipartStartMatch = url.pathname.match(/^\/v1\/submissions\/([a-f0-9-]+)\/multipart$/i);
+  if (multipartStartMatch && request.method === "POST") {
+    const id = multipartStartMatch[1];
+    const row = await env.DB.prepare("SELECT id,status,multipart_upload_id,multipart_key,multipart_token,file_name,file_size,multipart_parts FROM submissions WHERE id=? AND owner_email=?").bind(id, identity.email).first();
+    if (!row || row.status !== "pending") return json({ error: "Submission not found or upload is closed." }, 404);
+    const body = await request.json().catch(() => null);
+    const filename = safeName(body?.file_name);
+    const fileSize = Number(body?.file_size);
+    const token = String(body?.file_token || "").slice(0, 200);
+    const ext = filename.toLowerCase().split(".").pop();
+    const allowed = ["apk","aab","exe","msi","dmg","pkg","deb","rpm","appimage","flatpak","zip","tar","gz","wasm"];
+    const max = Number(env.MAX_UPLOAD_BYTES || 2147483648);
+    if (!body || !token || !Number.isSafeInteger(fileSize) || fileSize < 1 || fileSize > max || !allowed.includes(ext)) {
+      return json({ error: "Invalid filename, file size, upload token, or unsupported file type." }, 400);
+    }
+    if (row.multipart_upload_id && row.multipart_token === token && row.file_size === fileSize && row.file_name === filename) {
+      let parts = [];
+      try { parts = JSON.parse(row.multipart_parts || "[]"); } catch {}
+      return json({ id, upload_id: row.multipart_upload_id, part_size: 8388608, parts, resumed: true });
+    }
+    if (row.multipart_upload_id && row.multipart_key) {
+      try { await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).abort(); } catch {}
+    }
+    const key = "quarantine/" + id + "/" + crypto.randomUUID() + "-" + filename;
+    const upload = await env.FILES.createMultipartUpload(key, {
+      httpMetadata: { contentType: "application/octet-stream" },
+      customMetadata: { submissionId: id, uploader: identity.email }
+    });
+    await env.DB.prepare("UPDATE submissions SET file_name=?,file_size=?,multipart_upload_id=?,multipart_key=?,multipart_token=?,multipart_parts='[]',updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
+      .bind(filename, fileSize, upload.uploadId, key, token, id).run();
+    return json({ id, upload_id: upload.uploadId, part_size: 8388608, parts: [], resumed: false }, 201);
+  }
+
+  const multipartPartMatch = url.pathname.match(/^\/v1\/submissions\/([a-f0-9-]+)\/multipart\/([0-9]+)$/i);
+  if (multipartPartMatch && request.method === "PUT") {
+    const id = multipartPartMatch[1];
+    const partNumber = Number(multipartPartMatch[2]);
+    const row = await env.DB.prepare("SELECT multipart_upload_id,multipart_key,multipart_parts FROM submissions WHERE id=? AND owner_email=? AND status='pending'").bind(id, identity.email).first();
+    if (!row?.multipart_upload_id || !row.multipart_key || row.multipart_upload_id !== request.headers.get("x-upload-id")) return json({ error: "Upload session not found." }, 404);
+    if (!Number.isInteger(partNumber) || partNumber < 1 || partNumber > 10000 || !request.body) return json({ error: "Invalid upload part." }, 400);
+    const bytes = await request.arrayBuffer();
+    if (!bytes.byteLength || bytes.byteLength > 8388608) return json({ error: "Each upload part must be between 1 byte and 8 MiB." }, 413);
+    const upload = env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id);
+    const uploadedPart = await upload.uploadPart(partNumber, bytes);
+    let parts = [];
+    try { parts = JSON.parse(row.multipart_parts || "[]"); } catch {}
+    parts = parts.filter(part => part.partNumber !== partNumber);
+    parts.push({ partNumber, etag: uploadedPart.etag });
+    parts.sort((a, b) => a.partNumber - b.partNumber);
+    await env.DB.prepare("UPDATE submissions SET multipart_parts=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
+      .bind(JSON.stringify(parts), id).run();
+    return json({ partNumber, etag: uploadedPart.etag, uploaded_parts: parts.length });
+  }
+
+  const multipartCompleteMatch = url.pathname.match(/^\/v1\/submissions\/([a-f0-9-]+)\/multipart\/complete$/i);
+  if (multipartCompleteMatch && request.method === "POST") {
+    const id = multipartCompleteMatch[1];
+    const row = await env.DB.prepare("SELECT multipart_upload_id,multipart_key,multipart_parts,file_size FROM submissions WHERE id=? AND owner_email=? AND status='pending'").bind(id, identity.email).first();
+    if (!row?.multipart_upload_id || !row.multipart_key) return json({ error: "Upload session not found." }, 404);
+    const body = await request.json().catch(() => null);
+    if (body?.upload_id !== row.multipart_upload_id) return json({ error: "Upload session mismatch." }, 409);
+    let parts = [];
+    try { parts = JSON.parse(row.multipart_parts || "[]"); } catch {}
+    parts.sort((a, b) => a.partNumber - b.partNumber);
+    if (!parts.length || parts.some((part, index) => part.partNumber !== index + 1 || typeof part.etag !== "string")) {
+      return json({ error: "Upload is incomplete. Retry missing parts before completing." }, 409);
+    }
+    try {
+      await env.FILES.resumeMultipartUpload(row.multipart_key, row.multipart_upload_id).complete(parts);
+    } catch {
+      return json({ error: "Could not complete multipart upload. Verify all parts and retry." }, 400);
+    }
+    await env.DB.prepare("UPDATE submissions SET object_key=multipart_key,multipart_upload_id=NULL,multipart_key=NULL,multipart_token=NULL,multipart_parts='[]',status='pending_review',updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?")
+      .bind(id).run();
+    return json({ id, status: "pending_review", file_size: row.file_size, message: "File received and held for security and rights review." });
+  }
+
   const uploadMatch = url.pathname.match(/^\/v1\/submissions\/([a-f0-9-]+)\/file$/i);
   if (uploadMatch && request.method === "PUT") {
     const id = uploadMatch[1];
     const row = await env.DB.prepare("SELECT id,status FROM submissions WHERE id=? AND owner_email=?").bind(id, identity.email).first();
     if (!row || !["pending","pending_review"].includes(row.status)) return json({ error: "Submission not found or upload is closed." }, 404);
     const size = Number(request.headers.get("content-length") || 0);
-    const max = Number(env.MAX_UPLOAD_BYTES || 104857600);
+    const max = Math.min(Number(env.MAX_UPLOAD_BYTES || 104857600), 104857600);
     if (!request.body || !size) return json({ error: "A known file size is required for secure streaming uploads." }, 411);
     if (size > max) return json({ error: "File exceeds the upload limit." }, 413);
     const filename = safeName(request.headers.get("x-file-name"));
