@@ -8,3 +8,5 @@
 
 /* Keep hidden filter results hidden despite card display styles. */
 .app-card[hidden], .apps-empty[hidden] { display: none !important; }
+
+.app-license { display:block; margin:.25rem 0 .8rem; color:var(--text-secondary); font-size:.75rem; line-height:1.6; overflow-wrap:anywhere; }
