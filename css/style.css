@@ -810,3 +810,24 @@ html[lang="en"] .lightbox-close {
 #verification-details dd{margin:0;overflow-wrap:anywhere;font-weight:650}
 @media(max-width:760px){.store-directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:440px){.store-directory-grid{grid-template-columns:1fr}}
+
+
+/* Printable MTA developer credential */
+.credential-print-page{min-height:100vh;background:#eef2f7;color:#0b1120;padding:2rem 1rem}
+.credential-wrap{max-width:900px;margin:3rem auto}
+.credential-card{background:linear-gradient(125deg,#fff 0%,#f7fbff 62%,#e9f3ff 100%);border:2px solid #1d4f91;border-radius:22px;box-shadow:0 24px 70px rgba(8,25,55,.18);overflow:hidden;padding:2rem;color:#0b1120}
+.credential-card header,.credential-card footer{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.credential-card header strong{display:block;font-size:1.2rem;letter-spacing:.12em;color:#123b72}
+.credential-card header small,.credential-card header>span,.credential-card footer{font-size:.65rem;letter-spacing:.08em;color:#52647b}
+.credential-body{display:grid;grid-template-columns:1fr 230px;align-items:center;gap:2rem;padding:2.4rem 0}
+.credential-body h1{font-size:clamp(2rem,5vw,3.2rem);margin:.5rem 0;color:#0b2347}
+.credential-body p{color:#1d4f91;font-weight:800}
+.credential-body dl{display:grid;grid-template-columns:120px 1fr;gap:.55rem;font-size:.8rem}
+.credential-body dt{color:#64748b}.credential-body dd{margin:0;font-weight:750;overflow-wrap:anywhere}
+.credential-qr{display:flex;flex-direction:column;align-items:center;gap:.6rem}.credential-qr img{width:190px;height:190px;object-fit:contain;background:#fff;padding:8px;border:1px solid #dbe4f0}.credential-qr small{font-size:.65rem;color:#52647b}
+.credential-card footer{border-top:1px solid #d7e1ed;padding-top:1rem}
+.credential-card footer a{color:#1d4f91;font-weight:800}
+.credential-actions{display:flex;justify-content:center;gap:1rem;margin:1.5rem}.credential-actions button,.credential-actions a{border:1px solid #1d4f91;border-radius:8px;background:#fff;color:#123b72;padding:.7rem 1rem;text-decoration:none;font-weight:700}
+#credential-error{text-align:center;color:#b91c1c}
+@media(max-width:620px){.credential-card{padding:1.1rem}.credential-body{grid-template-columns:1fr;gap:1.2rem}.credential-qr{grid-row:1}.credential-card header{align-items:flex-start;flex-direction:column}.credential-card footer{align-items:flex-start;flex-direction:column}}
+@media print{.credential-print-page{background:#fff;padding:0}.credential-wrap{margin:0;max-width:none}.credential-card{box-shadow:none;border-radius:0;min-height:480px}.credential-actions,#credential-error{display:none}}
