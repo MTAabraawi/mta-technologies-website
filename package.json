@@ -2,8 +2,5 @@
   "name": "mta-technologies-marketplace",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "@cloudflare/pages-plugin-cloudflare-access": "^1.0.5"
-  }
+  "type": "module"
 }
