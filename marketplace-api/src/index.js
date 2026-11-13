@@ -63,12 +63,13 @@ async function handle(request, env, ctx) {
     const serial = String(url.searchParams.get("serial") || "");
     const supplied = String(url.searchParams.get("sig") || "");
     const row = await env.DB.prepare("SELECT serial_number,subject_name,credential_type,issued_at,expires_at,status,signature,signature_algorithm FROM issued_certificates WHERE serial_number=?").bind(serial).first();
-    if (!row || !supplied || !env.CERT_SIGNING_SECRET) return json({ valid: false, reason: "not_found" }, 404);
+    if (!row || !env.CERT_SIGNING_SECRET) return json({ valid: false, reason: "not_found" }, 404);
+    const submittedSignature = supplied || row.signature;
     const payload = [row.serial_number,row.subject_name,row.credential_type,row.issued_at,row.expires_at].join("|");
     const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.CERT_SIGNING_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
-    const bytes = Uint8Array.from(atob(supplied.replace(/-/g,"+").replace(/_/g,"/")), ch => ch.charCodeAt(0));
+    const bytes = Uint8Array.from(atob(submittedSignature.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-submittedSignature.length%4)%4)), ch => ch.charCodeAt(0));
     const validSignature = await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(payload));
-    const signatureMatches = supplied === row.signature && validSignature;
+    const signatureMatches = submittedSignature === row.signature && validSignature;
     const current = Date.now();
     const expired = Date.parse(row.expires_at) <= current;
     return json({ valid: signatureMatches && row.status === "active" && !expired, authentic: signatureMatches, status: expired && row.status === "active" ? "expired" : row.status, serial: row.serial_number, name: row.subject_name, credential: row.credential_type, issued_at: row.issued_at, expires_at: row.expires_at });
