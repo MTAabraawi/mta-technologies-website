@@ -391,6 +391,7 @@
   const catalogueSentinel = document.getElementById("catalogue-sentinel");
   if (moreButton) {
     moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
+    if (!("IntersectionObserver" in window) || !catalogueSentinel) moreButton.classList.add("is-retry");
     // Continue loading catalogue batches automatically as the visitor reaches
     // the end of the currently rendered results. The button remains available
     // for manual loading and browsers without IntersectionObserver.
