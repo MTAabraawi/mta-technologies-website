@@ -17,10 +17,23 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   expect(Array.isArray(payload), 'The catalogue API must return an array').toBeTruthy();
   expect(payload.length, 'The first API page should contain app records').toBeGreaterThan(0);
 
+  // The catalogue intentionally suppresses duplicate name/platform pairs.
+  // Compare rendered cards with the unique records, not the raw API row count.
+  const platformNames = {
+    android: 'Android', ios: 'iOS', windows: 'Windows',
+    macos: 'macOS', linux: 'Linux', web: 'Web'
+  };
+  const uniquePayloadCount = new Set(payload.map(app => {
+    const name = String(app.app_name || app.name || '').trim().toLocaleLowerCase();
+    const platform = platformNames[String(app.platform || 'Other').toLowerCase()]
+      || String(app.platform || 'Other');
+    return name + '|' + platform.toLocaleLowerCase();
+  })).size;
+
   const firstBatch = page.locator('#apps-grid .app-card[data-dynamic-app="true"]');
   await expect(firstBatch.first()).toBeVisible({ timeout: 30_000 });
   const firstCount = await firstBatch.count();
-  expect(firstCount, 'The first API batch and curated catalogue records must be rendered').toBeGreaterThanOrEqual(payload.length);
+  expect(firstCount, 'Every unique first-page record must be rendered').toBeGreaterThanOrEqual(uniquePayloadCount);
   await expect(firstBatch.filter({ has: page.locator('h3', { hasText: /^#WEATHER$/ }) }).first())
     .toBeVisible();
 
