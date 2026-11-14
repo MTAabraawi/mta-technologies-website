@@ -150,13 +150,13 @@
   }
   function addApps(items) {
     const existing = new Set([
-      ...[...grid.querySelectorAll(".app-card")].map(card => (card.dataset.name || "").toLocaleLowerCase()),
-      ...dynamicApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase())
+      ...[...grid.querySelectorAll(".app-card")].map(card => (card.dataset.name || "").toLocaleLowerCase() + "|" + (card.dataset.platform || "").toLocaleLowerCase()),
+      ...dynamicApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase())
     ]);
     (Array.isArray(items) ? items : []).forEach(app => {
       if (!app || typeof app !== "object") return;
       const name = String(app.app_name || app.name || "").trim();
-      const key = name.toLocaleLowerCase();
+      const key = name.toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase();
       if (!key || existing.has(key)) return;
       dynamicApps.push({ ...app, app_name: name });
       existing.add(key);
@@ -176,6 +176,7 @@
 
   let nextOffset = 0;
   let engineTotal = 0;
+  let activeQuery = "";
   async function fetchEnginePage() {
     if (!api) return [];
     const button = document.getElementById("load-more-apps");
@@ -184,7 +185,8 @@
       button.textContent = text("جارٍ التحميل...", "Loading...");
     }
     try {
-      const response = await fetch(api + "/api/v1/apps?limit=200&offset=" + nextOffset, {
+      const queryPart = activeQuery ? "&q=" + encodeURIComponent(activeQuery) : "";
+      const response = await fetch(api + "/api/v1/apps?limit=200&offset=" + nextOffset + queryPart, {
         credentials: "omit", cache: "no-store"
       });
       if (!response.ok) throw new Error("Catalogue HTTP " + response.status);
@@ -236,9 +238,21 @@
     }
   }
 
-  [search, platform, category, developer].forEach(element => {
+  [platform, category, developer].forEach(element => {
     element.addEventListener("input", filter);
     element.addEventListener("change", filter);
+  });
+  let searchTimer = null;
+  search.addEventListener("input", () => {
+    filter();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      const query = search.value.trim();
+      if (query === activeQuery) return;
+      activeQuery = query;
+      nextOffset = 0;
+      fetchEnginePage().catch(() => {});
+    }, 450);
   });
   const moreButton = document.getElementById("load-more-apps");
   if (moreButton) moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
