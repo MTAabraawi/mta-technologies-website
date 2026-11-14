@@ -181,6 +181,7 @@
     }
   }
 
+  const pageSize = 60;
   let nextOffset = 0;
   let engineTotal = 0;
   let activeQuery = "";
@@ -193,7 +194,7 @@
     }
     try {
       const queryPart = activeQuery ? "&q=" + encodeURIComponent(activeQuery) : "";
-      const response = await fetch(api + "/api/v1/apps?limit=200&offset=" + nextOffset + queryPart, {
+      const response = await fetch(api + "/api/v1/apps?limit=" + pageSize + "&offset=" + nextOffset + queryPart, {
         credentials: "omit", cache: "no-store"
       });
       if (!response.ok) throw new Error("Catalogue HTTP " + response.status);
@@ -202,7 +203,7 @@
       addApps(items);
       nextOffset += items.length;
       if (button) {
-        button.hidden = items.length < 200 || (engineTotal > 0 && nextOffset >= engineTotal);
+        button.hidden = items.length < pageSize || (engineTotal > 0 && nextOffset >= engineTotal);
         button.disabled = false;
         button.textContent = text("تحميل المزيد من التطبيقات", "Load more applications");
       }
