@@ -192,15 +192,22 @@
       ...curatedApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase()),
       ...engineApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase())
     ]);
+    let added = 0;
     (Array.isArray(items) ? items : []).forEach(app => {
       if (!app || typeof app !== "object") return;
       const name = String(app.app_name || app.name || "").trim();
       const key = name.toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase();
       if (!name || existing.has(key)) return;
-      target.push({ ...app, app_name: name });
+      const normalized = { ...app, app_name: name };
+      target.push(normalized);
       existing.add(key);
+      // Append only the new card. Rebuilding every previously loaded card on
+      // every page made long catalogues progressively slower on mobile devices.
+      grid.insertBefore(makeCard(normalized), empty);
+      added++;
     });
-    renderDynamicApps();
+    filter();
+    return added;
   }
 
   window.addEventListener("mta:languagechange", renderDynamicApps);
@@ -213,7 +220,7 @@
     }
   }
 
-  const pageSize = 48;
+  const pageSize = 24;
   let nextOffset = 0;
   let engineTotal = 0;
   let activeQuery = "";
@@ -237,6 +244,9 @@
         credentials: "omit", cache: "no-store", signal: controller.signal
       });
       if (!response.ok) throw new Error("Catalogue HTTP " + response.status);
+      if (!response.headers.get("content-type")?.includes("application/json")) {
+        throw new Error("Catalogue returned a non-JSON response");
+      }
       const payload = await response.json();
       if (!Array.isArray(payload)) throw new Error("Unexpected catalogue response");
       const reportedTotal = Number(response.headers.get("X-Total-Count") || 0);
@@ -259,6 +269,7 @@
       return payload;
     } catch (error) {
       console.warn("MTA Applications Engine catalogue page unavailable", error);
+      if (connection) connection.title = String(error && error.message ? error.message : error);
       if (button) {
         button.hidden = false;
         button.disabled = false;
