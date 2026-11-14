@@ -95,10 +95,15 @@
       img.loading = "lazy";
       img.decoding = "async";
       img.referrerPolicy = "no-referrer";
+      let usingFallback = false;
       img.addEventListener("error", () => {
-        if (fallbackUrl) img.src = fallbackUrl;
-        else icon.replaceChildren(fallbackIcon());
-      }, { once: true });
+        if (fallbackUrl && !usingFallback) {
+          usingFallback = true;
+          img.src = fallbackUrl;
+        } else {
+          icon.replaceChildren(fallbackIcon());
+        }
+      });
       icon.append(img);
     };
     if (iconUrl) appendIconImage(iconUrl, faviconUrl && faviconUrl !== iconUrl ? faviconUrl : "");
