@@ -13,7 +13,7 @@
   const providers = {
     Android: { label: "F-Droid", url: q => "https://search.f-droid.org/?q=" + encodeURIComponent(q) },
     iOS: { label: "Apple App Store", url: q => "https://www.apple.com/us/search/" + encodeURIComponent(q) },
-    Windows: { label: "WinGet", url: q => "https://winget.run/search?query=" + encodeURIComponent(q) },
+    Windows: { label: "WinGet", url: q => "https://github.com/microsoft/winget-pkgs/search?q=" + encodeURIComponent(q) },
     Linux: { label: "Flathub", url: q => "https://flathub.org/apps/search?q=" + encodeURIComponent(q) },
     macOS: { label: "Homebrew", url: q => "https://formulae.brew.sh/" },
     Web: { label: "Web applications", url: q => "https://www.google.com/search?q=" + encodeURIComponent(q + " official web app") }
