@@ -45,7 +45,7 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   expect(secondPayload.length, 'The second API page should contain app records').toBeGreaterThan(0);
   await expect.poll(async () => firstBatch.count(), { timeout: 30_000 })
     .toBeGreaterThan(firstCount);
-  await expect(page.locator('#apps-grid .app-card[data-dynamic-app="true"] h3', { hasText: /^1Password$/ }))
+  await expect(page.locator('#apps-grid .app-card[data-dynamic-app="true"] h3', { hasText: /^1Password$/ }).first())
     .toBeVisible();
 
   expect(pageErrors, 'The marketplace should not throw uncaught JavaScript errors').toEqual([]);
