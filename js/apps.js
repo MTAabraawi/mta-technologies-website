@@ -299,7 +299,8 @@
       );
       throw error;
     } finally {
-      clearTimeout(timeoutId);
+      // timeoutId is scoped to each retry attempt; it must not be
+      // referenced here. Always release the loading lock after success/failure.
       engineLoading = false;
       if (button) button.disabled = false;
     }
