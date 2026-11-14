@@ -8,6 +8,12 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
     const url = new URL(response.url());
     return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '0';
   }, { timeout: 90_000 });
+  // Register before navigation: automatic loading can request the next page
+  // as soon as the load-more sentinel enters the observer margin.
+  const secondApiResponsePromise = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '50';
+  }, { timeout: 90_000 });
 
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const firstApiResponse = await apiResponsePromise;
@@ -45,10 +51,6 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   await expect(moreButton).toBeVisible({ timeout: 20_000 });
   await expect(moreButton).toBeEnabled();
 
-  const secondApiResponsePromise = page.waitForResponse(response => {
-    const url = new URL(response.url());
-    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '50';
-  }, { timeout: 60_000 });
   await moreButton.scrollIntoViewIfNeeded();
   const secondPageResponse = await secondApiResponsePromise;
   expect(secondPageResponse.status(), 'The second catalogue page must return HTTP 200').toBe(200);
