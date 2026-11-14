@@ -50,3 +50,13 @@
 .external-source-links a:hover{transform:translateY(-2px);border-color:var(--border-hover)}
 .directory-note{border-radius:14px}
 @media(max-width:600px){.apps-hero{padding:3.2rem 0 2.4rem}.apps-toolbar{padding:.7rem;gap:.6rem}.apps-toolbar select,.apps-search{min-height:50px}.app-card{padding:1.2rem}.app-card p{min-height:0}.catalog-connection{align-items:flex-start;flex-direction:column}}
+
+/* Comfortable bilingual typography for the marketplace */
+html[lang="ar"],html[lang="ar"] body,.apps-main{font-family:"IBM Plex Sans Arabic","Plus Jakarta Sans",system-ui,sans-serif}
+html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex Sans Arabic",system-ui,sans-serif}
+.apps-main{letter-spacing:normal}
+.apps-hero h1{line-height:1.45}
+.apps-hero p,.app-card p,.directory-note p,.external-catalog-footnote{line-height:2}
+.directory-count-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.25rem}
+.catalog-total{font-size:.72rem;color:var(--accent-emerald);font-weight:800}
+@media(max-width:600px){.directory-count-wrap{align-items:flex-start}.apps-hero h1{line-height:1.5}}
