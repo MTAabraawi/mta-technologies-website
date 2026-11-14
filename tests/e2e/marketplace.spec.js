@@ -34,9 +34,9 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
 
   const secondApiResponsePromise = page.waitForResponse(response => {
     const url = new URL(response.url());
-    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '24';
+    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '200';
   }, { timeout: 60_000 });
-  await moreButton.click();
+  await moreButton.scrollIntoViewIfNeeded();
   const secondPageResponse = await secondApiResponsePromise;
   expect(secondPageResponse.status(), 'The second catalogue page must return HTTP 200').toBe(200);
 
