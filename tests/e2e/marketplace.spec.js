@@ -2,22 +2,25 @@ const { test, expect } = require('@playwright/test');
 
 test('marketplace loads real catalogue records and app icons', async ({ page }) => {
   const pageErrors = [];
-  const catalogueResponses = [];
   page.on('pageerror', error => pageErrors.push(error.message));
-  page.on('response', response => {
-    if (response.url().includes('/api/v1/apps')) catalogueResponses.push(response);
-  });
+
+  const apiResponsePromise = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '0';
+  }, { timeout: 90_000 });
 
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#apps-grid .app-card[data-dynamic-app="true"]').first()).toBeVisible({ timeout: 90_000 });
+  const firstApiResponse = await apiResponsePromise;
+  expect(firstApiResponse.status(), 'The catalogue API must return HTTP 200').toBe(200);
+
+  const payload = await firstApiResponse.json();
+  expect(Array.isArray(payload), 'The catalogue API must return an array').toBeTruthy();
+  expect(payload.length, 'The first API page should contain app records').toBeGreaterThan(0);
 
   const firstBatch = page.locator('#apps-grid .app-card[data-dynamic-app="true"]');
+  await expect(firstBatch.first()).toBeVisible({ timeout: 30_000 });
   const firstCount = await firstBatch.count();
   expect(firstCount).toBeGreaterThan(0);
-
-  const firstApiResponse = catalogueResponses.find(response => new URL(response.url()).searchParams.get('offset') === '0');
-  expect(firstApiResponse, 'The first catalogue API request should be observed').toBeTruthy();
-  expect(firstApiResponse.status()).toBe(200);
 
   const firstDynamicCard = firstBatch.first();
   await expect(firstDynamicCard.locator('h3')).not.toBeEmpty();
@@ -26,12 +29,19 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   const moreButton = page.locator('#load-more-apps');
   await expect(moreButton).toBeVisible({ timeout: 20_000 });
   await expect(moreButton).toBeEnabled();
-  await moreButton.click();
 
-  await expect.poll(async () => firstBatch.count(), { timeout: 60_000 }).toBeGreaterThan(firstCount);
-  const secondPageResponse = catalogueResponses.find(response => new URL(response.url()).searchParams.get('offset') === '24');
-  expect(secondPageResponse, 'Clicking Load More should request the next offset').toBeTruthy();
-  expect(secondPageResponse.status()).toBe(200);
+  const secondApiResponsePromise = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '24';
+  }, { timeout: 60_000 });
+  await moreButton.click();
+  const secondPageResponse = await secondApiResponsePromise;
+  expect(secondPageResponse.status(), 'The second catalogue page must return HTTP 200').toBe(200);
+
+  const secondPayload = await secondPageResponse.json();
+  expect(Array.isArray(secondPayload)).toBeTruthy();
+  expect(secondPayload.length, 'The second API page should contain app records').toBeGreaterThan(0);
+  await expect.poll(async () => firstBatch.count(), { timeout: 30_000 }).toBeGreaterThan(firstCount);
 
   expect(pageErrors, 'The marketplace should not throw uncaught JavaScript errors').toEqual([]);
 });
