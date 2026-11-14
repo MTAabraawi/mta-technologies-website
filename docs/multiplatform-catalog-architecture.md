@@ -4,37 +4,36 @@
 MTA is a discovery directory, not a mirror. Third-party app binaries remain at their original stores and publisher sites. Every result must link to the original listing. Do not hotlink or copy icons/screenshots unless the source terms permit it; retain source attribution and a last-checked timestamp.
 
 ## Current browser-search providers
-- Android: F-Droid public search API (https://search.f-droid.org/api/search_apps) and original package pages.
+- Android: F-Droid public search API and original package pages.
 - iOS: Apple iTunes Search API (entity=software) and returned App Store URL.
 - macOS: Apple iTunes Search API (entity=macSoftware) and returned Mac App Store URL.
-- Windows: winget.run v2 package search API; a community service indexing Microsoft's public WinGet manifest repository, not a Microsoft-operated API. Results link to package pages and offer a source search link.
+- Windows: winget.run v2 package search API; a community service indexing Microsoft's public WinGet manifest repository, not a Microsoft-operated API.
 - Linux: Flathub source-search link. Do not assume a stable public Flathub search API until its endpoint, terms and CORS behavior are verified.
 - Web: search link for official web apps. Do not scrape search engines or claim these are verified listings.
 
-## Candidate bulk catalog sources
-- F-Droid signed repository index (https://f-droid.org/repo/index-v2.json). For bulk sync, follow the signed index/entry process and verify signatures; do not treat the display-only package API as a security verification mechanism.
-- WinGet community manifests (https://github.com/microsoft/winget-pkgs) or documented winget.run paginated search API. Preserve PackageIdentifier, publisher, homepage, license, version and source link.
-- Homebrew Formulae JSON API (https://formulae.brew.sh/docs/api/) for macOS and command-line packages. Treat Formulae and Casks separately and retain each package's upstream homepage.
-- Flathub and Snap Store: use only supported/public endpoints or approved feeds after validating terms and availability. Prefer verified publisher metadata where provided.
-- Apple App Store: use Apple's Search API for discovery and link to trackViewUrl. Respect rate limits and regional storefront differences.
-- Web apps: accept publisher submissions and curate official product URLs. There is no single universal, authoritative global web-app catalog API.
+## Bulk ingestion sources
+- F-Droid public v2 repository index (https://f-droid.org/repo/index-v2.json) for Android metadata. The builder uses it only for discovery metadata; it does not download APKs or claim binary verification. F-Droid documents the signed index and recommends signature verification for security-sensitive use.
+- Homebrew Formulae JSON API (https://formulae.brew.sh/api/formula.json) and Casks JSON API (https://formulae.brew.sh/api/cask.json) for macOS and command-line software. Formulae and Casks remain distinct source records.
+- Next adapters to add after endpoint, rate-limit, attribution and reuse checks: WinGet manifests, Flathub, Snap, Debian/Ubuntu repositories, Apple App Store, Microsoft Store, and curated official web apps.
+- Storefronts without a supported bulk metadata feed will be represented by source search links or publisher submissions, not scraped without permission.
 
-## Normalized record proposal
-- id (stable source-qualified key, e.g. fdroid:org.example.App)
-- name, summary, description, developer
-- platforms[] and categories[]
-- source_id, source_name, source_listing_url
-- publisher_homepage, icon_url (only where reuse/hotlink terms permit)
-- version, updated_at, last_checked_at
-- license, verification_status, region/storefront
-- record_status (active, unavailable, needs_review)
+## Normalized record
+Each generated record has a stable source-qualified ID, name, description, developer, platforms, categories, source ID, source listing URL, optional publisher homepage, version, license, last-checked timestamp, and record status. Separate official distribution listings are retained when they are genuinely distinct.
 
-## Scale and sync
-1. Build source adapters independently; each adapter must document endpoint, pagination, attribution, rate limits, CORS/server-side requirements and reuse terms.
-2. Run scheduled ingestion outside the static page (a free scheduled CI job or small serverless job only after limits and terms are checked). Never make the visitor's browser download a complete 100k-item catalog.
-3. Deduplicate by package identifier first, then normalized publisher + product name + platform. Keep separate store listings when they are distinct official distribution channels.
-4. Refresh metadata periodically; mark dead links as unavailable rather than silently deleting audit history.
-5. Start with measured source counts. Do not advertise 10,000+ until imported, deduplicated, active records have been counted and link-checked.
+## Automated catalog refresh
+- scripts/build_multiplatform_catalog.py imports metadata from the F-Droid v2 index and Homebrew Formulae/Casks JSON feeds.
+- .github/workflows/refresh-multiplatform-catalog.yml supports manual runs and scheduled refreshes (Tuesday and Friday at 04:17 UTC).
+- The output is data/catalog.json; it contains metadata and original listing links only, never installer files.
+- The workflow runs on the selected branch and commits the generated JSON only when it changes. The first successful run must be checked before publishing any catalog size.
+- This is an initial ingestion layer, not yet the complete global catalog. A source is not considered integrated until its adapter is tested and its reuse conditions are recorded.
+
+## Scale, quality and integrity
+1. Add source adapters independently; document endpoint, pagination, attribution, rate limits, CORS/server-side requirements and reuse terms.
+2. Keep the complete catalog out of the visitor's browser; serve paginated/searchable static data or a small index.
+3. Deduplicate by source-qualified package identifier first, then review likely cross-source duplicates using normalized publisher + product name + platform. Never merge distinct official listings blindly.
+4. Refresh metadata periodically; mark dead links unavailable rather than silently deleting audit history.
+5. Count only imported, deduplicated records. Report total records and per-platform totals separately; do not claim every record is a unique app because one app can have several platform/store listings.
+6. Do not advertise a public count until the first successful ingestion has been run, inspected, and link-checked.
 
 ## Current implementation status
-The existing page is a first search interface, not yet a populated unified 10,000+ catalog. F-Droid and Apple endpoints are called from the browser and may be affected by CORS, rate limits or regional catalog settings. WinGet search uses the documented community API and may also be unavailable from some browsers. Linux and web currently provide source-search links only. macOS has Mac App Store search plus Homebrew's official catalog link.
+The PR contains the first multi-platform search UI and an initial metadata-only bulk importer for F-Droid and Homebrew. Apple and WinGet remain live search integrations rather than bulk imports. Linux and Web currently offer source-search links. The generated catalog has not yet been run and its real record count is therefore not yet established.
