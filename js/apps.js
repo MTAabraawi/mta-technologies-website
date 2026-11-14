@@ -220,7 +220,7 @@
     }
   }
 
-  const pageSize = 200;
+  const pageSize = 50;
   let nextOffset = 0;
   let engineTotal = 0;
   let activeQuery = "";
@@ -234,8 +234,6 @@
       button.disabled = true;
       button.textContent = text("جارٍ تحميل التطبيقات...", "Loading applications...");
     }
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000);
     try {
       const params = new URLSearchParams({limit:String(pageSize),offset:String(nextOffset)});
       if (activeQuery) params.set("q", activeQuery);
@@ -243,7 +241,11 @@
       const requestUrl = api + "/api/v1/apps?" + params.toString();
       let response = null;
       let requestError = null;
+      // Give each retry its own timeout controller. Reusing an aborted
+      // controller made every retry fail immediately after the first timeout.
       for (let attempt = 0; attempt < 3; attempt++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 45000);
         try {
           response = await fetch(requestUrl, {
             credentials: "omit", cache: "no-store", signal: controller.signal
@@ -253,9 +255,11 @@
           if (response.status < 500) throw requestError;
         } catch (error) {
           requestError = error;
-          if (attempt === 2 || (error && error.name === "AbortError")) throw error;
+          if (attempt === 2) throw error;
+        } finally {
+          clearTimeout(timeoutId);
         }
-        if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 450 * (attempt + 1)));
+        if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 700 * (attempt + 1)));
       }
       if (!response || !response.ok) throw requestError || new Error("Catalogue request failed");
       if (!response.headers.get("content-type")?.includes("application/json")) {
