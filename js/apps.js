@@ -60,19 +60,26 @@
     top.className = "app-card-top";
     const icon = document.createElement("div");
     icon.className = "app-icon app-icon-image";
-    const img = document.createElement("img");
     const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
-    img.src = iconUrl || "images/apps/mta-net-blocker.svg";
-    img.alt = name + " icon";
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.addEventListener("error", () => {
-      if (!img.dataset.fallback) {
-        img.dataset.fallback = "1";
-        img.src = "images/apps/mta-net-blocker.svg";
-      }
-    });
-    icon.append(img);
+    const fallbackIcon = () => {
+      const mark = document.createElement("span");
+      mark.className = "app-icon-fallback";
+      mark.textContent = name.trim().split(/\\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
+      return mark;
+    };
+    if (iconUrl) {
+      const img = document.createElement("img");
+      img.src = iconUrl;
+      img.alt = name + " icon";
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.addEventListener("error", () => {
+        icon.replaceChildren(fallbackIcon());
+      }, { once: true });
+      icon.append(img);
+    } else {
+      icon.append(fallbackIcon());
+    }
     top.append(icon);
     const status = document.createElement("span");
     status.className = "app-status status-live";
