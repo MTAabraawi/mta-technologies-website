@@ -218,13 +218,16 @@
     if (!api) return [];
     const button = document.getElementById("load-more-apps");
     if (button) {
+      button.hidden = false;
       button.disabled = true;
-      button.textContent = text("جارٍ التحميل...", "Loading...");
+      button.textContent = text("جارٍ تحميل التطبيقات...", "Loading applications...");
     }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
     try {
       const queryPart = activeQuery ? "&q=" + encodeURIComponent(activeQuery) : "";
       const response = await fetch(api + "/api/v1/apps?limit=" + pageSize + "&offset=" + nextOffset + queryPart, {
-        credentials: "omit", cache: "no-store"
+        credentials: "omit", cache: "no-store", signal: controller.signal
       });
       if (!response.ok) throw new Error("Catalogue HTTP " + response.status);
       const payload = await response.json();
@@ -233,20 +236,25 @@
       nextOffset += items.length;
       if (button) {
         button.hidden = items.length < pageSize || (engineTotal > 0 && nextOffset >= engineTotal);
-        button.disabled = false;
         button.textContent = text("تحميل المزيد من التطبيقات", "Load more applications");
       }
       return items;
     } catch (error) {
       console.warn("MTA Applications Engine catalogue page unavailable", error);
       if (button) {
-        button.hidden = true;
-        button.disabled = false;
+        button.hidden = false;
+        button.textContent = text("تعذّر التحميل — اضغط لإعادة المحاولة", "Load failed — tap to retry");
       }
+      if (connection) connection.textContent = text(
+        "تعذّر تحميل هذه الدفعة. يمكنك إعادة المحاولة دون فقد التطبيقات المعروضة.",
+        "This batch could not load. Retry without losing the apps already displayed."
+      );
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
+      if (button) button.disabled = false;
     }
   }
-
   async function loadEngine() {
     if (!api) {
       if (connection) connection.textContent = text("محرك الفهرسة غير مضبوط.", "Application engine is not configured.");
