@@ -53,7 +53,7 @@
     icon.className = "app-icon app-icon-image";
     const iconImage = document.createElement("img");
     const iconPath = String(app.icon_path || "");
-    if (/^images\\/apps\\/[a-z0-9-]+\\.svg$/.test(iconPath)) {
+    if (iconPath.startsWith("images/apps/") && /^[a-z0-9-]+\\.svg$/.test(iconPath.slice("images/apps/".length))) {
       iconImage.src = iconPath;
     } else {
       iconImage.src = "images/apps/mta-net-blocker.svg";
