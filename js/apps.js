@@ -310,30 +310,58 @@
   }
   async function loadEngine() {
     if (!api) {
-      if (connection) connection.textContent = text("محرك الفهرسة غير مضبوط.", "Application engine is not configured.");
+      if (connection) connection.textContent = text("عنوان محرك التطبيقات غير مضبوط.", "Application engine URL is not configured.");
       return;
     }
+
+    // Load application records first. Statistics are supplementary and must
+    // never prevent the actual catalogue from appearing.
+    if (connection) connection.textContent = text("جارٍ تحميل التطبيقات...", "Loading applications...");
+    const statsTask = (async () => {
+      try {
+        let response;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          response = await fetch(api + "/api/v1/catalog-stats", {
+            credentials: "omit", cache: "no-store"
+          });
+          if (response.ok) break;
+          if (response.status < 500 || attempt === 2) {
+            throw new Error("Catalogue stats HTTP " + response.status);
+          }
+          await new Promise(resolve => setTimeout(resolve, 400 * (attempt + 1)));
+        }
+        const data = await response.json();
+        engineTotal = Number(data.total || engineTotal || 0);
+        if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+        document.querySelectorAll("[data-catalog-platform]").forEach(element => {
+          const key = element.dataset.catalogPlatform;
+          const amount = Number((data.platforms || {})[key] || 0);
+          element.textContent = amount.toLocaleString() + " " + platformName(key);
+          element.title = amount.toLocaleString() + " " + text("تطبيقاً", "applications");
+        });
+      } catch (error) {
+        console.warn("Catalogue statistics unavailable; continuing with app records", error);
+      }
+    })();
+
     try {
-      const health = await fetch(api + "/health", {credentials:"omit",cache:"no-store"});
-      if (!health.ok) throw new Error("Engine health HTTP " + health.status);
-      const statsResponse = await fetch(api + "/api/v1/catalog-stats", {credentials:"omit",cache:"no-store"});
-      if (!statsResponse.ok) throw new Error("Catalogue stats HTTP " + statsResponse.status);
-      const data = await statsResponse.json();
-      engineTotal = Number(data.total || 0);
-      if (stats) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
-      document.querySelectorAll("[data-catalog-platform]").forEach(element => {
-        const key = element.dataset.catalogPlatform;
-        const amount = Number((data.platforms || {})[key] || 0);
-        element.textContent = amount.toLocaleString() + " " + platformName(key);
-        element.title = amount.toLocaleString() + " " + text("تطبيقاً", "applications");
-      });
       await fetchEnginePage();
+      await statsTask;
     } catch (error) {
-      console.warn("MTA Applications Engine is currently unavailable", error);
-      if (connection) connection.textContent = text(
-        "تعذّر الاتصال بكتالوج التطبيقات. أعد تحميل الصفحة أو حاول مجدداً.",
-        "Could not connect to the application catalogue. Reload the page or try again."
-      );
+      console.warn("MTA Applications Engine app records unavailable", error);
+      if (connection) {
+        connection.title = String(error && error.message ? error.message : error);
+        connection.textContent = text(
+          "تعذّر تحميل التطبيقات حالياً. اضغط «إعادة المحاولة» أو تحقق من الاتصال.",
+          "Applications could not be loaded. Press Retry or check your connection."
+        );
+      }
+      const button = document.getElementById("load-more-apps");
+      if (button) {
+        button.hidden = false;
+        button.disabled = false;
+        button.textContent = text("إعادة محاولة تحميل التطبيقات", "Retry loading applications");
+      }
     }
   }
 
@@ -354,14 +382,6 @@
   const moreButton = document.getElementById("load-more-apps");
   if (moreButton) {
     moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
-    if ("IntersectionObserver" in window) {
-      const moreObserver = new IntersectionObserver(entries => {
-        if (entries.some(entry => entry.isIntersecting) && !engineLoading && !moreButton.hidden) {
-          fetchEnginePage().catch(() => {});
-        }
-      }, { rootMargin: "600px 0px" });
-      moreObserver.observe(moreButton);
-    }
   }
   filter();
   loadCurated();
