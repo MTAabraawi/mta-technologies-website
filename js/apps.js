@@ -240,10 +240,24 @@
       const params = new URLSearchParams({limit:String(pageSize),offset:String(nextOffset)});
       if (activeQuery) params.set("q", activeQuery);
       if (platform.value !== "all") params.set("platform", platform.value.toLowerCase());
-      const response = await fetch(api + "/api/v1/apps?" + params.toString(), {
-        credentials: "omit", cache: "no-store", signal: controller.signal
-      });
-      if (!response.ok) throw new Error("Catalogue HTTP " + response.status);
+      const requestUrl = api + "/api/v1/apps?" + params.toString();
+      let response = null;
+      let requestError = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await fetch(requestUrl, {
+            credentials: "omit", cache: "no-store", signal: controller.signal
+          });
+          if (response.ok) break;
+          requestError = new Error("Catalogue HTTP " + response.status);
+          if (response.status < 500) throw requestError;
+        } catch (error) {
+          requestError = error;
+          if (attempt === 2 || (error && error.name === "AbortError")) throw error;
+        }
+        if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 450 * (attempt + 1)));
+      }
+      if (!response || !response.ok) throw requestError || new Error("Catalogue request failed");
       if (!response.headers.get("content-type")?.includes("application/json")) {
         throw new Error("Catalogue returned a non-JSON response");
       }
