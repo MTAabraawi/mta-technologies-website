@@ -28,6 +28,7 @@
   function makeCard(app) {
     const card = document.createElement("article");
     card.className = "app-card";
+    card.dataset.dynamicApp = "true";
 
     const platforms = Array.isArray(app.platforms)
       ? app.platforms.map(value => String(value).trim()).filter(Boolean)
@@ -136,21 +137,32 @@
     count.textContent = visible + " " + text("تطبيق معروض", "apps shown");
   }
 
+  const dynamicApps = [];
+
+  function renderDynamicApps() {
+    grid.querySelectorAll('.app-card[data-dynamic-app="true"]').forEach(card => card.remove());
+    dynamicApps.forEach(app => grid.insertBefore(makeCard(app), empty));
+    filter();
+  }
+
   function addApps(items) {
-    const existing = new Set(
-      [...grid.querySelectorAll(".app-card")].map(card => card.dataset.name.toLocaleLowerCase())
-    );
+    const existing = new Set([
+      ...[...grid.querySelectorAll(".app-card")].map(card => card.dataset.name.toLocaleLowerCase()),
+      ...dynamicApps.map(app => String(app.app_name || "").trim().toLocaleLowerCase())
+    ]);
 
     (Array.isArray(items) ? items : []).forEach(app => {
       if (!app || typeof app !== "object") return;
       const key = String(app.app_name || "").trim().toLocaleLowerCase();
       if (!key || existing.has(key)) return;
-      grid.insertBefore(makeCard(app), empty);
+      dynamicApps.push(app);
       existing.add(key);
     });
 
-    filter();
+    renderDynamicApps();
   }
+
+  window.addEventListener("mta:languagechange", renderDynamicApps);
 
   async function loadCurated() {
     try {
