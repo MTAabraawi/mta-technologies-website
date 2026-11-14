@@ -47,11 +47,9 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   await expect(firstDynamicCard.locator('h3')).not.toBeEmpty();
   await expect(firstDynamicCard.locator('.app-icon img, .app-icon-fallback').first()).toBeAttached();
 
-  const moreButton = page.locator('#load-more-apps');
-  await expect(moreButton).toBeVisible({ timeout: 20_000 });
-  await expect(moreButton).toBeEnabled();
-
-  await moreButton.scrollIntoViewIfNeeded();
+  const sentinel = page.locator("#catalogue-sentinel");
+  await expect(sentinel).toBeAttached();
+  await sentinel.scrollIntoViewIfNeeded();
   const secondPageResponse = await secondApiResponsePromise;
   expect(secondPageResponse.status(), 'The second catalogue page must return HTTP 200').toBe(200);
 
