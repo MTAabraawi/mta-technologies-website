@@ -279,6 +279,7 @@
           "تحميل المزيد · " + Math.max(0, engineTotal-nextOffset).toLocaleString() + " متبقٍ",
           "Load more · " + Math.max(0, engineTotal-nextOffset).toLocaleString() + " remaining"
         );
+        button.classList.remove("is-retry");
       }
       if (connection) connection.textContent = text(
         "متصل · عُرض " + Math.min(nextOffset, engineTotal || nextOffset).toLocaleString() + " من " + (engineTotal || nextOffset).toLocaleString() + " تطبيقاً",
@@ -292,6 +293,7 @@
         button.hidden = false;
         button.disabled = false;
         button.textContent = text("تعذّر التحميل — أعد المحاولة", "Load failed — retry");
+        button.classList.add("is-retry");
       }
       if (connection) connection.textContent = text(
         "تعذّر تحميل هذه الدفعة. تحقق من الاتصال ثم أعد المحاولة؛ لم نحذف التطبيقات المعروضة.",
@@ -365,6 +367,7 @@
       if (button) {
         button.hidden = false;
         button.disabled = false;
+        button.classList.add("is-retry");
         button.textContent = text("إعادة محاولة تحميل التطبيقات", "Retry loading applications");
       }
     }
@@ -385,19 +388,20 @@
     }, 450);
   });
   const moreButton = document.getElementById("load-more-apps");
+  const catalogueSentinel = document.getElementById("catalogue-sentinel");
   if (moreButton) {
     moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
     // Continue loading catalogue batches automatically as the visitor reaches
     // the end of the currently rendered results. The button remains available
     // for manual loading and browsers without IntersectionObserver.
-    if ("IntersectionObserver" in window) {
+    if ("IntersectionObserver" in window && catalogueSentinel) {
       const loadObserver = new IntersectionObserver(entries => {
         if (entries.some(entry => entry.isIntersecting) && !engineLoading
             && !moreButton.hidden && !moreButton.disabled) {
           fetchEnginePage().catch(() => {});
         }
       }, { root: null, rootMargin: "700px 0px", threshold: 0 });
-      loadObserver.observe(moreButton);
+      loadObserver.observe(catalogueSentinel);
     }
   }
   filter();
