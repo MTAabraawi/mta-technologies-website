@@ -20,7 +20,9 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   const firstBatch = page.locator('#apps-grid .app-card[data-dynamic-app="true"]');
   await expect(firstBatch.first()).toBeVisible({ timeout: 30_000 });
   const firstCount = await firstBatch.count();
-  expect(firstCount).toBeGreaterThan(0);
+  expect(firstCount, 'The first 24 API records must be rendered as catalogue cards').toBe(24);
+  await expect(firstBatch.filter({ has: page.locator('h3', { hasText: /^#WEATHER$/ }) }).first())
+    .toBeVisible();
 
   const firstDynamicCard = firstBatch.first();
   await expect(firstDynamicCard.locator('h3')).not.toBeEmpty();
@@ -41,7 +43,9 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
   const secondPayload = await secondPageResponse.json();
   expect(Array.isArray(secondPayload)).toBeTruthy();
   expect(secondPayload.length, 'The second API page should contain app records').toBeGreaterThan(0);
-  await expect.poll(async () => firstBatch.count(), { timeout: 30_000 }).toBeGreaterThan(firstCount);
+  await expect.poll(async () => firstBatch.count(), { timeout: 30_000 }).toBe(48);
+  await expect(page.locator('#apps-grid .app-card[data-dynamic-app="true"] h3', { hasText: '(Deep) HIARCS Chess Explorer' }))
+    .toBeVisible();
 
   expect(pageErrors, 'The marketplace should not throw uncaught JavaScript errors').toEqual([]);
 });
