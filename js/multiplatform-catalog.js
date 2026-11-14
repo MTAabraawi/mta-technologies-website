@@ -60,10 +60,11 @@
         icon: x.icon
       })).map(makeCard);
     }
-    if (key === "iOS") {
-      const data = await getJson("https://itunes.apple.com/search?term=" + encodeURIComponent(q) + "&entity=software&limit=20&country=us");
+    if (key === "iOS" || key === "macOS") {
+      const entity = key === "macOS" ? "macSoftware" : "software";
+      const data = await getJson("https://itunes.apple.com/search?term=" + encodeURIComponent(q) + "&entity=" + entity + "&limit=20&country=us");
       return (data.results || []).map(x => makeCard({
-        title: x.trackName, description: x.description, source: "Apple App Store",
+        title: x.trackName, description: x.description, source: key === "macOS" ? "Mac App Store" : "Apple App Store",
         href: x.trackViewUrl, icon: x.artworkUrl512 || x.artworkUrl100
       }));
     }
