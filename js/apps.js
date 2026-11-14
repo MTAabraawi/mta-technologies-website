@@ -103,17 +103,13 @@
   let nextOffset = 0;\n  let engineTotal = 0;\n  async function fetchEnginePage(reset) {\n    if (!api) return;\n    const button = document.getElementById("load-more-apps");\n    if (button) { button.disabled = true; button.textContent = text("جارٍ التحميل...", "Loading..."); }\n    try {\n      const response = await fetch(api + "/api/v1/apps?limit=200&offset=" + nextOffset, {credentials:"omit", cache:"no-store"});\n      if (!response.ok) throw new Error("Catalogue HTTP " + response.status);\n      const payload = await response.json();\n      const items = Array.isArray(payload) ? payload : (payload.apps || payload.items || []);\n      addApps(items);\n      nextOffset += items.length;\n      if (button) { button.hidden = items.length < 200 || nextOffset >= engineTotal; button.disabled = false; button.textContent = text("تحميل المزيد من التطبيقات", "Load more applications"); }\n      return items;\n    } catch (error) {\n      console.warn("MTA Applications Engine catalogue page unavailable", error);\n      if (button) { button.hidden = true; button.disabled = false; }\n      throw error;\n    }\n  }\n  async function loadEngine() {
     if (!api) { if (connection) connection.textContent = text("محرك الفهرسة غير مضبوط.", "Application engine is not configured."); return; }
     try {
-      const [appsResponse, statsResponse] = await Promise.all([
-        fetch(api + "/api/v1/apps?limit=200", {credentials:"omit", cache:"no-store"}),
-        fetch(api + "/api/v1/catalog-stats", {credentials:"omit", cache:"no-store"})
-      ]);
-      if (!appsResponse.ok) throw new Error("Catalogue HTTP " + appsResponse.status);
-      const payload = await appsResponse.json();
-      addApps(Array.isArray(payload) ? payload : (payload.apps || payload.items || []));
+      const statsResponse = await fetch(api + "/api/v1/catalog-stats", {credentials:"omit", cache:"no-store"});
       if (statsResponse.ok) {
         const data = await statsResponse.json();
-        if (stats) stats.textContent = Number(data.total || 0).toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+        engineTotal = Number(data.total || 0);
+        if (stats) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
       }
+      await fetchEnginePage(true);
       if (connection) connection.textContent = text("متصل بمحرك MTA العالمي · بيانات وروابط من المصادر الأصلية", "Connected to MTA Global Engine · metadata and links from original sources");
     } catch (error) {
       console.warn("MTA Applications Engine is currently unavailable", error);
@@ -121,5 +117,5 @@
     }
   }
   [search, platform, category, developer].forEach(el => { el.addEventListener("input", filter); el.addEventListener("change", filter); });
-  filter(); loadCurated(); loadEngine();
+  const moreButton = document.getElementById("load-more-apps");\n  if (moreButton) moreButton.addEventListener("click", () => fetchEnginePage(false).catch(() => {}));\n  filter(); loadCurated(); loadEngine();
 })();
