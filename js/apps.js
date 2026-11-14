@@ -220,7 +220,7 @@
     }
   }
 
-  const pageSize = 24;
+  const pageSize = 200;
   let nextOffset = 0;
   let engineTotal = 0;
   let activeQuery = "";
@@ -382,6 +382,18 @@
   const moreButton = document.getElementById("load-more-apps");
   if (moreButton) {
     moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
+    // Continue loading catalogue batches automatically as the visitor reaches
+    // the end of the currently rendered results. The button remains available
+    // for manual loading and browsers without IntersectionObserver.
+    if ("IntersectionObserver" in window) {
+      const loadObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting) && !engineLoading
+            && !moreButton.hidden && !moreButton.disabled) {
+          fetchEnginePage().catch(() => {});
+        }
+      }, { root: null, rootMargin: "700px 0px", threshold: 0 });
+      loadObserver.observe(moreButton);
+    }
   }
   filter();
   loadCurated();
