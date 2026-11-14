@@ -117,5 +117,6 @@
     }
   }
   [search, platform, category, developer].forEach(el => { el.addEventListener("input", filter); el.addEventListener("change", filter); });
-  const moreButton = document.getElementById("load-more-apps");\n  if (moreButton) moreButton.addEventListener("click", () => fetchEnginePage(false).catch(() => {}));\n  filter(); loadCurated(); loadEngine();
+  const moreButton = document.getElementById("load-more-apps");
+  if (moreButton) moreButton.addEventListener("click", () => fetchEnginePage(false).catch(() => {}));\n  filter(); loadCurated(); loadEngine();
 })();
