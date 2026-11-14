@@ -22,6 +22,7 @@
     document.documentElement.setAttribute('lang', nextLang);
     document.documentElement.setAttribute('dir', nextLang === 'ar' ? 'rtl' : 'ltr');
     localStorage.setItem('mta-lang', nextLang);
+    window.dispatchEvent(new CustomEvent('mta:languagechange'));
   };
 
   // Copy Email Helper
