@@ -225,6 +225,8 @@
   let engineTotal = 0;
   let activeQuery = "";
   let engineLoading = false;
+  let catalogueObserver = null;
+  const catalogueSentinel = document.getElementById("catalogue-sentinel");
   async function fetchEnginePage() {
     if (!api || engineLoading) return [];
     const button = document.getElementById("load-more-apps");
@@ -305,6 +307,14 @@
       // referenced here. Always release the loading lock after success/failure.
       engineLoading = false;
       if (button) button.disabled = false;
+      // Re-arm the sentinel after a successful batch. IntersectionObserver
+      // may not emit another callback when the sentinel stayed in its margin
+      // while the previous request was in flight.
+      if (catalogueObserver && catalogueSentinel && button
+          && !button.hidden && !button.classList.contains("is-retry")) {
+        catalogueObserver.unobserve(catalogueSentinel);
+        catalogueObserver.observe(catalogueSentinel);
+      }
     }
   }
   async function reloadEngine() {
@@ -388,7 +398,6 @@
     }, 450);
   });
   const moreButton = document.getElementById("load-more-apps");
-  const catalogueSentinel = document.getElementById("catalogue-sentinel");
   if (moreButton) {
     moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
     if (!("IntersectionObserver" in window) || !catalogueSentinel) moreButton.classList.add("is-retry");
@@ -396,13 +405,13 @@
     // the end of the currently rendered results. The button remains available
     // for manual loading and browsers without IntersectionObserver.
     if ("IntersectionObserver" in window && catalogueSentinel) {
-      const loadObserver = new IntersectionObserver(entries => {
+      catalogueObserver = new IntersectionObserver(entries => {
         if (entries.some(entry => entry.isIntersecting) && !engineLoading
             && !moreButton.hidden && !moreButton.disabled) {
           fetchEnginePage().catch(() => {});
         }
       }, { root: null, rootMargin: "700px 0px", threshold: 0 });
-      loadObserver.observe(catalogueSentinel);
+      catalogueObserver.observe(catalogueSentinel);
     }
   }
   filter();
