@@ -39,7 +39,7 @@ async function handle(request, env, ctx) {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(request, env) });
   if (url.pathname === "/health" && request.method === "GET") return json({ ok: true, service: "MTA Marketplace API" });
   if (url.pathname === "/v1/apps" && request.method === "GET") {
-    const { results } = await env.DB.prepare("SELECT id, app_name, developer_name, platform, category, version, license_name, source_url, description, file_name, file_size, created_at FROM submissions WHERE status='approved' ORDER BY app_name").all();
+    const { results } = await env.DB.prepare("SELECT id, app_name, developer_name, platform, category, version, license_name, source_url, description, file_name, file_size, CASE WHEN object_key IS NOT NULL THEN 1 ELSE 0 END AS download_available, created_at FROM submissions WHERE status='approved' ORDER BY app_name").all();
     return json({ apps: results });
   }
   if (url.pathname.startsWith("/v1/download/") && request.method === "GET") {
