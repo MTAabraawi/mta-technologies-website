@@ -222,13 +222,14 @@
 
   const pageSize = 50;
   let nextOffset = 0;
+  let catalogueExhausted = false;
   let engineTotal = 0;
   let activeQuery = "";
   let engineLoading = false;
   let catalogueObserver = null;
   const catalogueSentinel = document.getElementById("catalogue-sentinel");
   async function fetchEnginePage() {
-    if (!api || engineLoading) return [];
+    if (!api || engineLoading || catalogueExhausted) return [];
     const button = document.getElementById("load-more-apps");
     engineLoading = true;
     if (button) {
@@ -270,12 +271,14 @@
       const payload = await response.json();
       if (!Array.isArray(payload)) throw new Error("Unexpected catalogue response");
       const reportedTotal = Number(response.headers.get("X-Total-Count") || 0);
+      if (payload.length === 0) catalogueExhausted = true;
       if (reportedTotal) engineTotal = reportedTotal;
       addApps(payload, engineApps);
       nextOffset += payload.length;
       if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
       if (button) {
         button.hidden = payload.length < pageSize || (engineTotal > 0 && nextOffset >= engineTotal);
+        if (catalogueExhausted) button.hidden = true;
         button.disabled = false;
         button.textContent = text(
           "تحميل المزيد · " + Math.max(0, engineTotal-nextOffset).toLocaleString() + " متبقٍ",
@@ -311,7 +314,7 @@
       // may not emit another callback when the sentinel stayed in its margin
       // while the previous request was in flight.
       if (catalogueObserver && catalogueSentinel && button
-          && !button.hidden && !button.classList.contains("is-retry")) {
+          && !button.hidden && !button.classList.contains("is-retry") && !catalogueExhausted) {
         catalogueObserver.unobserve(catalogueSentinel);
         catalogueObserver.observe(catalogueSentinel);
       }
@@ -320,6 +323,7 @@
   async function reloadEngine() {
     if (!api) return;
     nextOffset = 0;
+    catalogueExhausted = false;
     engineApps.length = 0;
     renderDynamicApps();
     if (connection) connection.textContent = text("جارٍ تحديث نتائج البحث...", "Refreshing catalogue results...");
