@@ -10,3 +10,10 @@
 .app-card[hidden], .apps-empty[hidden] { display: none !important; }
 
 .app-license { display:block; margin:.25rem 0 .8rem; color:var(--text-secondary); font-size:.75rem; line-height:1.6; overflow-wrap:anywhere; }
+
+
+/* Original local application directory icons */
+.app-icon-image{overflow:hidden;padding:0;background:transparent;flex:0 0 64px}
+.app-icon-image img{display:block;width:100%;height:100%;object-fit:cover;border-radius:18px}
+
+.app-icon img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}

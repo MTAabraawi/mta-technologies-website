@@ -8,7 +8,8 @@
     "license_name": "GPL-3.0-or-later",
     "source_url": "https://f-droid.org/packages/org.fdroid.fdroid/",
     "description_ar": "متجر مفتوح المصدر لاكتشاف تطبيقات Android الحرة وتثبيتها ومتابعة تحديثاتها.",
-    "description_en": "An open-source catalogue for discovering, installing, and updating free and open-source Android apps."
+    "description_en": "An open-source catalogue for discovering, installing, and updating free and open-source Android apps.",
+    "icon_path": "images/apps/fdroid.svg"
   },
   {
     "id": "newpipe",
@@ -19,7 +20,8 @@
     "license_name": "GPL-3.0-or-later",
     "source_url": "https://f-droid.org/packages/org.schabi.newpipe/",
     "description_ar": "مشغل وواجهة وسائط مفتوحة المصدر لأجهزة Android. صفحة F-Droid تعرض الترخيص ومعلومات الإصدار ومصدر البناء.",
-    "description_en": "An open-source media frontend for Android. The F-Droid listing provides license, release, and build-source details."
+    "description_en": "An open-source media frontend for Android. The F-Droid listing provides license, release, and build-source details.",
+    "icon_path": "images/apps/newpipe.svg"
   },
   {
     "id": "vlc",
@@ -30,7 +32,8 @@
     "license_name": "GPL family; see upstream COPYING and component notices",
     "source_url": "https://www.videolan.org/vlc/",
     "description_ar": "مشغل وسائط متعدد المنصات. نوفر رابط صفحة VideoLAN الرسمية فقط؛ شروط إعادة توزيع كل حزمة ومكوناتها يجب مراجعتها قبل الاستضافة.",
-    "description_en": "A cross-platform media player. MTA links to VideoLAN's official download page; package-specific redistribution terms and component notices must be checked before hosting."
+    "description_en": "A cross-platform media player. MTA links to VideoLAN's official download page; package-specific redistribution terms and component notices must be checked before hosting.",
+    "icon_path": "images/apps/vlc.svg"
   },
   {
     "id": "gimp",
@@ -41,7 +44,8 @@
     "license_name": "GPL-3.0-or-later",
     "source_url": "https://www.gimp.org/downloads/",
     "description_ar": "محرر صور مفتوح المصدر مع تنزيلات رسمية لأنظمة Windows وmacOS وLinux.",
-    "description_en": "Open-source image editor with official downloads for Windows, macOS, and Linux."
+    "description_en": "Open-source image editor with official downloads for Windows, macOS, and Linux.",
+    "icon_path": "images/apps/gimp.svg"
   },
   {
     "id": "blender",
@@ -52,7 +56,8 @@
     "license_name": "GPL-3.0",
     "source_url": "https://www.blender.org/download/",
     "description_ar": "منصة مفتوحة المصدر لإنشاء الرسوم ثلاثية الأبعاد والتحريك والرندر، مع ملفات تثبيت رسمية متعددة الأنظمة.",
-    "description_en": "Open-source 3D creation, animation, and rendering suite with official installers for major desktop platforms."
+    "description_en": "Open-source 3D creation, animation, and rendering suite with official installers for major desktop platforms.",
+    "icon_path": "images/apps/blender.svg"
   },
   {
     "id": "libreoffice",
@@ -63,7 +68,8 @@
     "license_name": "MPL-2.0; components may use additional open-source licenses",
     "source_url": "https://www.libreoffice.org/download/download-libreoffice/",
     "description_ar": "حزمة مكتبية مفتوحة المصدر. الترخيص الأساسي MPL 2.0 مع مكونات قد تخضع لتراخيص إضافية.",
-    "description_en": "Open-source office suite. Its primary license is MPL 2.0, with some components under additional open-source licenses."
+    "description_en": "Open-source office suite. Its primary license is MPL 2.0, with some components under additional open-source licenses.",
+    "icon_path": "images/apps/libreoffice.svg"
   },
   {
     "id": "nextcloud-ios",
@@ -74,7 +80,8 @@
     "license_name": "GPL-3.0 with Apple App Store exception",
     "source_url": "https://apps.apple.com/us/app/nextcloud/id1125420102",
     "description_ar": "تطبيق iOS للوصول إلى ملفات Nextcloud ومزامنتها. التوزيع عبر App Store الرسمي.",
-    "description_en": "The iOS client for accessing and syncing Nextcloud files. Distributed through Apple's official App Store."
+    "description_en": "The iOS client for accessing and syncing Nextcloud files. Distributed through Apple's official App Store.",
+    "icon_path": "images/apps/nextcloud.svg"
   },
   {
     "id": "penpot",
@@ -85,6 +92,7 @@
     "license_name": "MPL-2.0",
     "source_url": "https://design.penpot.app/",
     "description_ar": "أداة تصميم ونمذجة واجهات تعمل من المتصفح، ومشروعها مفتوح المصدر بترخيص MPL 2.0.",
-    "description_en": "Browser-based design and prototyping platform; its source project is open source under MPL 2.0."
+    "description_en": "Browser-based design and prototyping platform; its source project is open source under MPL 2.0.",
+    "icon_path": "images/apps/penpot.svg"
   }
 ]
