@@ -85,3 +85,36 @@ html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex S
   .app-card-meta{font-size:.7rem}
   .load-more-wrap{margin-top:1.25rem}
 }
+
+
+/* App-store style icon presentation and readable catalogue cards */
+.store-directory-grid a{
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  padding:1rem;
+  min-height:76px;
+  padding-inline-start:1rem;
+}
+.store-directory-grid a:before{display:none}
+.store-directory-grid .store-icon{
+  width:42px;height:42px;flex:0 0 42px;
+  border-radius:12px;object-fit:contain;
+  padding:5px;background:var(--bg-card);
+  border:1px solid var(--border-color);
+}
+.store-directory-grid a span{display:block;margin-inline-start:auto;text-align:end}
+.app-icon-image{background:var(--bg-card);border:1px solid var(--border-color)}
+.app-icon-fallback{background:linear-gradient(145deg,#0b2544,#173b66);color:#d8efff;border:1px solid rgba(56,189,248,.28)}
+.app-card{display:flex;flex-direction:column;min-height:100%}
+.app-card .app-card-link{margin-top:auto}
+.app-card-top{align-items:center}
+.app-card .app-icon-image{width:76px;height:76px;flex-basis:76px;border-radius:20px}
+.app-card .app-icon-image img{border-radius:15px}
+@media(max-width:760px){
+  .apps-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .apps-grid{grid-template-columns:1fr}
+  .store-directory-grid{grid-template-columns:1fr}
+}
