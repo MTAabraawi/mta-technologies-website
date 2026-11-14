@@ -41,8 +41,9 @@ Create a Self-hosted Access application for the existing website hostname. Prote
 - `www.mtahqq.dpdns.org/api/v1/submissions*`
 - `www.mtahqq.dpdns.org/api/v1/me/*`
 - `www.mtahqq.dpdns.org/api/v1/admin/*`
+- `www.mtahqq.dpdns.org/api/v1/certificates/requests*`
 
-Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The same Access application authenticates developer and administrator requests. The API independently checks `ADMIN_EMAILS` on every admin endpoint, so a normal signed-in developer cannot moderate or inspect other users' submissions.
+Do **not** protect `/api/v1/apps` or `/api/v1/download/*`; those routes are public catalogue/download endpoints. Configure an email one-time PIN provider or a supported identity provider for developer sign-in. Allow external developer identities for the developer routes. The same Access application authenticates developer and administrator requests, including developer credential applications. Public certificate verification remains unauthenticated by design. The API independently checks `ADMIN_EMAILS` on every admin endpoint, so a normal signed-in developer cannot moderate or inspect other users' submissions.
 
 The Pages middleware validates the `Cf-Access-Jwt-Assertion` (or `CF_Authorization` cookie) signature, issuer, audience, expiry, and key ID using Cloudflare's published JWKS. The API trusts the verified JWT payload placed in the Pages request context. Do not replace it with an unverified email header.
 
@@ -115,3 +116,83 @@ The marketplace directory links to official stores and repositories. Listing a s
 - Test revision requests, re-upload, issuance, serial uniqueness, expired credentials, revoked credentials, invalid signatures, and unauthorized access.
 - Generate the QR code from the official verification URL in the final printable credential renderer. Do not treat the stamp or signature image as a security control.
 - Add an actual malware scanning integration or a documented isolated scanning procedure before approving third-party binaries.
+
+## Current integration work (Preview only)
+
+The following setup has been completed in the Cloudflare account for the development/Preview environment only:
+- D1 database `mta-marketplace` created (ID: `28ebbdba-6fb8-481d-bbc4-d21ccc25d0ea`).
+- The schema in `schema.sql` was applied successfully; eight tables are present: `submissions`, `store_connections`, `publish_jobs`, `publish_job_events`, `certificate_requests`, `certificate_serial_counter`, `issued_certificates`, and `certificate_events`.
+- Pages Preview D1 binding `DB` points to `mta-marketplace`.
+- Preview variables saved: `SITE_ORIGIN`, `ADMIN_EMAILS`, and `MAX_UPLOAD_BYTES`.
+- Existing `ANALYTICS_LIMITER` binding was preserved.
+
+Still blocked / not configured:
+- R2 is not activated on the account; the private bucket `mta-marketplace-files` has not been created. Do not activate an account subscription or add billing details without the account owner's explicit confirmation.
+- Cloudflare Access team domain and audience tag are not configured/verified in Preview. Do not expose protected APIs until Access is configured and the JWT middleware is verified.
+- `CERT_SIGNING_SECRET` is not configured; certificate issuance must remain disabled until a high-entropy secret is added to the Preview secret store.
+- No Preview deployment has yet consumed these new settings. Run the full API integration tests only after a Preview deployment with DB and FILES bindings is available.
+- Production bindings, variables, and deployment have not been changed.
+
+
+## 14. Free-only launch decision (2026-11-13)
+
+The project owner has approved a **free-only operating model**. Do not add a payment method, accept a paid subscription, or enable metered billing for R2 or Cloudflare One without separate explicit approval.
+
+- D1 `mta-marketplace` and its eight-table schema are configured in Preview. The Preview `DB` binding and the three documented Preview variables are saved.
+- R2 activation was inspected and stopped at the account checkout because Cloudflare requires a payment method and billing authorization before activating the R2 subscription. No payment method was added, no subscription was accepted, and no bucket was created.
+- The Zero Trust dashboard was inspected. A team exists, but no Access application or application policies are configured for `www.mtahqq.dpdns.org`. The dashboard showed no selected Cloudflare One plan. Do not select a paid plan. The team domain/AUD values must not be guessed or replaced with placeholders.
+- The Preview hostname is currently intercepted by a Cloudflare Access login page, so anonymous Preview health/catalogue checks cannot reach the Pages Functions.
+- Until a no-cost authentication path is configured and verified, developer/admin API workflows must be treated as unavailable. Do not invite developers or claim that submissions, uploads, or moderation are live.
+- Binary upload, quarantine, direct download, and file-based approval depend on the `FILES` R2 binding. These features remain unavailable. Do not deploy an interface that claims direct uploads are active.
+- The public catalogue should use official publisher/store URLs and only list third-party binaries when redistribution rights are documented. Do not mirror APK/EXE/IPA files to the website in the free-only phase.
+- `CERT_SIGNING_SECRET` remains unset. Certificate issuance and signature verification remain disabled until the secret is safely configured in the Preview secret store and tested.
+- Production Pages bindings, environment variables, Access policies, and deployments have not been changed.
+
+### Remaining launch gates
+
+1. Resolve Preview Access sign-in using a user-authenticated browser session, then verify `/api/health` and `/api/v1/apps` return JSON.
+2. Configure an Access application and developer/admin policies only if Cloudflare offers a genuinely no-cost activation path that does not require payment authorization; otherwise keep the portal disabled.
+3. Either retain link-only submissions and adjust the portal/API accordingly, or defer developer submissions until private file storage is available. Do not leave a false impression that uploads work.
+4. Keep binary upload/download routes unavailable until a private storage binding exists and malware/rights review procedures are operational.
+5. Configure certificate signing only after an owner-managed secret is added; never put the secret in GitHub source or chat.
+6. Run authenticated end-to-end tests before inviting external developers. Production remains untouched until separately approved.
+
+
+## 15. Verified Preview status (2026-11-14)
+
+The owner requested completion of the remaining work while keeping production unpublished. The following read-only checks were run against the current Preview deployment:
+
+- `GET /api/health` returned HTTP 200 with `{"ok":true,"service":"MTA Marketplace API"}`.
+- `GET /api/v1/apps` returned HTTP 200 with `{"apps":[]}`.
+- `GET /api/v1/me/submissions` returned `{"error":"Marketplace authentication is not configured."}`.
+- `GET /api/v1/admin/submissions` returned the same authentication-configuration error. The browser did not show a sign-in page for these two routes; the Pages middleware rejected the requests because `ACCESS_TEAM_DOMAIN` and/or `ACCESS_AUD` are not configured.
+
+These results establish that the public health and catalogue routes work in Preview, but they do **not** establish that developer or administrator authentication works. The API must not accept submissions until an actual Access application, policy, issuer domain, and audience are configured and JWT verification is tested.
+
+### Safe frontend availability gate
+
+A client-side availability guard was added to the developer portal, credential request page, and both admin consoles. It disables submission, upload, moderation, and issuance controls while `window.MTA_MARKETPLACE_PORTAL_ENABLED` is false. The value is deliberately false in `marketplace-config.js`. This is a user-interface safety measure only; server-side Access/JWT and administrator checks remain mandatory. Do not set the flag to true until the server-side services have been configured and end-to-end tests pass.
+
+### Remaining external blockers — not bypassed
+
+- **Private binary storage:** R2 bucket `mta-marketplace-files` and the `FILES` binding do not exist. Account activation previously required a payment method/checkout. The owner approved free-only operation and has not authorized billing; do not activate R2 or substitute a public bucket.
+- **Access authentication:** protected endpoints currently return `Marketplace authentication is not configured.`. The actual Access team domain and app audience are not available in Pages Preview variables. Never guess them, use placeholders, or weaken the JWT middleware.
+- **Credential signing:** `CERT_SIGNING_SECRET` is unset. Issuance and signature validation must remain disabled until an owner-managed random secret (at least 32 characters) is entered directly in the Cloudflare Pages secret store. Never put it in GitHub, source files, logs, or chat.
+- **Malware review:** no scanning engine is included. Do not approve third-party binary releases until an isolated manual scanning procedure or a real scanning integration is in place.
+- **External store publishing:** provider APIs and signed agreements are not connected. MTA ONE-PUBLISH must remain a planning/workflow feature and must not claim that it publishes automatically to stores.
+
+### Safe operating mode before launch
+
+- Keep the public catalogue link-based and direct users to official publisher/store pages.
+- Do not host or mirror third-party binaries without documented redistribution rights and private quarantine/review capability.
+- Keep developer submissions, uploads, admin moderation, and credential issuance disabled in the frontend and protected on the server.
+- Do not invite developers or announce the portal as operational.
+- Preview code and configuration may continue to be validated without changing Production.
+- Production deployment, PR merge, production bindings, and production variables remain untouched. The owner must separately authorize publication after all launch gates are cleared.
+
+
+### Latest frontend deployment verification
+
+- The latest branch commit at the time of validation is `5dcd2a23a29bc6981155fc44b99c79042be0e8f6`; GitHub Actions run #133 completed successfully: https://github.com/MTAabraawi/mta-technologies-website/actions/runs/43511584311.
+- The source branch contains the explicit disabled attributes on developer submission and credential request controls, plus the availability guard script and the false-by-default portal feature flag.
+- A live read-only visit to the previously used Preview hostname served older portal markup that did not match the current GitHub branch. The alternate hostname based on the full branch name returned Cloudflare Pages "Deployment Not Found". Therefore the latest frontend deployment could not be verified in a live Preview. Do not claim that the newest UI commit is deployed or tested until a matching Preview deployment is available.

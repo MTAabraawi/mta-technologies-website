@@ -39,7 +39,7 @@ async function handle(request, env, ctx) {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(request, env) });
   if (url.pathname === "/health" && request.method === "GET") return json({ ok: true, service: "MTA Marketplace API" });
   if (url.pathname === "/v1/apps" && request.method === "GET") {
-    const { results } = await env.DB.prepare("SELECT id, app_name, developer_name, platform, category, version, license_name, source_url, description, file_name, file_size, created_at FROM submissions WHERE status='approved' ORDER BY app_name").all();
+    const { results } = await env.DB.prepare("SELECT id, app_name, developer_name, platform, category, version, license_name, source_url, description, file_name, file_size, CASE WHEN object_key IS NOT NULL THEN 1 ELSE 0 END AS download_available, created_at FROM submissions WHERE status='approved' ORDER BY app_name").all();
     return json({ apps: results });
   }
   if (url.pathname.startsWith("/v1/download/") && request.method === "GET") {
@@ -66,10 +66,13 @@ async function handle(request, env, ctx) {
     if (!row || !env.CERT_SIGNING_SECRET) return json({ valid: false, reason: "not_found" }, 404);
     const submittedSignature = supplied || row.signature;
     const payload = [row.serial_number,row.subject_name,row.credential_type,row.issued_at,row.expires_at].join("|");
-    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.CERT_SIGNING_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
-    const bytes = Uint8Array.from(atob(submittedSignature.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-submittedSignature.length%4)%4)), ch => ch.charCodeAt(0));
-    const validSignature = await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(payload));
-    const signatureMatches = submittedSignature === row.signature && validSignature;
+    const signatureFormatValid = /^[A-Za-z0-9_-]{43}$/.test(submittedSignature);
+    let signatureMatches = false;
+    if (signatureFormatValid && submittedSignature === row.signature) {
+      const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env.CERT_SIGNING_SECRET), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
+      const bytes = Uint8Array.from(atob(submittedSignature.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-submittedSignature.length%4)%4)), ch => ch.charCodeAt(0));
+      signatureMatches = await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(payload));
+    }
     const current = Date.now();
     const expired = Date.parse(row.expires_at) <= current;
     return json({ valid: signatureMatches && row.status === "active" && !expired, authentic: signatureMatches, status: expired && row.status === "active" ? "expired" : row.status, serial: row.serial_number, name: row.subject_name, credential: row.credential_type, issued_at: row.issued_at, expires_at: row.expires_at });
@@ -115,8 +118,8 @@ async function handle(request, env, ctx) {
   if (certRequestMatch && request.method === "PATCH") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     const body = await request.json().catch(() => null);
-    if (!body || !["rejected","more_info"].includes(body.status) || !String(body.note || "").trim()) return json({ error: "Choose a valid review action and provide a note." }, 400);
-    const result = await env.DB.prepare("UPDATE certificate_requests SET status=?,reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND status IN ('pending','more_info')").bind(body.status,identity.email,String(body.note).slice(0,1000),certRequestMatch[1]).run();
+    if (!body || !["approved","rejected","more_info"].includes(body.status) || (body.status !== "approved" && !String(body.note || "").trim())) return json({ error: "Choose a valid review action; a note is required for rejection or more information." }, 400);
+    const result = await env.DB.prepare("UPDATE certificate_requests SET status=?,reviewer_email=?,reviewer_note=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=? AND status IN ('pending','more_info')").bind(body.status,identity.email,String(body.note || "").slice(0,1000),certRequestMatch[1]).run();
     if (!result.meta?.changes) return json({ error: "Request not found or already processed." }, 404);
     return json({ id: certRequestMatch[1], status: body.status });
   }
@@ -124,7 +127,7 @@ async function handle(request, env, ctx) {
   if (issueCertMatch && request.method === "POST") {
     if (!isAdmin(identity, env)) return json({ error: "Forbidden" }, 403);
     if (!env.CERT_SIGNING_SECRET || String(env.CERT_SIGNING_SECRET).length < 32) return json({ error: "Certificate signing secret is not configured securely." }, 503);
-    const req = await env.DB.prepare("SELECT * FROM certificate_requests WHERE id=? AND status IN ('pending','approved')").bind(issueCertMatch[1]).first();
+    const req = await env.DB.prepare("SELECT * FROM certificate_requests WHERE id=? AND status='approved'").bind(issueCertMatch[1]).first();
     if (!req) return json({ error: "Certificate request not found or not eligible." }, 404);
     const body = await request.json().catch(() => ({}));
     const now = new Date();
@@ -139,7 +142,7 @@ async function handle(request, env, ctx) {
     const key = await crypto.subtle.importKey("raw",new TextEncoder().encode(env.CERT_SIGNING_SECRET),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
     const raw = new Uint8Array(await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(payload)));
     let binary = ""; for (const b of raw) binary += String.fromCharCode(b);
-    const signature = btoa(binary).replace(/\\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+    const signature = btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
     const id = crypto.randomUUID();
     await env.DB.prepare("INSERT INTO issued_certificates (id,request_id,serial_number,subject_name,credential_type,issued_at,expires_at,signature,signer_key_version,issuer_email) VALUES (?,?,?,?,?,?,?,?,?,?)")
       .bind(id,req.id,serial,subject,credential,issuedAt,expiresAt,signature,String(env.CERT_SIGNING_KEY_VERSION || "v1"),identity.email).run();

@@ -1,4 +1,4 @@
-const protectedPath = /^\/api\/v1\/(?:submissions(?:\/|$)|me(?:\/|$)|admin(?:\/|$))/;
+const protectedPath = /^\/api\/v1\/(?:submissions(?:\/|$)|me(?:\/|$)|admin(?:\/|$)|certificates\/requests(?:\/|$))/;
 let cachedJwks = null;
 let cachedJwksAt = 0;
 
