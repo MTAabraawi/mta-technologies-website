@@ -62,3 +62,26 @@ html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex S
 @media(max-width:600px){.directory-count-wrap{align-items:flex-start}.apps-hero h1{line-height:1.5}}
 
 .app-icon-fallback{display:grid;width:100%;height:100%;place-items:center;border-radius:15px;background:linear-gradient(145deg,rgba(56,189,248,.2),rgba(99,102,241,.24));color:var(--text-primary);font:800 1.1rem "Plus Jakarta Sans",sans-serif;letter-spacing:.04em}
+
+/* Keep application cards balanced even when upstream descriptions are very long. */
+.app-card-meta{overflow-wrap:anywhere;line-height:1.6}
+.app-card h3{overflow-wrap:anywhere}
+.app-card p{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:4;
+  overflow:hidden;
+  min-height:6.8em;
+}
+.app-tags{min-height:2rem}
+.app-icon-fallback{font-size:1.05rem}
+.load-more-wrap{display:flex;justify-content:center;margin:1.8rem 0 .5rem}
+#load-more-apps{min-width:min(100%,260px)}
+#load-more-apps:disabled{opacity:.65;cursor:wait}
+[data-theme="light"] .app-card{box-shadow:0 12px 32px rgba(30,55,90,.07)}
+[data-theme="light"] .apps-toolbar{box-shadow:0 14px 34px rgba(30,55,90,.06)}
+@media(max-width:600px){
+  .app-card p{-webkit-line-clamp:5;min-height:0}
+  .app-card-meta{font-size:.7rem}
+  .load-more-wrap{margin-top:1.25rem}
+}
