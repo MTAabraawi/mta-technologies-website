@@ -42,7 +42,7 @@
     card.dataset.category = app.category || "Other";
     card.dataset.developer = app.developer_name || "";
 
-    const hasMtaDownload = Boolean(app.file_name && api && app.id);
+    const hasMtaDownload = Boolean((app.download_available === 1 || app.download_available === true) && api && app.id);
     const sourceUrl = safeHttpsUrl(app.source_url);
 
     const top = document.createElement("div");
