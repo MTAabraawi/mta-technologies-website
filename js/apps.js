@@ -77,7 +77,7 @@
     let faviconUrl = "";
     try {
       if (homepageUrl) {
-        const host = new URL(homepageUrl).hostname.replace(/^www\\./, "");
+        const host = new URL(homepageUrl).hostname.replace(/^www\./, "");
         faviconUrl = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(host) + "&sz=128";
       }
     } catch {}
@@ -85,7 +85,7 @@
       const mark = document.createElement("span");
       mark.className = "app-icon-fallback";
       mark.setAttribute("aria-label", name + " icon unavailable");
-      mark.textContent = name.trim().split(/\\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
+      mark.textContent = name.trim().split(/\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
       return mark;
     };
     const appendIconImage = (url, fallbackUrl) => {
