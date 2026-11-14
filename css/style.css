@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
+
 /* MTA TECHNOLOGIES - Official Design System */
 :root {
   --bg-primary: #070B14;
@@ -831,3 +833,62 @@ html[lang="en"] .lightbox-close {
 #credential-error{text-align:center;color:#b91c1c}
 @media(max-width:620px){.credential-card{padding:1.1rem}.credential-body{grid-template-columns:1fr;gap:1.2rem}.credential-qr{grid-row:1}.credential-card header{align-items:flex-start;flex-direction:column}.credential-card footer{align-items:flex-start;flex-direction:column}}
 @media print{.credential-print-page{background:#fff;padding:0}.credential-wrap{margin:0;max-width:none}.credential-card{box-shadow:none;border-radius:0;min-height:480px}.credential-actions,#credential-error{display:none}}
+
+/* MTA 2026 global comfort and visual refinement */
+:root {
+  --bg-primary: #080E1A;
+  --bg-surface: #0E1728;
+  --bg-card: #121E32;
+  --border-color: rgba(148, 163, 184, 0.14);
+  --border-hover: rgba(91, 199, 244, 0.52);
+  --text-primary: #F4F7FC;
+  --text-secondary: #A5B3C7;
+  --text-muted: #7E8DA4;
+  --accent-blue: #59C7F4;
+  --accent-cobalt: #426CEB;
+  --accent-emerald: #34C6A0;
+  --accent-glow: rgba(91, 199, 244, 0.16);
+}
+[data-theme="light"] {
+  --bg-primary: #F6F8FC;
+  --bg-surface: #FFFFFF;
+  --bg-card: #EEF3FA;
+  --border-color: #DFE7F1;
+  --border-hover: #4A9FD0;
+  --text-primary: #17243A;
+  --text-secondary: #53647B;
+  --text-muted: #718198;
+  --accent-blue: #168DBB;
+  --accent-cobalt: #345FD4;
+  --accent-emerald: #078D70;
+  --accent-glow: rgba(22, 141, 187, 0.11);
+}
+html {
+  font-family: "IBM Plex Sans Arabic", "Plus Jakarta Sans", system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+html[lang="en"] {
+  font-family: "Plus Jakarta Sans", "IBM Plex Sans Arabic", system-ui, sans-serif;
+}
+body, button, input, select, textarea {
+  font-family: inherit;
+}
+body { letter-spacing: normal; }
+:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 3px;
+}
+.btn, .control-btn, .card, .corp-capability, .app-card {
+  transition-duration: .22s;
+}
+.card, .corp-capability {
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .08);
+}
+[data-theme="light"] .card,
+[data-theme="light"] .corp-capability {
+  box-shadow: 0 12px 30px rgba(30, 55, 90, .07);
+}
+::selection {
+  background: rgba(89, 199, 244, .28);
+  color: var(--text-primary);
+}
