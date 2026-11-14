@@ -178,23 +178,26 @@
     count.textContent = visible + " " + text("تطبيق معروض", "apps shown");
   }
 
-  const dynamicApps = [];
+  const curatedApps = [];
+  const engineApps = [];
   function renderDynamicApps() {
     grid.querySelectorAll('.app-card[data-dynamic-app="true"]').forEach(card => card.remove());
-    dynamicApps.forEach(app => grid.insertBefore(makeCard(app), empty));
+    [...curatedApps, ...engineApps].forEach(app => grid.insertBefore(makeCard(app), empty));
     filter();
   }
-  function addApps(items) {
+  function addApps(items, target) {
     const existing = new Set([
-      ...[...grid.querySelectorAll(".app-card")].map(card => (card.dataset.name || "").toLocaleLowerCase() + "|" + (card.dataset.platform || "").toLocaleLowerCase()),
-      ...dynamicApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase())
+      ...[...grid.querySelectorAll(".app-card")].filter(card => card.dataset.dynamicApp !== "true")
+        .map(card => (card.dataset.name || "").toLocaleLowerCase() + "|" + (card.dataset.platform || "").toLocaleLowerCase()),
+      ...curatedApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase()),
+      ...engineApps.map(app => String(app.app_name || app.name || "").trim().toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase())
     ]);
     (Array.isArray(items) ? items : []).forEach(app => {
       if (!app || typeof app !== "object") return;
       const name = String(app.app_name || app.name || "").trim();
       const key = name.toLocaleLowerCase() + "|" + platformName(app.platform).toLocaleLowerCase();
-      if (!key || existing.has(key)) return;
-      dynamicApps.push({ ...app, app_name: name });
+      if (!name || existing.has(key)) return;
+      target.push({ ...app, app_name: name });
       existing.add(key);
     });
     renderDynamicApps();
@@ -204,56 +207,81 @@
   async function loadCurated() {
     try {
       const response = await fetch("data/curated-apps.json", { cache: "no-cache" });
-      if (response.ok) addApps(await response.json());
+      if (response.ok) addApps(await response.json(), curatedApps);
     } catch (error) {
       console.warn("Curated app directory unavailable", error);
     }
   }
 
-  const pageSize = 60;
+  const pageSize = 48;
   let nextOffset = 0;
   let engineTotal = 0;
   let activeQuery = "";
+  let engineLoading = false;
   async function fetchEnginePage() {
-    if (!api) return [];
+    if (!api || engineLoading) return [];
     const button = document.getElementById("load-more-apps");
+    engineLoading = true;
     if (button) {
       button.hidden = false;
       button.disabled = true;
       button.textContent = text("جارٍ تحميل التطبيقات...", "Loading applications...");
     }
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000);
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
     try {
-      const queryPart = activeQuery ? "&q=" + encodeURIComponent(activeQuery) : "";
-      const response = await fetch(api + "/api/v1/apps?limit=" + pageSize + "&offset=" + nextOffset + queryPart, {
+      const params = new URLSearchParams({limit:String(pageSize),offset:String(nextOffset)});
+      if (activeQuery) params.set("q", activeQuery);
+      if (platform.value !== "all") params.set("platform", platform.value.toLowerCase());
+      const response = await fetch(api + "/api/v1/apps?" + params.toString(), {
         credentials: "omit", cache: "no-store", signal: controller.signal
       });
       if (!response.ok) throw new Error("Catalogue HTTP " + response.status);
       const payload = await response.json();
-      const items = Array.isArray(payload) ? payload : (payload.apps || payload.items || []);
-      addApps(items);
-      nextOffset += items.length;
+      if (!Array.isArray(payload)) throw new Error("Unexpected catalogue response");
+      const reportedTotal = Number(response.headers.get("X-Total-Count") || 0);
+      if (reportedTotal) engineTotal = reportedTotal;
+      addApps(payload, engineApps);
+      nextOffset += payload.length;
+      if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
       if (button) {
-        button.hidden = items.length < pageSize || (engineTotal > 0 && nextOffset >= engineTotal);
-        button.textContent = text("تحميل المزيد من التطبيقات", "Load more applications");
+        button.hidden = payload.length < pageSize || (engineTotal > 0 && nextOffset >= engineTotal);
+        button.disabled = false;
+        button.textContent = text(
+          "تحميل المزيد · " + Math.max(0, engineTotal-nextOffset).toLocaleString() + " متبقٍ",
+          "Load more · " + Math.max(0, engineTotal-nextOffset).toLocaleString() + " remaining"
+        );
       }
-      return items;
+      if (connection) connection.textContent = text(
+        "متصل · عُرض " + Math.min(nextOffset, engineTotal || nextOffset).toLocaleString() + " من " + (engineTotal || nextOffset).toLocaleString() + " تطبيقاً",
+        "Connected · showing " + Math.min(nextOffset, engineTotal || nextOffset).toLocaleString() + " of " + (engineTotal || nextOffset).toLocaleString() + " apps"
+      );
+      return payload;
     } catch (error) {
       console.warn("MTA Applications Engine catalogue page unavailable", error);
       if (button) {
         button.hidden = false;
-        button.textContent = text("تعذّر التحميل — اضغط لإعادة المحاولة", "Load failed — tap to retry");
+        button.disabled = false;
+        button.textContent = text("تعذّر التحميل — أعد المحاولة", "Load failed — retry");
       }
       if (connection) connection.textContent = text(
-        "تعذّر تحميل هذه الدفعة. يمكنك إعادة المحاولة دون فقد التطبيقات المعروضة.",
-        "This batch could not load. Retry without losing the apps already displayed."
+        "تعذّر تحميل هذه الدفعة. تحقق من الاتصال ثم أعد المحاولة؛ لم نحذف التطبيقات المعروضة.",
+        "This batch failed to load. Check the connection and retry; displayed apps were kept."
       );
       throw error;
     } finally {
       clearTimeout(timeoutId);
+      engineLoading = false;
       if (button) button.disabled = false;
     }
+  }
+  async function reloadEngine() {
+    if (!api) return;
+    nextOffset = 0;
+    engineApps.length = 0;
+    renderDynamicApps();
+    if (connection) connection.textContent = text("جارٍ تحديث نتائج البحث...", "Refreshing catalogue results...");
+    await fetchEnginePage();
   }
   async function loadEngine() {
     if (!api) {
@@ -261,39 +289,32 @@
       return;
     }
     try {
-      const statsResponse = await fetch(api + "/api/v1/catalog-stats", {
-        credentials: "omit", cache: "no-store"
+      const health = await fetch(api + "/health", {credentials:"omit",cache:"no-store"});
+      if (!health.ok) throw new Error("Engine health HTTP " + health.status);
+      const statsResponse = await fetch(api + "/api/v1/catalog-stats", {credentials:"omit",cache:"no-store"});
+      if (!statsResponse.ok) throw new Error("Catalogue stats HTTP " + statsResponse.status);
+      const data = await statsResponse.json();
+      engineTotal = Number(data.total || 0);
+      if (stats) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+      document.querySelectorAll("[data-catalog-platform]").forEach(element => {
+        const key = element.dataset.catalogPlatform;
+        const amount = Number((data.platforms || {})[key] || 0);
+        element.textContent = amount.toLocaleString() + " " + platformName(key);
+        element.title = amount.toLocaleString() + " " + text("تطبيقاً", "applications");
       });
-      if (statsResponse.ok) {
-        const data = await statsResponse.json();
-        engineTotal = Number(data.total || 0);
-        if (stats) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
-        document.querySelectorAll("[data-catalog-platform]").forEach(element => {
-          const key = element.dataset.catalogPlatform;
-          const label = platformName(key);
-          const amount = Number((data.platforms || {})[key] || 0);
-          element.textContent = amount.toLocaleString() + " " + label;
-          element.title = amount.toLocaleString() + " " + text("تطبيقاً", "applications");
-        });
-      }
       await fetchEnginePage();
-      if (connection) connection.textContent = text(
-        "متصل بمحرك MTA العالمي · بيانات وروابط من المصادر الأصلية",
-        "Connected to MTA Global Engine · metadata and links from original sources"
-      );
     } catch (error) {
       console.warn("MTA Applications Engine is currently unavailable", error);
       if (connection) connection.textContent = text(
-        "تعذر الاتصال بالمحرك حالياً؛ ما زالت التطبيقات المحلية وروابط المصادر متاحة.",
-        "The engine is temporarily unreachable; local listings and source links remain available."
+        "تعذّر الاتصال بكتالوج التطبيقات. أعد تحميل الصفحة أو حاول مجدداً.",
+        "Could not connect to the application catalogue. Reload the page or try again."
       );
     }
   }
 
-  [platform, category, developer].forEach(element => {
-    element.addEventListener("input", filter);
-    element.addEventListener("change", filter);
-  });
+  category.addEventListener("change", filter);
+  developer.addEventListener("change", filter);
+  platform.addEventListener("change", () => reloadEngine().catch(() => {}));
   let searchTimer = null;
   search.addEventListener("input", () => {
     filter();
@@ -302,8 +323,7 @@
       const query = search.value.trim();
       if (query === activeQuery) return;
       activeQuery = query;
-      nextOffset = 0;
-      fetchEnginePage().catch(() => {});
+      reloadEngine().catch(() => {});
     }, 450);
   });
   const moreButton = document.getElementById("load-more-apps");
