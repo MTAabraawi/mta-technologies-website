@@ -100,7 +100,7 @@
     try { const r = await fetch("data/curated-apps.json", {cache:"no-cache"}); if (r.ok) addApps(await r.json()); }
     catch (e) { console.warn("Curated app directory unavailable", e); }
   }
-  async function loadEngine() {
+  let nextOffset = 0;\n  let engineTotal = 0;\n  async function fetchEnginePage(reset) {\n    if (!api) return;\n    const button = document.getElementById("load-more-apps");\n    if (button) { button.disabled = true; button.textContent = text("جارٍ التحميل...", "Loading..."); }\n    try {\n      const response = await fetch(api + "/api/v1/apps?limit=200&offset=" + nextOffset, {credentials:"omit", cache:"no-store"});\n      if (!response.ok) throw new Error("Catalogue HTTP " + response.status);\n      const payload = await response.json();\n      const items = Array.isArray(payload) ? payload : (payload.apps || payload.items || []);\n      addApps(items);\n      nextOffset += items.length;\n      if (button) { button.hidden = items.length < 200 || nextOffset >= engineTotal; button.disabled = false; button.textContent = text("تحميل المزيد من التطبيقات", "Load more applications"); }\n      return items;\n    } catch (error) {\n      console.warn("MTA Applications Engine catalogue page unavailable", error);\n      if (button) { button.hidden = true; button.disabled = false; }\n      throw error;\n    }\n  }\n  async function loadEngine() {
     if (!api) { if (connection) connection.textContent = text("محرك الفهرسة غير مضبوط.", "Application engine is not configured."); return; }
     try {
       const [appsResponse, statsResponse] = await Promise.all([
