@@ -14,6 +14,10 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
     const url = new URL(response.url());
     return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '50';
   }, { timeout: 90_000 });
+  const thirdApiResponsePromise = page.waitForResponse(response => {
+    const url = new URL(response.url());
+    return url.pathname.endsWith('/api/v1/apps') && url.searchParams.get('offset') === '100';
+  }, { timeout: 90_000 });
 
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const firstApiResponse = await apiResponsePromise;
@@ -60,6 +64,17 @@ test('marketplace loads real catalogue records and app icons', async ({ page }) 
     .toBeGreaterThan(firstCount);
   await expect(page.locator('#apps-grid .app-card[data-dynamic-app="true"] h3', { hasText: /^1Password$/ }).first())
     .toBeVisible();
+
+  // Reach the end of the second batch. The third page must load from the
+  // observer without clicking the fallback button.
+  await sentinel.scrollIntoViewIfNeeded();
+  const thirdPageResponse = await thirdApiResponsePromise;
+  expect(thirdPageResponse.status(), 'The third catalogue page must return HTTP 200').toBe(200);
+  const thirdPayload = await thirdPageResponse.json();
+  expect(Array.isArray(thirdPayload)).toBeTruthy();
+  expect(thirdPayload.length, 'The third API page should contain app records').toBeGreaterThan(0);
+  await expect.poll(async () => firstBatch.count(), { timeout: 30_000 })
+    .toBeGreaterThan(firstCount + secondPayload.length / 2);
 
   expect(pageErrors, 'The marketplace should not throw uncaught JavaScript errors').toEqual([]);
 });
