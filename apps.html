@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://www.mtahqq.dpdns.org/apps.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/apps.css">
   <link rel="stylesheet" href="css/external-catalogs.css">
@@ -48,8 +48,8 @@
     </div>
   </section>
   <section class="container directory-section" id="directory">
-    <div class="directory-heading"><div><span class="apps-eyebrow"><span class="ar-only">دليل التطبيقات</span><span class="en-only">APPLICATION DIRECTORY</span></span><h2><span class="ar-only">ابحث واكتشف</span><span class="en-only">Find what you need</span></h2></div><span class="directory-count" id="app-count">1 <span class="ar-only">تطبيق متاح حالياً</span><span class="en-only">listed product</span></span></div>
-    <div class="apps-toolbar">
+    <div class="directory-heading"><div><span class="apps-eyebrow"><span class="ar-only">دليل التطبيقات</span><span class="en-only">APPLICATION DIRECTORY</span></span><h2><span class="ar-only">ابحث واكتشف</span><span class="en-only">Find what you need</span></h2></div><div class="directory-count-wrap"><span class="directory-count" id="app-count">1 تطبيق</span><span class="catalog-total" id="catalog-stats">...</span></div></div>
+    <div class="catalog-connection" role="status" aria-live="polite"><span id="catalog-connection">جارٍ الاتصال بمحرك التطبيقات العالمي...</span><strong>MTA GLOBAL CATALOG</strong></div>\n    <div class="apps-toolbar">
       <label class="apps-search"><span aria-hidden="true">⌕</span><input id="app-search" type="search" placeholder="ابحث باسم التطبيق أو وصفه..." aria-label="Search apps"></label>
       <select id="platform-filter" aria-label="Filter by platform"><option value="all">كل المنصات / All platforms</option><option value="Android">Android</option><option value="iOS">iOS</option><option value="Windows">Windows</option><option value="macOS">macOS</option><option value="Linux">Linux</option><option value="Web">Web</option></select>
       <select id="category-filter" aria-label="Filter by category"><option value="all">كل التصنيفات / All categories</option><option value="Security">الأمن / Security</option><option value="Productivity">الإنتاجية / Productivity</option><option value="Education">التعليم / Education</option><option value="AI">الذكاء الاصطناعي / AI</option><option value="Tools">الأدوات / Tools</option><option value="Games">الألعاب / Games</option><option value="Media">الوسائط / Media</option><option value="Graphics">الرسوم / Graphics</option><option value="3D & Animation">3D & Animation</option><option value="Office">المكتبية / Office</option><option value="Cloud">السحابة / Cloud</option><option value="Design">التصميم / Design</option></select>
@@ -66,7 +66,7 @@
       </article>
       <div class="apps-empty" id="apps-empty" hidden><strong><span class="ar-only">لا توجد نتائج مطابقة</span><span class="en-only">No matching apps</span></strong><p><span class="ar-only">جرّب تغيير كلمات البحث أو عوامل التصفية.</span><span class="en-only">Try changing your search or filters.</span></p></div>
     </div>
-    <div class="directory-note"><strong><span class="ar-only">دليل في طور التوسع</span><span class="en-only">A growing directory</span></strong><p><span class="ar-only">سنضيف تطبيقات جديدة من المطورين والشركات بعد مراجعة معلوماتها وروابطها. لا تمثل التصنيفات أو المنصات دعماً لتطبيق غير مدرج فعلياً.</span><span class="en-only">New apps from developers and companies will be listed after their details and links are reviewed. Platform labels do not imply an app is available unless it is listed.</span></p></div>
+    <div class="load-more-wrap"><button class="btn btn-outline" id="load-more-apps" type="button" hidden>تحميل المزيد من التطبيقات</button></div>\n    <div class="directory-note"><strong><span class="ar-only">دليل في طور التوسع</span><span class="en-only">A growing directory</span></strong><p><span class="ar-only">سنضيف تطبيقات جديدة من المطورين والشركات بعد مراجعة معلوماتها وروابطها. لا تمثل التصنيفات أو المنصات دعماً لتطبيق غير مدرج فعلياً.</span><span class="en-only">New apps from developers and companies will be listed after their details and links are reviewed. Platform labels do not imply an app is available unless it is listed.</span></p></div>
   </section>
   <section class="container store-directory-section">
     <div class="apps-section-heading"><span class="apps-eyebrow">OFFICIAL DISTRIBUTION CHANNELS</span><h2><span class="ar-only">متاجر ومستودعات التطبيقات</span><span class="en-only">App stores & software repositories</span></h2><p><span class="ar-only">استكشف قنوات التوزيع الرسمية حسب المنصة. نعرض روابط المتاجر الأصلية ولا نعيد استضافة ملفاتها دون إذن وحقوق توزيع واضحة.</span><span class="en-only">Explore official distribution channels by platform. We link to original stores and do not mirror their files without explicit redistribution rights.</span></p></div>

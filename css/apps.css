@@ -17,3 +17,46 @@
 .app-icon-image img{display:block;width:100%;height:100%;object-fit:cover;border-radius:18px}
 
 .app-icon img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+
+/* MTA marketplace visual refresh */
+.apps-hero{position:relative;isolation:isolate;padding-top:clamp(4rem,8vw,7rem);padding-bottom:4.2rem;background:radial-gradient(ellipse at 78% 12%,rgba(14,165,233,.16),transparent 42%),radial-gradient(ellipse at 12% 72%,rgba(99,102,241,.12),transparent 38%),linear-gradient(180deg,var(--bg-surface),var(--bg-primary))}
+.apps-hero:after{content:"";position:absolute;z-index:-1;inset:0;opacity:.22;background-image:linear-gradient(rgba(148,163,184,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,#000,transparent 90%)}
+.apps-hero h1{letter-spacing:-.045em}
+.apps-eyebrow{letter-spacing:.08em}
+.apps-hero p{max-width:760px}
+.apps-platform-strip span{padding:.55rem 1rem;border-radius:12px;transition:transform .2s,border-color .2s}
+.apps-platform-strip span:hover{transform:translateY(-2px);border-color:var(--accent-blue)}
+.directory-heading h2,.apps-section-heading h2{letter-spacing:-.035em}
+.apps-toolbar{padding:1rem;border:1px solid var(--border-color);border-radius:18px;background:var(--bg-surface);box-shadow:0 16px 44px rgba(0,0,0,.10)}
+.apps-search,.apps-toolbar select{min-height:52px;border-radius:12px}
+.apps-search:focus-within,.apps-toolbar select:focus{outline:2px solid var(--accent-blue);outline-offset:2px}
+.apps-grid{gap:1.15rem}
+.app-card{position:relative;overflow:hidden;border-radius:20px;box-shadow:0 12px 34px rgba(0,0,0,.09);transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease}
+.app-card:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#38bdf8,#6366f1,#10b981);opacity:.75}
+.app-card:hover{transform:translateY(-5px);box-shadow:0 22px 48px rgba(0,0,0,.16)}
+.app-icon-image{width:68px;height:68px;flex-basis:68px;border:1px solid var(--border-color);border-radius:19px;background:var(--bg-card);padding:4px}
+.app-icon-image img{border-radius:15px;object-fit:contain}
+.app-card h3{font-size:1.18rem;line-height:1.5}
+.app-card p{min-height:4.8rem}
+.app-status{max-width:55%;text-align:center;line-height:1.5}
+.catalog-connection{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:0 0 1rem;padding:.85rem 1rem;border:1px solid var(--border-color);border-radius:12px;background:var(--bg-surface);color:var(--text-secondary);font-size:.78rem}
+.catalog-connection strong{color:var(--accent-emerald);font-weight:800}
+.store-directory-grid a{position:relative;padding:1.15rem 1.1rem 1.1rem 3.3rem;border-radius:14px;transition:transform .2s,border-color .2s,background .2s}
+.store-directory-grid a:before{content:"↗";position:absolute;inset-inline-start:1rem;top:1.1rem;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:var(--accent-glow);color:var(--accent-blue);font-weight:900}
+.store-directory-grid a:hover{transform:translateY(-3px);border-color:var(--border-hover);background:var(--bg-surface)}
+.external-result-card{border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,.08)}
+.external-result-card:hover{border-color:var(--border-hover)}
+.external-source-links a{border-radius:13px;transition:transform .2s,border-color .2s}
+.external-source-links a:hover{transform:translateY(-2px);border-color:var(--border-hover)}
+.directory-note{border-radius:14px}
+@media(max-width:600px){.apps-hero{padding:3.2rem 0 2.4rem}.apps-toolbar{padding:.7rem;gap:.6rem}.apps-toolbar select,.apps-search{min-height:50px}.app-card{padding:1.2rem}.app-card p{min-height:0}.catalog-connection{align-items:flex-start;flex-direction:column}}
+
+/* Comfortable bilingual typography for the marketplace */
+html[lang="ar"],html[lang="ar"] body,.apps-main{font-family:"IBM Plex Sans Arabic","Plus Jakarta Sans",system-ui,sans-serif}
+html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex Sans Arabic",system-ui,sans-serif}
+.apps-main{letter-spacing:normal}
+.apps-hero h1{line-height:1.45}
+.apps-hero p,.app-card p,.directory-note p,.external-catalog-footnote{line-height:2}
+.directory-count-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:.25rem}
+.catalog-total{font-size:.72rem;color:var(--accent-emerald);font-weight:800}
+@media(max-width:600px){.directory-count-wrap{align-items:flex-start}.apps-hero h1{line-height:1.5}}
