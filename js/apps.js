@@ -48,7 +48,7 @@
     card.dataset.dynamicApp = "true";
     const platforms = Array.isArray(app.platforms)
       ? app.platforms.map(platformName)
-      : String(app.platform || "Other").split(/\s*,\s*.filter(Boolean).map(platformName);
+      : String(app.platform || "Other").split(/\s*,\s*/).filter(Boolean).map(platformName);
     const description = isEnglish()
       ? (app.description_en || app.summary || app.description || "")
       : (app.description_ar || app.summary || app.description || "");
