@@ -68,6 +68,16 @@
     </div>
     <div class="directory-note"><strong><span class="ar-only">دليل في طور التوسع</span><span class="en-only">A growing directory</span></strong><p><span class="ar-only">سنضيف تطبيقات جديدة من المطورين والشركات بعد مراجعة معلوماتها وروابطها. لا تمثل التصنيفات أو المنصات دعماً لتطبيق غير مدرج فعلياً.</span><span class="en-only">New apps from developers and companies will be listed after their details and links are reviewed. Platform labels do not imply an app is available unless it is listed.</span></p></div>
   </section>
+  <section class="container directory-section multiplatform-live-section" id="global-catalog">
+    <div class="apps-section-heading"><span class="apps-eyebrow">GLOBAL MULTIPLATFORM DISCOVERY</span><h2><span class="ar-only">بحث موحد عبر المنصات</span><span class="en-only">Search across platforms</span></h2><p><span class="ar-only">ابحث في مصادر التطبيقات الأصلية. نتائج البحث تفتح صفحات الناشرين والمتاجر مباشرة، ولا يتم تنزيل أو تخزين ملفات التطبيقات على خوادم MTA.</span><span class="en-only">Search original app sources. Results link directly to publishers and stores; MTA does not download or host third-party application files.</span></p></div>
+    <form class="mta-global-search" id="mta-global-search">
+      <label class="apps-search"><span aria-hidden="true">⌕</span><input id="mta-global-query" type="search" required maxlength="120" placeholder="ابحث عن تطبيق أو برنامج..." aria-label="Global app search"></label>
+      <select id="mta-global-platform" aria-label="Choose platform"><option value="Android">Android</option><option value="iOS">iOS</option><option value="Windows">Windows</option><option value="Linux">Linux</option><option value="macOS">macOS</option><option value="Web">Web Apps</option></select>
+      <button class="btn btn-primary" type="submit"><span class="ar-only">ابحث الآن</span><span class="en-only">Search</span></button>
+    </form>
+    <p class="catalog-live-status" id="mta-global-status" role="status" aria-live="polite">اختر المنصة واكتب اسم التطبيق لبدء البحث.</p>
+    <div class="catalog-live-results" id="mta-global-results"></div>
+  </section>
   <section class="container store-directory-section">
     <div class="apps-section-heading"><span class="apps-eyebrow">OFFICIAL DISTRIBUTION CHANNELS</span><h2><span class="ar-only">متاجر ومستودعات التطبيقات</span><span class="en-only">App stores & software repositories</span></h2><p><span class="ar-only">استكشف قنوات التوزيع الرسمية حسب المنصة. نعرض روابط المتاجر الأصلية ولا نعيد استضافة ملفاتها دون إذن وحقوق توزيع واضحة.</span><span class="en-only">Explore official distribution channels by platform. We link to original stores and do not mirror their files without explicit redistribution rights.</span></p></div>
     <div class="store-directory-grid">
@@ -95,5 +105,5 @@
 <div><h3><span class="ar-only">المنظومة</span><span class="en-only">Ecosystem</span></h3><a href="apps.html">Marketplace / المتجر</a><a href="developer-portal.html">Developer Portal / المطورون</a><a href="developer-certification.html">Developer Certification / اعتماد المطورين</a><a href="marketplace-policy.html">Marketplace Policy</a></div>
 <div><h3><span class="ar-only">السياسات</span><span class="en-only">Legal</span></h3><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a><a href="cookies.html">Cookies</a></div>
 </div><div class="corp-footer-bottom"><span>© 2026 MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
-<script src="js/main.js"></script><script src="marketplace-config.js"></script><script src="js/apps.js"></script><script src="js/external-catalogs.js"></script>
+<script src="js/main.js"></script><script src="marketplace-config.js"></script><script src="js/apps.js"></script><script src="js/external-catalogs.js"></script><script src="js/multiplatform-catalog.js" defer></script>
 </body></html>
