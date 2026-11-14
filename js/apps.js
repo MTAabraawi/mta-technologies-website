@@ -327,7 +327,17 @@
     }, 450);
   });
   const moreButton = document.getElementById("load-more-apps");
-  if (moreButton) moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
+  if (moreButton) {
+    moreButton.addEventListener("click", () => fetchEnginePage().catch(() => {}));
+    if ("IntersectionObserver" in window) {
+      const moreObserver = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting) && !engineLoading && !moreButton.hidden) {
+          fetchEnginePage().catch(() => {});
+        }
+      }, { rootMargin: "600px 0px" });
+      moreObserver.observe(moreButton);
+    }
+  }
   filter();
   loadCurated();
   loadEngine();
