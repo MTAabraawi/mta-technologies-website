@@ -73,25 +73,37 @@
     const icon = document.createElement("div");
     icon.className = "app-icon app-icon-image";
     const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
+    const homepageUrl = safeHttpsUrl(app.app_url || app.homepage || app.source_url);
+    let faviconUrl = "";
+    try {
+      if (homepageUrl) {
+        const host = new URL(homepageUrl).hostname.replace(/^www\\./, "");
+        faviconUrl = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(host) + "&sz=128";
+      }
+    } catch {}
     const fallbackIcon = () => {
       const mark = document.createElement("span");
       mark.className = "app-icon-fallback";
-      mark.textContent = name.trim().split(/\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
+      mark.setAttribute("aria-label", name + " icon unavailable");
+      mark.textContent = name.trim().split(/\\s+/).slice(0, 2).map(part => part.charAt(0)).join("").toUpperCase();
       return mark;
     };
-    if (iconUrl) {
+    const appendIconImage = (url, fallbackUrl) => {
       const img = document.createElement("img");
-      img.src = iconUrl;
+      img.src = url;
       img.alt = name + " icon";
       img.loading = "lazy";
       img.decoding = "async";
+      img.referrerPolicy = "no-referrer";
       img.addEventListener("error", () => {
-        icon.replaceChildren(fallbackIcon());
+        if (fallbackUrl) img.src = fallbackUrl;
+        else icon.replaceChildren(fallbackIcon());
       }, { once: true });
       icon.append(img);
-    } else {
-      icon.append(fallbackIcon());
-    }
+    };
+    if (iconUrl) appendIconImage(iconUrl, faviconUrl && faviconUrl !== iconUrl ? faviconUrl : "");
+    else if (faviconUrl) appendIconImage(faviconUrl, "");
+    else icon.append(fallbackIcon());
     top.append(icon);
     const status = document.createElement("span");
     status.className = "app-status status-live";
