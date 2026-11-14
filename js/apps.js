@@ -32,7 +32,12 @@
       graphics: "Graphics", photo: "Graphics", multimedia: "Media",
       video: "Media", audio: "Media", browser: "Tools", utilities: "Tools",
       utility: "Tools", development: "Tools", communication: "Tools",
-      network: "Tools", system: "Tools", science: "Education", internet: "Web"
+      network: "Tools", system: "Tools", science: "Education", internet: "Web",
+      ai: "AI", artificialintelligence: "AI", "artificial intelligence": "AI",
+      design: "Design", cloud: "Cloud", "3d": "3D & Animation",
+      animation: "3D & Animation", office: "Office", business: "Productivity",
+      weather: "Tools", travel: "Tools", finance: "Productivity",
+      health: "Education", lifestyle: "Tools", food: "Tools", books: "Education"
     };
     return map[raw] || (raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "Other");
   };
@@ -50,6 +55,13 @@
     const name = String(app.app_name || app.name || "Application");
     const dev = String(app.developer_name || app.developer || "Independent developer");
     const cat = categoryName(app.category);
+    const categorySelect = document.getElementById("category-filter");
+    if (categorySelect && cat && ![...categorySelect.options].some(option => option.value === cat)) {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.append(option);
+    }
     card.dataset.name = name;
     card.dataset.description = description;
     card.dataset.platform = platforms.join(",");
