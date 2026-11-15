@@ -48,6 +48,7 @@ test('marketplace automatically renders successive catalogue batches through its
     }
   });
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  await page.locator('[data-store-source="fdroid"]').click();
   const cards = page.locator('#apps-grid .app-card[data-dynamic-app="true"]');
   await expect(cards.first()).toBeVisible({ timeout: 90_000 });
   const sentinel = page.locator('#catalogue-sentinel');
@@ -65,6 +66,7 @@ test('marketplace automatically renders successive catalogue batches through its
 
 test('marketplace includes the MTA Net Blocker listing and branded icon', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  await page.locator('[data-store-source="mta-curated-web"]').click();
   const card = page.locator('#apps-grid .app-card').filter({ hasText: 'MTA Net Blocker' }).first();
   await expect(card).toBeVisible();
   await expect(card.locator('img[alt*="MTA Net Blocker"]')).toHaveAttribute('src', /mta-net-blocker/);
@@ -109,4 +111,25 @@ test('public catalogue can be paginated from first record through the final reco
   expect(result.received).toBe(result.total);
   expect(result.unique).toBe(result.total);
   expect(result.pages).toBe(Math.ceil(result.total / 200));
+});
+
+test('store picker requests and displays only the selected catalogue source', async ({ page }) => {
+  const sourceRequests = [];
+  page.on('request', request => {
+    const url = new URL(request.url());
+    if (url.pathname === '/api/v1/apps') sourceRequests.push(url.searchParams.get('source'));
+  });
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#store-picker')).toBeVisible();
+  await expect(page.locator('#catalogue-view')).toBeHidden();
+  await page.locator('[data-store-source="fdroid"]').click();
+  await expect(page.locator('#catalogue-view')).toBeVisible();
+  await expect(page.locator('#store-picker')).toBeHidden();
+  await expect.poll(() => sourceRequests.includes('fdroid'), { timeout: 30_000 }).toBe(true);
+  const cards = page.locator('#apps-grid .app-card[data-dynamic-app="true"]');
+  await expect(cards.first()).toBeVisible({ timeout: 30_000 });
+  await expect.poll(async () => cards.first().getAttribute('data-source')).toBe('fdroid');
+  await page.locator('#store-back').click();
+  await expect(page.locator('#store-picker')).toBeVisible();
+  await expect(page.locator('#catalogue-view')).toBeHidden();
 });
