@@ -26,6 +26,7 @@
     "flathub": ["Flathub", "تطبيقات Linux عبر Flatpak", "Linux apps via Flatpak"],
     "homebrew-cask": ["Homebrew", "تطبيقات macOS", "macOS applications"],
     "winget-run-community": ["WinGet", "برامج Windows", "Windows software"],
+    "arch-linux": ["Arch Linux Packages", "حزم وتطبيقات Arch Linux", "Arch Linux packages and apps"],
     "steam": ["Steam", "نتائج بحث من متجر Steam", "Steam storefront search results"],
     "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"]
   };
@@ -144,6 +145,17 @@
     const desc = document.createElement("p");
     desc.textContent = description;
     card.append(desc);
+    const metadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
+    const sizeBytes = Number(metadata.size_bytes || app.size_bytes || 0);
+    if (Number.isFinite(sizeBytes) && sizeBytes > 0) {
+      const size = document.createElement("small");
+      size.className = "app-license";
+      const units = ["B", "KB", "MB", "GB"];
+      let amount = sizeBytes, unit = 0;
+      while (amount >= 1024 && unit < units.length - 1) { amount /= 1024; unit++; }
+      size.textContent = text("الحجم: ", "Size: ") + amount.toFixed(amount >= 10 || unit === 0 ? 0 : 1) + " " + units[unit];
+      card.append(size);
+    }
 
     if (app.license || app.license_name) {
       const license = document.createElement("small");
