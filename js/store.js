@@ -85,10 +85,12 @@ function makeCard(app){
  const iconCollection=metadata.icons&&typeof metadata.icons==="object"?Object.values(metadata.icons):[];
  const metadataIcons=[metadata.icon_url,metadata.iconUrl,metadata.icon,iconObject.url,iconObject.path,metadata.logo,metadata.image,metadata.image_url,metadata.artworkUrl512,metadata.artworkUrl100,metadata.thumbnail,...iconCollection];
  const iconUrl=safe(app.icon_url||"");
- const candidates=[iconUrl,...metadataIcons.map(value=>safe(typeof value==="string"?value:(value&&typeof value==="object"?(value.url||value.path||""):""))),host?"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=128":"",host?"https://icons.duckduckgo.com/ip3/"+encodeURIComponent(host)+".ico":""] .filter((v,i,a)=>v&&a.indexOf(v)===i);let iconIndex=0;
- const monogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();icon.replaceWith(mark)};
- icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else monogram()};if(candidates.length)icon.src=candidates[0];else icon.dataset.iconMissing="true";
- const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;top.append(icon,badge);if(!candidates.length)monogram();
+ const candidates=[iconUrl,...metadataIcons.map(value=>safe(typeof value==="string"?value:(value&&typeof value==="object"?(value.url||value.path||""):""))),host?"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=128":"",host?"https://icons.duckduckgo.com/ip3/"+encodeURIComponent(host)+".ico":""].filter((v,i,a)=>v&&a.indexOf(v)===i);
+ let iconIndex=0;
+ const makeMonogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();return mark};
+ icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else if(icon.parentNode)icon.replaceWith(makeMonogram())};
+ const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;
+ if(candidates.length){icon.src=candidates[0];top.append(icon,badge)}else{top.append(makeMonogram(),badge)}
  const h=document.createElement("h3");h.textContent=app.name||"Application";
  const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
  const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
