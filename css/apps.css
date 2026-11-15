@@ -161,3 +161,11 @@ html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex S
 .store-card-state.is-connected{color:#C8F58B!important;font-weight:850}.store-card-state.is-coming-soon{color:#C5D0DF!important;font-weight:750}
 .catalogue-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;margin:1rem 0}.catalogue-summary-item{display:flex;flex-direction:column;gap:.25rem;padding:1rem;border:1px solid var(--border-color);border-radius:15px;background:var(--bg-card)}.catalogue-summary-item strong{font-size:clamp(1.2rem,3vw,1.8rem);font-variant-numeric:tabular-nums;color:var(--text-primary)}.catalogue-summary-item span,.catalogue-icon-note{color:var(--text-secondary);font-size:.78rem;line-height:1.8}.catalogue-icon-note{margin:.1rem 0 1.2rem}.store-connected-group{order:-1;border-color:var(--border-hover);background:linear-gradient(145deg,var(--bg-surface),var(--bg-card))}.store-coming-soon-group{border-style:dashed}.store-picker-card[data-catalogue-state="connected"]{border-color:rgba(196,234,122,.34)}.store-picker-card[data-catalogue-state="coming-soon"]{background:var(--bg-surface)}
 @media(max-width:560px){.catalogue-summary-grid{grid-template-columns:1fr 1fr}.catalogue-summary-item:last-child{grid-column:1/-1}}
+
+/* Marketplace contrast and interaction refinements */
+.apps-hero h1 em{background-image:linear-gradient(110deg,#BAE6FD,#93C5FD)!important}
+[data-theme="light"] .apps-hero h1 em{background-image:linear-gradient(110deg,#075985,#1D4ED8)!important}
+.store-picker-card small,.store-picker-card>span,.apps-platform-strip span{color:var(--text-secondary)}
+.store-card-state.is-connected{color:#D9F99D!important}
+.store-card-state.is-coming-soon{color:#D2DCE9!important}
+[data-theme="light"] .store-card-state.is-coming-soon{color:#334155!important}
