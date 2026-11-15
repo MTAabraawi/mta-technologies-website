@@ -68,7 +68,7 @@ else{
 const grid=$("store-app-grid"), count=$("store-count"), load=$("store-load-more"), search=$("store-search"), platform=$("store-platform-filter");
 let offset=0,total=0,loading=false,exhausted=false,query="",timer=null;
 function makeCard(app){
- const card=document.createElement("article");card.className="store-app-card";
+ const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();
  const top=document.createElement("div");top.className="store-app-top";
  const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.alt=(app.name||"App")+" icon";
  const iconUrl=safe(app.icon_url||"");icon.src=iconUrl||"images/mta-logo-square.png";icon.onerror=()=>{icon.onerror=null;icon.src="images/mta-logo-square.png"};
@@ -78,9 +78,9 @@ function makeCard(app){
  const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
  const tags=document.createElement("div");tags.className="store-app-tags";[app.platform,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});
  const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
- card.append(top,h,meta,summary,tags,link);return card;
+ card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,link);return card;
 }
-function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
+function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}\nfunction applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
 async function fetchPage(reset=false){
  if(!store?.source||loading||exhausted||!API)return;
  if(reset){offset=0;exhausted=false;total=0;grid.replaceChildren();$("store-empty").hidden=true}
@@ -93,7 +93,7 @@ async function fetchPage(reset=false){
   const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
-  items.forEach(app=>grid.append(makeCard(app)));if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,36).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
+  items.forEach(app=>grid.append(makeCard(app)));applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,36).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
   if(items.length<36||(total&&offset>=total))exhausted=true;
   count.textContent=total?total.toLocaleString()+" "+copy("تطبيق مفهرس","indexed apps"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
@@ -101,6 +101,6 @@ async function fetchPage(reset=false){
  }catch(e){console.error("Store catalogue fetch failed",e);if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
  finally{loading=false;load.disabled=false}
 }
-if(store?.source){if(store.source==="steam"){$("store-results-note").textContent=copy("اكتب اسم لعبة أو برنامج للبحث في نتائج Steam المتاحة.","Enter a game or software title to search available Steam results.");grid.replaceChildren();setEmpty(copy("ابدأ البحث باسم لعبة أو برنامج لعرض النتائج المتاحة من Steam.","Search for a game or software title to view available Steam results."));}else fetchPage(true);load.addEventListener("click",()=>fetchPage(false));search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();if(store.source==="steam"&&query.length<2)return;fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));}
+if(store?.source){if(store.source==="steam"){$("store-results-note").textContent=copy("اكتب اسم لعبة أو برنامج للبحث في نتائج Steam المتاحة.","Enter a game or software title to search available Steam results.");grid.replaceChildren();setEmpty(copy("ابدأ البحث باسم لعبة أو برنامج لعرض النتائج المتاحة من Steam.","Search for a game or software title to view available Steam results."));}else fetchPage(true);load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();if(store.source==="steam"&&query.length<2)return;fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));}
 window.addEventListener("mta:languagechange",()=>{if(store){document.title=store.name+" | MTA TECHNOLOGIES"}});
 })();
