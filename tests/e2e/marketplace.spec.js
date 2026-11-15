@@ -163,7 +163,7 @@ test('connected store pages are server-rendered with a unique canonical and visi
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'http://127.0.0.1:8788/store?store=fdroid');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.mtahqq.dpdns.org/store?store=fdroid');
   await expect(page.locator('.store-app-card')).toHaveCount(12);
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
 });
@@ -173,7 +173,7 @@ test('catalogue cards open dedicated in-site application profiles before the ori
   const card = page.locator('.store-app-card').first();
   await expect(card).toBeVisible({ timeout: 15_000 });
   await card.locator('.store-app-detail-link').click();
-  await expect(page).toHaveURL(/application\.html\?source=fdroid/);
+  await expect(page).toHaveURL(/\/application\?source=fdroid\//);
   await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
   await expect(page.locator('#application-source-link')).toHaveAttribute('href', 'https://example.org/apps/1');
