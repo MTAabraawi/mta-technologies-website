@@ -19,7 +19,10 @@
   let activeSource = "";
   const storeInfo = {
     "fdroid": ["F-Droid", "تطبيقات Android مفتوحة المصدر", "Open-source Android apps"],
+    "izzyondroid": ["IzzyOnDroid", "تطبيقات Android من مستودع IzzyOnDroid", "Android apps from the IzzyOnDroid repository"],
     "apple-itunes": ["Apple App Store", "تطبيقات iPhone وiPad", "iPhone and iPad apps"],
+    "apple-macos": ["Mac App Store", "تطبيقات macOS من متجر Apple", "macOS apps from Apple's store"],
+    "snap-store": ["Snap Store", "تطبيقات Linux عبر Snap", "Linux apps via Snap"],
     "flathub": ["Flathub", "تطبيقات Linux عبر Flatpak", "Linux apps via Flatpak"],
     "homebrew-cask": ["Homebrew", "تطبيقات macOS", "macOS applications"],
     "winget-run-community": ["WinGet", "برامج Windows", "Windows software"],
