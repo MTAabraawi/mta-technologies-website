@@ -211,7 +211,7 @@ test('all public HTML pages are free of Google AdSense and advertising integrati
     '/suggestions.html', '/application.html', '/store.html',
     '/store?store=fdroid'
   ];
-  const adCode = /pagead2\\.googlesyndication\\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\\.net/i;
+  const adCode = /pagead2\.googlesyndication\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\.net/i;
   for (const path of pages) {
     const response = await page.request.get(path);
     expect(response.status(), 'Page should load: ' + path).toBe(200);
