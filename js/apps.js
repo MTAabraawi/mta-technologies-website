@@ -27,6 +27,7 @@
     "homebrew-cask": ["Homebrew", "تطبيقات macOS", "macOS applications"],
     "winget-run-community": ["WinGet", "برامج Windows", "Windows software"],
     "arch-linux": ["Arch Linux Packages", "حزم وتطبيقات Arch Linux", "Arch Linux packages and apps"],
+    "debian-packages": ["Debian Packages", "برامج وحزم Debian", "Debian software packages"],
     "steam": ["Steam", "نتائج بحث من متجر Steam", "Steam storefront search results"],
     "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"]
   };
