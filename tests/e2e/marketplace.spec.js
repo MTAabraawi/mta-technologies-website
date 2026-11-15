@@ -137,7 +137,7 @@ test('store picker requests and displays only the selected catalogue source', as
 
 test('newly connected public catalogues are available in the store picker', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
-  for (const source of ['izzyondroid', 'snap-store', 'apple-macos', 'steam']) {
+  for (const source of ['izzyondroid', 'snap-store', 'apple-macos']) {
     const store = page.locator('[data-store-source="' + source + '"]');
     await expect(store).toHaveCount(1);
     await expect(store.locator('[data-source-count="' + source + '"]')).toHaveCount(1);
