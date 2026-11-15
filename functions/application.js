@@ -17,7 +17,7 @@ function safe(value) {
 }
 function meta(html, name, value) {
   const tag = '<meta name="' + name + '" content="' + esc(value) + '">';
-  const re = new RegExp("<meta\\s+name=[\\"']" + name + "[\\"'][^>]*>", "i");
+  const re = new RegExp('<meta\\s+name="' + name + '"[^>]*>', "i");
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
 }
 function canonical(html, url) {
