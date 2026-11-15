@@ -19,3 +19,11 @@
 .store-app-grid[hidden]{display:none!important}
 
 .store-editorial{padding:1rem 0 3rem}.store-editorial-intro{max-width:850px;margin:0 auto 1.2rem;text-align:center}.store-editorial-intro h2{font-size:clamp(1.45rem,3vw,2.1rem);margin:.35rem 0 .6rem}.store-editorial-intro p,.store-editorial-grid p{color:var(--text-secondary);font-size:.86rem;line-height:2}.store-editorial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.store-editorial-grid article{padding:1.25rem;border:1px solid var(--border-color);border-radius:18px;background:var(--bg-surface)}.store-editorial-grid h3{font-size:1rem;margin:0 0 .5rem;color:var(--text-primary)}.store-app-icon-fallback{display:grid;width:58px;height:58px;flex:0 0 58px;place-items:center;border:1px solid var(--border-color);border-radius:15px;background:linear-gradient(145deg,#173B66,#245A82);color:#F4FAFF;font:800 1.05rem "Plus Jakarta Sans",sans-serif}@media(max-width:760px){.store-editorial-grid{grid-template-columns:1fr}}
+
+/* Store catalogue contrast and application-detail affordances */
+.store-app-card h3 a,.store-app-detail-link{color:var(--text-primary);text-decoration:none}
+.store-app-card h3 a:hover,.store-app-detail-link:hover{color:var(--accent-blue);text-decoration:underline}
+.store-app-detail-link{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:.5rem .85rem;border:1px solid var(--border-hover);border-radius:10px;font-size:.76rem;font-weight:800}
+.store-app-icon,.store-app-icon-fallback{flex-shrink:0}
+.store-app-summary,.store-app-meta,.store-app-details{color:var(--text-secondary)}
+.store-app-tags span{color:var(--text-secondary)}
