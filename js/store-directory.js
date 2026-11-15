@@ -2,6 +2,20 @@
 const api=String(window.MTA_MARKETPLACE_API||"").replace(/\/$/,""),root=document.getElementById("store-picker");
 if(!root||!api)return;
 const en=()=>document.documentElement.lang==="en",w=(ar,eng)=>en()?eng:ar;
+function repairStoreLogos(){
+ root.querySelectorAll(".store-picker-card img").forEach(img=>{
+  if(img.dataset.fallbackBound)return;img.dataset.fallbackBound="1";
+  img.addEventListener("error",()=>{
+   if(!img.dataset.faviconFallback){
+    img.dataset.faviconFallback="1";let domain="";
+    try{const u=new URL(img.src);domain=u.searchParams.get("domain")||u.hostname.replace(/^www\\./,"")}catch{}
+    if(domain){img.src="https://icons.duckduckgo.com/ip3/"+encodeURIComponent(domain)+".ico";return}
+   }
+   if(!img.dataset.brandFallback){img.dataset.brandFallback="1";img.src="images/mta-logo-square.png"}
+  });
+ });
+}
+repairStoreLogos();
 const group=(cls,ar,eng)=>{const s=document.createElement("section");s.className="store-group "+cls;const h=document.createElement("h4");h.textContent=w(ar,eng);const g=document.createElement("div");g.className="store-picker-grid";s.append(h,g);return{section:s,grid:g}};
 function arrange(sources){
  const wrapper=root.querySelector(".store-groups");if(!wrapper)return;
