@@ -26,6 +26,7 @@
     "flathub": ["Flathub", "تطبيقات Linux عبر Flatpak", "Linux apps via Flatpak"],
     "homebrew-cask": ["Homebrew", "تطبيقات macOS", "macOS applications"],
     "winget-run-community": ["WinGet", "برامج Windows", "Windows software"],
+    "steam": ["Steam", "نتائج بحث من متجر Steam", "Steam storefront search results"],
     "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"]
   };
   const isEnglish = () => document.documentElement.lang === "en";
