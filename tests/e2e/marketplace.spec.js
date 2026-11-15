@@ -135,9 +135,11 @@ test('store picker requests and displays only the selected catalogue source', as
 });
 
 
-test('Snap Store remains an external link until its catalogue source is indexed', async ({ page }) => {
+test('newly connected public catalogues are available in the store picker', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('[data-store-source="snap-store"]')).toHaveCount(0);
-  const snapLinks = page.locator('.store-picker-card[href*="snapcraft.io"]');
-  await expect(snapLinks).toHaveCount(1);
+  for (const source of ['izzyondroid', 'snap-store', 'apple-macos']) {
+    const store = page.locator('[data-store-source="' + source + '"]');
+    await expect(store).toHaveCount(1);
+    await expect(store.locator('[data-source-count="' + source + '"]')).toHaveCount(1);
+  }
 });
