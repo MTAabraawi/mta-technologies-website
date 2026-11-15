@@ -37,7 +37,7 @@ function makeCard(app, storeKey, store) {
   const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); } catch { return {}; } })();
   const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
   let publisherHost = "";
-  for (const candidate of [app.app_url, app.source_url, metadata.homepage, metadata.website, metadata.project_url]) {
+  for (const candidate of [metadata.homepage, metadata.website, metadata.project_url, app.app_url, app.source_url]) {
     try { publisherHost = new URL(candidate).hostname.replace(/^www\./, ""); if (publisherHost) break; } catch {}
   }
   const icon = safeHttps(app.icon_url || metadata.icon_url || metadata.iconUrl ||
@@ -122,7 +122,7 @@ export async function onRequest(context) {
         html = html.replace('<span id="breadcrumb-store">Store</span>', '<span id="breadcrumb-store">' + escapeHtml(store.name) + '</span>');
         html = html.replace('<p id="store-subtitle"></p>', '<p id="store-subtitle">' + escapeHtml(store.platforms.join(" · ")) + '</p>');
         html = html.replace('<p id="store-description"></p>', '<p id="store-description">' + escapeHtml(store.description) + '</p>');
-        html = html.replace('<span class="store-status" id="store-status">Checking integration</span>', '<span class="store-status is-connected" id="store-status">متصل · ' + count.toLocaleString("en-US") + ' تطبيق مفهرس</span>');
+        html = html.replace('<span class="store-status" id="store-status">Checking integration</span>', '<span class="store-status is-connected" id="store-status">متصل · ' + count.toLocaleString("en-US") + ' سجل مفهرس</span>');
         html = html.replace('<p id="store-results-note"><span class="ar-only">نحمّل بيانات التطبيقات المتاحة من المصدر.</span><span class="en-only">Loading available application metadata.</span></p>',
           '<p id="store-results-note">يعرض هذا القسم عينة أولية من ' + count.toLocaleString("en-US") + ' سجلاً مفهرساً من مصدر ' + escapeHtml(store.name) + '. تُحمّل بقية النتائج على دفعات.</p>');
         html = html.replace('<div class="store-live-count" id="store-count">—</div>', '<div class="store-live-count" id="store-count">' + count.toLocaleString("en-US") + ' تطبيق مفهرس</div>');
