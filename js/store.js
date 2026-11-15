@@ -76,6 +76,16 @@ function makeCard(app){
  const h=document.createElement("h3");h.textContent=app.name||"Application";
  const meta=document.createElement("p");meta.className="store-app-meta";meta.textContent=[app.developer,app.platform,app.category].filter(Boolean).join(" · ");
  const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
+ let details=null;const fullDescription=String(app.description||"").trim();
+ if(fullDescription&&fullDescription!==String(app.summary||"").trim()){
+  details=document.createElement("details");details.className="store-app-details";
+  const summaryToggle=document.createElement("summary");summaryToggle.textContent=copy("قراءة التفاصيل","Read full description");
+  const body=document.createElement("p");body.textContent=fullDescription;details.append(summaryToggle,body);
+ }
+ const categorySelect=$("store-category-filter"),category=card.dataset.category;
+ if(category&&categorySelect&&!Array.from(categorySelect.options).some(o=>o.value===category)){
+  const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option);
+ }
  const tags=document.createElement("div");tags.className="store-app-tags";[app.platform,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});
  const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
  card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,link);return card;
