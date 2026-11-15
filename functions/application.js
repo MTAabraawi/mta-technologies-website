@@ -51,13 +51,14 @@ function setIdHtml(html, id, value) {
 export async function onRequest(context) {
   const response = await context.next();
   const url = new URL(context.request.url);
-  if (url.pathname !== "/application.html") return response;
+  if (url.pathname !== "/application" && url.pathname !== "/application.html") return response;
   let html = await response.text();
   const source = url.searchParams.get("source") || "";
   const store = url.searchParams.get("store") || source;
   const id = url.searchParams.get("id") || "";
   const name = url.searchParams.get("name") || "";
-  const canonicalUrl = url.origin + url.pathname + url.search;
+  const canonicalOrigin = (context.env && context.env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
+  const canonicalUrl = canonicalOrigin + url.pathname + url.search;
   const engine = (context.env && context.env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
   try {
     if (!source || !id || !name) throw new Error("Missing app reference");
