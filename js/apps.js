@@ -21,7 +21,6 @@
     "fdroid": ["F-Droid", "تطبيقات Android مفتوحة المصدر", "Open-source Android apps"],
     "apple-itunes": ["Apple App Store", "تطبيقات iPhone وiPad", "iPhone and iPad apps"],
     "flathub": ["Flathub", "تطبيقات Linux عبر Flatpak", "Linux apps via Flatpak"],
-    "snap-store": ["Snap Store", "تطبيقات Linux عبر Snap", "Linux applications via Snap"],
     "homebrew-cask": ["Homebrew", "تطبيقات macOS", "macOS applications"],
     "winget-run-community": ["WinGet", "برامج Windows", "Windows software"],
     "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"]
