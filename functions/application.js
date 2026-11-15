@@ -25,13 +25,28 @@ function canonical(html, url) {
   const re = /<link\s+rel=["']canonical["'][^>]*>/i;
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
 }
+function replaceInner(html, id, value) {
+  const opening = new RegExp("<([a-z][a-z0-9:-]*)\\\\b(?=[^>]*\\\\bid=\\\"" + id + "\\\")[^>]*>", "i");
+  const match = opening.exec(html);
+  if (!match) return html;
+  const tag = match[1];
+  const contentStart = match.index + match[0].length;
+  const token = new RegExp("<\\\\/?"+tag+"\\\\b[^>]*>", "gi");
+  token.lastIndex = match.index;
+  let depth = 0, closeStart = -1, item;
+  while ((item = token.exec(html))) {
+    if (/^<\\\\//.test(item[0])) depth--;
+    else if (!/\\\\/>$/.test(item[0])) depth++;
+    if (depth === 0) { closeStart = item.index; break; }
+  }
+  if (closeStart < 0) return html;
+  return html.slice(0, contentStart) + value + html.slice(closeStart);
+}
 function setIdText(html, id, value) {
-  const re = new RegExp('(<[^>]+\\bid=["\\']' + id + '["\\'][^>]*>)[\\s\\S]*?(</[^>]+>)', "i");
-  return html.replace(re, "$1" + esc(value) + "$2");
+  return replaceInner(html, id, esc(value));
 }
 function setIdHtml(html, id, value) {
-  const re = new RegExp('(<[^>]+\\bid=["\\']' + id + '["\\'][^>]*>)[\\s\\S]*?(</[^>]+>)', "i");
-  return html.replace(re, "$1" + value + "$2");
+  return replaceInner(html, id, value);
 }
 export async function onRequest(context) {
   const response = await context.next();
