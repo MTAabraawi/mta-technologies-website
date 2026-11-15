@@ -54,7 +54,7 @@ const copy=(ar,en)=>lang()?en:ar;
 const title=$("store-title"), subtitle=$("store-subtitle"), logo=$("store-logo"), official=$("store-official-link"), status=$("store-status"), desc=$("store-description");
 if(!store){$("store-results-note").textContent=copy("لم يتم العثور على المتجر المطلوب. ارجع إلى دليل المتاجر لاختيار متجر آخر.","Store not found. Return to the marketplace and choose another store.");$("store-catalogue-section").hidden=true;}
 else{
- title.textContent=store.name; $("breadcrumb-store").textContent=store.name; document.title=store.name+" | MTA TECHNOLOGIES";
+ title.textContent=store.name; $("breadcrumb-store").textContent=store.name; document.title=store.name+" | MTA TECHNOLOGIES"; const canonical=document.querySelector("link[rel=canonical]"); if(canonical)canonical.href=location.origin+location.pathname+"?store="+encodeURIComponent(key); const descriptionMeta=document.querySelector("meta[name=description]"); if(descriptionMeta)descriptionMeta.content=store.name+" catalogue on MTA TECHNOLOGIES. Browse verified app metadata and original publisher links.";
  $("store-description").textContent=store.desc; subtitle.textContent=store.platforms.join(" · ");
  const logoUrl="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.host)+"&sz=128";
  logo.src=logoUrl;logo.alt=store.name+" logo";logo.onerror=()=>{logo.src="images/mta-logo-square.png"};
@@ -63,7 +63,7 @@ else{
  const connected=!!store.source;
  status.textContent=store.mode==="live"?copy("مصدر متصل","Connected catalogue"):store.mode==="partial"?copy("تكامل جزئي","Partial integration"):copy("كتالوج خارجي · غير مفهرس بعد","External catalogue · not indexed yet");
  status.classList.toggle("is-connected",connected);
- if(!connected){$("store-search-row").hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
+ if(!connected){const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";$("store-search-row").hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
 }
 const grid=$("store-app-grid"), count=$("store-count"), load=$("store-load-more"), search=$("store-search"), platform=$("store-platform-filter");
 let offset=0,total=0,loading=false,exhausted=false,query="",timer=null;
@@ -93,7 +93,7 @@ async function fetchPage(reset=false){
   const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
-  items.forEach(app=>grid.append(makeCard(app)));offset+=items.length;
+  items.forEach(app=>grid.append(makeCard(app)));if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,36).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
   if(items.length<36||(total&&offset>=total))exhausted=true;
   count.textContent=total?total.toLocaleString()+" "+copy("تطبيق مفهرس","indexed apps"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
