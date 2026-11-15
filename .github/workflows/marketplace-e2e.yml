@@ -9,6 +9,8 @@ on:
       - 'js/apps.js'
       - 'css/apps.css'
       - 'marketplace-config.js'
+      - 'functions/**'
+      - 'functions/**'
       - 'tests/e2e/**'
       - 'playwright.config.js'
       - 'package.json'
