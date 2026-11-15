@@ -946,3 +946,46 @@ body{letter-spacing:normal;text-rendering:optimizeLegibility}
 /* Accessibility contrast refinement for dim displays */
 :root{--text-secondary:#C5D0DF;--text-muted:#AAB8CB;--accent-blue:#79DDF8;--accent-cobalt:#9AABFF;--accent-emerald:#C4EA7A}
 [data-theme="light"]{--text-secondary:#40536C;--text-muted:#586B83;--accent-blue:#006B83;--accent-cobalt:#344DB4;--accent-emerald:#3F6818}
+
+
+/* Accessibility contrast pass — shared by every corporate page */
+:root{
+  --text-secondary:#D2DCE9;
+  --text-muted:#B4C1D2;
+  --accent-blue:#7DD3FC;
+  --accent-cobalt:#3B82F6;
+  --border-color:rgba(226,232,240,.16);
+  --border-hover:rgba(125,211,252,.72);
+  --accent-glow:rgba(125,211,252,.22);
+}
+[data-theme="light"]{
+  --text-secondary:#334155;
+  --text-muted:#475569;
+  --accent-blue:#0369A1;
+  --accent-cobalt:#1D4ED8;
+  --border-color:#CBD5E1;
+  --border-hover:#0284C7;
+  --accent-glow:rgba(2,132,199,.14);
+}
+.highlight-text,.apps-hero h1 em,.market-hero h1 em{
+  background-image:linear-gradient(110deg,#BAE6FD,#93C5FD);
+}
+[data-theme="light"] .highlight-text,
+[data-theme="light"] .apps-hero h1 em,
+[data-theme="light"] .market-hero h1 em{
+  background-image:linear-gradient(110deg,#075985,#1D4ED8);
+}
+:where(.corp-page-nav a,.corp-header nav a,.corp-section-index span,.corp-note-line,
+.market-hero-mark span,.market-eyebrow,.market-kicker,.apps-eyebrow,
+.store-kicker,.store-app-source,.store-app-meta,.store-app-details summary){
+  text-shadow:0 0 0 transparent;
+}
+:where(p,li,small,label,input,select,textarea)::placeholder{color:var(--text-muted)}
+:where(a,button,input,select,textarea):focus-visible{
+  outline:3px solid var(--accent-blue);
+  outline-offset:3px;
+}
+@media(prefers-contrast:more){
+  :root{--text-secondary:#F1F5F9;--text-muted:#E2E8F0;--border-color:rgba(255,255,255,.3)}
+  [data-theme="light"]{--text-secondary:#1E293B;--text-muted:#334155;--border-color:#94A3B8}
+}
