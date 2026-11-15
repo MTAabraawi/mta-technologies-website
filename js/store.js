@@ -47,7 +47,7 @@ const stores={
 "mta-web-apps":{name:"MTA Web Apps",platforms:["Web"],url:"https://www.mtahqq.dpdns.org/apps.html",host:"mtahqq.dpdns.org",source:"mta-curated-web",mode:"live",desc:"تطبيقات ويب مدرجة في دليل MTA التحريري."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
-const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
+const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];\nconst grid=$("store-app-grid"), count=$("store-count"), load=$("store-load-more"), search=$("store-search"), platform=$("store-platform-filter");
 const safe=(value)=>{try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch{return""}};
 const lang=()=>document.documentElement.lang==="en";
 const copy=(ar,en)=>lang()?en:ar;
