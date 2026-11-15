@@ -56,7 +56,7 @@ function makeCard(app, storeKey, store) {
 }
 function setMeta(html, name, content) {
   const escaped = escapeHtml(content);
-  const re = new RegExp('<meta\\s+name=["\\']' + name + '["\\'][^>]*>', "i");
+  const re = new RegExp("<meta\\s+name=[\"']" + name + "[\"'][^>]*>", "i");
   if (re.test(html)) return html.replace(re, '<meta name="' + name + '" content="' + escaped + '">');
   return html.replace("</head>", '<meta name="' + name + '" content="' + escaped + '"></head>');
 }
