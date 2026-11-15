@@ -107,3 +107,47 @@ test('public catalogue can be paginated without duplicate source identities', as
   expect(result.unique).toBe(result.total);
   expect(result.pages).toBe(Math.ceil(result.total / 200));
 });
+
+test('catalogue stores are separated by verified live source counts', async ({ page }) => {
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  const live = page.locator('.store-connected-group');
+  const upcoming = page.locator('.store-coming-soon-group');
+  await expect(live).toBeVisible({ timeout: 15_000 });
+  await expect(upcoming).toBeVisible();
+  await expect(live.locator('[data-store-key="fdroid"]')).toHaveAttribute('data-catalogue-state', 'connected');
+  await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
+  await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
+  await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('Coming soon');
+  await expect(page.locator('.store-picker-card')).toHaveCount(44);
+});
+
+test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
+  const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
+  expect(sitemap.status()).toBe(200);
+  expect(sitemap.headers()['content-type']).toContain('xml');
+  const xml = await sitemap.text();
+  expect(xml.trim().startsWith('<?xml')).toBe(true);
+  const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  expect(locations.length).toBeGreaterThan(15);
+  expect(new Set(locations).size).toBe(locations.length);
+  for (const location of locations) {
+    const url = new URL(location);
+    expect(url.hostname).toBe('www.mtahqq.dpdns.org');
+    const response = await page.request.get(url.pathname + url.search, { maxRedirects: 0 });
+    expect(response.status(), 'Sitemap URL should resolve directly: ' + location).toBe(200);
+  }
+  const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
+  expect(robots.status()).toBe(200);
+  expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+});
+
+test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#store-title')).toHaveText('F-Droid');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  await expect(page.locator('#store-editorial')).toBeVisible();
+  await page.goto('/store?store=google-play', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#store-title')).toHaveText('Google Play');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
+  await expect(page.locator('#store-unavailable')).toBeVisible();
+});
