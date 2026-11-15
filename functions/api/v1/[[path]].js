@@ -1,10 +1,10 @@
-const ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
+const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const ALLOWED_PATHS = new Set([
   "/api/v1/apps",
   "/api/v1/catalog-stats"
 ]);
 
-export async function onRequest({ request }) {
+export async function onRequest({ request, env }) {
   const incoming = new URL(request.url);
 
   if (request.method !== "GET") {
@@ -21,7 +21,8 @@ export async function onRequest({ request }) {
     });
   }
 
-  const upstream = new URL(incoming.pathname + incoming.search, ENGINE_ORIGIN);
+  const engineOrigin = (env && env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
+  const upstream = new URL(incoming.pathname + incoming.search, engineOrigin);
 
   try {
     const response = await fetch(upstream.toString(), {
@@ -46,6 +47,7 @@ export async function onRequest({ request }) {
       headers
     });
   } catch (error) {
+    console.error("MTA catalogue proxy upstream request failed:", error);
     return new Response(JSON.stringify({
       detail: "Application catalogue upstream is temporarily unavailable",
       code: "CATALOGUE_UPSTREAM_UNAVAILABLE"
