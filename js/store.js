@@ -57,13 +57,13 @@ if(!store){$("store-results-note").textContent=copy("لم يتم العثور ع
 else{
  title.textContent=store.name; $("breadcrumb-store").textContent=store.name; document.title=store.name+" | MTA TECHNOLOGIES"; const canonical=document.querySelector("link[rel=canonical]"); if(canonical)canonical.href=location.origin+location.pathname+"?store="+encodeURIComponent(key); const descriptionMeta=document.querySelector("meta[name=description]"); if(descriptionMeta)descriptionMeta.content=store.name+" catalogue on MTA TECHNOLOGIES. Browse verified app metadata and original publisher links.";
  $("store-description").textContent=store.desc; subtitle.textContent=store.platforms.join(" · ");
- const logoUrl="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.host)+"&sz=128";
- logo.src=logoUrl;logo.alt=store.name+" logo";logo.onerror=()=>{logo.src="images/mta-logo-square.png"};
+ const logoUrl="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.host)+"&sz=128",logoFallback="https://icons.duckduckgo.com/ip3/"+encodeURIComponent(store.host)+".ico";
+ logo.src=logoUrl;logo.alt=store.name+" logo";logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.png"}};
  official.href=store.url;
  $("store-platforms").replaceChildren(...store.platforms.map(p=>{const s=document.createElement("span");s.textContent=p;return s}));
  const connected=!!store.source;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
- status.textContent=store.mode==="live"?copy("مصدر متصل","Connected catalogue"):store.mode==="partial"?copy("تكامل جزئي","Partial integration"):copy("كتالوج خارجي · غير مفهرس بعد","External catalogue · not indexed yet");
- status.classList.toggle("is-connected",connected);
+ status.textContent=connected?copy("جارٍ التحقق من توفر السجلات","Checking indexed records"):copy("نعمل على توفيرها قريباً","Coming soon");status.classList.remove("is-connected");
+ const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";
  if(!connected){const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
 }
 
@@ -72,7 +72,10 @@ function makeCard(app){
  const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();
  const top=document.createElement("div");top.className="store-app-top";
  const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.alt=(app.name||"App")+" icon";
- const iconUrl=safe(app.icon_url||"");icon.src=iconUrl||"images/mta-logo-square.png";icon.onerror=()=>{icon.onerror=null;icon.src="images/mta-logo-square.png"};
+ const iconUrl=safe(app.icon_url||""),pageUrl=safe(app.app_url||app.source_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\\./,""):""}catch{}
+ const candidates=[iconUrl,host?"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=128":"",host?"https://icons.duckduckgo.com/ip3/"+encodeURIComponent(host)+".ico":""].filter((v,i,a)=>v&&a.indexOf(v)===i);let iconIndex=0;
+ const monogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();icon.replaceWith(mark)};
+ icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else monogram()};if(candidates.length)icon.src=candidates[0];else monogram();
  const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;top.append(icon,badge);
  const h=document.createElement("h3");h.textContent=app.name||"Application";
  const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
@@ -104,6 +107,7 @@ async function fetchPage(reset=false){
   if(!response.ok)throw new Error("HTTP "+response.status);
   const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
   total=Number(response.headers.get("X-Total-Count")||total||0);
+  if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" تطبيق مفهرس","Connected · "+total.toLocaleString()+" indexed apps"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
   if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
   items.forEach(app=>grid.append(makeCard(app)));applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,36).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
   if(items.length<36||(total&&offset>=total))exhausted=true;
@@ -113,6 +117,12 @@ async function fetchPage(reset=false){
  }catch(e){console.error("Store catalogue fetch failed",e);if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
  finally{loading=false;load.disabled=false}
 }
-if(store?.source){fetchPage(true);load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));}
+if(store?.source){
+ fetch(API+"/api/v1/catalog-stats",{cache:"no-store",credentials:"omit"}).then(r=>{if(!r.ok)throw Error("stats HTTP "+r.status);return r.json()}).then(data=>{
+  const available=Number((data.sources||{})[store.source]||0);
+  if(available>0){status.textContent=copy("متصل · "+available.toLocaleString()+" تطبيق مفهرس","Connected · "+available.toLocaleString()+" indexed apps");status.classList.add("is-connected");const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";fetchPage(true)}
+  else{status.textContent=copy("نعمل على توفيرها قريباً","Coming soon");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("نعمل على ربط هذا المتجر بمصدر بيانات يمكن التحقق منه. سنعرض التطبيقات هنا عندما تصبح بياناتها متاحة.","We are working to connect this store to a verifiable data source. Its apps will appear here once indexed data is available.");$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("هذا المتجر غير مفهرس حالياً داخل MTA.","This store is not currently indexed by MTA.")}
+ }).catch(error=>{console.warn("Store statistics unavailable",error);status.textContent=copy("تعذر التحقق من الاتصال","Connection could not be verified");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("تعذر التحقق من بيانات هذا المتجر حالياً. سنعرض التطبيقات بعد استعادة الاتصال والتحقق من المصدر.","We could not verify this store's catalogue right now. Listings will appear after the source connection is restored and verified.");$("store-unavailable-link").href=store.url});
+ load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));}
 window.addEventListener("mta:languagechange",()=>{if(store){document.title=store.name+" | MTA TECHNOLOGIES"}});
 })();

@@ -942,3 +942,7 @@ body{letter-spacing:normal;text-rendering:optimizeLegibility}
 .home-stat span{font-size:.75rem;color:var(--text-secondary);line-height:1.6}
 @media(max-width:760px){.home-marketplace-head{align-items:flex-start;flex-direction:column}.home-marketplace-grid{grid-template-columns:1fr}.home-marketplace-stats{grid-template-columns:1fr 1fr}}
 @media(max-width:440px){.home-marketplace-stats{grid-template-columns:1fr 1fr}.home-stat{padding:1rem}}
+
+/* Accessibility contrast refinement for dim displays */
+:root{--text-secondary:#C5D0DF;--text-muted:#AAB8CB;--accent-blue:#79DDF8;--accent-cobalt:#9AABFF;--accent-emerald:#C4EA7A}
+[data-theme="light"]{--text-secondary:#40536C;--text-muted:#586B83;--accent-blue:#006B83;--accent-cobalt:#344DB4;--accent-emerald:#3F6818}
