@@ -9,7 +9,9 @@ on:
       - 'js/apps.js'
       - 'css/apps.css'
       - 'marketplace-config.js'
+      - 'functions/**'
       - 'tests/e2e/**'
+      - 'tests/fixtures/**'
       - 'playwright.config.js'
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
@@ -22,7 +24,9 @@ on:
       - 'js/apps.js'
       - 'css/apps.css'
       - 'marketplace-config.js'
+      - 'functions/**'
       - 'tests/e2e/**'
+      - 'tests/fixtures/**'
       - 'playwright.config.js'
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
@@ -50,7 +54,45 @@ jobs:
         run: npm install
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Start deterministic catalogue upstream fixture
+        run: |
+          node tests/fixtures/catalogue-upstream.js > /tmp/mta-catalogue-fixture.log 2>&1 &
+          echo $! > /tmp/mta-catalogue-fixture.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8789/api/v1/catalog-stats > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail http://127.0.0.1:8789/api/v1/catalog-stats
+      - name: Check production catalogue upstream reachability
+        continue-on-error: true
+        run: |
+          curl --silent --show-error --max-time 20 -D /tmp/mta-upstream-headers.txt 'https://mta-applications-engine.hoaam100.workers.dev/api/v1/catalog-stats' -o /tmp/mta-upstream-body.json || true
+          echo '--- upstream headers ---'
+          cat /tmp/mta-upstream-headers.txt || true
+          echo '--- upstream body ---'
+          head -c 2000 /tmp/mta-upstream-body.json || true
+      - name: Start local Cloudflare Pages with Functions
+        run: |
+          nohup npx --yes wrangler@4 pages dev . --ip 127.0.0.1 --port 8788 --binding 'MTA_APPLICATIONS_ENGINE_ORIGIN=http://127.0.0.1:8789' > /tmp/mta-pages-dev.log 2>&1 &
+          echo $! > /tmp/mta-pages-dev.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8788/apps.html > /dev/null; then
+              echo 'Cloudflare Pages dev server is ready'
+              exit 0
+            fi
+            if ! kill -0 "$(cat /tmp/mta-pages-dev.pid)" 2>/dev/null; then
+              echo 'Cloudflare Pages dev server exited unexpectedly'
+              cat /tmp/mta-pages-dev.log
+              exit 1
+            fi
+            sleep 2
+          done
+          echo 'Cloudflare Pages dev server did not become ready'
+          cat /tmp/mta-pages-dev.log
+          exit 1
       - name: Run marketplace browser tests
+        env:
+          MTA_BASE_URL: http://127.0.0.1:8788
         run: npm run test:e2e
       - name: Upload Playwright report and diagnostics
         if: always()
@@ -60,5 +102,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            /tmp/mta-pages-dev.log
+            /tmp/mta-catalogue-fixture.log
           if-no-files-found: ignore
           retention-days: 7
