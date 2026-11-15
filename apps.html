@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=863aa90">
-  <link rel="stylesheet" href="css/apps.css?v=20261115-continuous2">
+  <link rel="stylesheet" href="css/apps.css?v=store-picker1">
   <link rel="stylesheet" href="css/external-catalogs.css">
   <link rel="icon" type="image/png" href="images/mta-logo-square.png">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLS74VD22C"></script>
@@ -48,8 +48,78 @@
     </div>
   </section>
   <section class="container directory-section" id="directory">
-    <div class="directory-heading"><div><span class="apps-eyebrow"><span class="ar-only">دليل التطبيقات</span><span class="en-only">APPLICATION DIRECTORY</span></span><h2><span class="ar-only">ابحث واكتشف</span><span class="en-only">Find what you need</span></h2></div><div class="directory-count-wrap"><span class="directory-count" id="app-count">1 تطبيق</span><span class="catalog-total" id="catalog-stats"><span class="ar-only">15,326 تطبيقاً مفهرساً</span><span class="en-only">15,326 indexed applications</span></span></div></div>
+    <div class="directory-heading"><div><span class="apps-eyebrow"><span class="ar-only">دليل التطبيقات</span><span class="en-only">APPLICATION DIRECTORY</span></span><h2><span class="ar-only">ابحث واكتشف</span><span class="en-only">Find what you need</span></h2></div><div class="directory-count-wrap"><span class="directory-count" id="app-count">1 تطبيق</span><span class="catalog-total" id="catalog-stats"><span class="ar-only">جارٍ تحميل إجمالي التطبيقات...</span><span class="en-only">Loading catalogue total...</span></span></div></div>
     <div class="catalog-connection" role="status" aria-live="polite"><span id="catalog-connection">جارٍ الاتصال بمحرك التطبيقات العالمي...</span><strong>MTA GLOBAL CATALOG</strong></div>
+    <section class="store-picker" id="store-picker" aria-label="Choose an app store">
+      <div class="store-picker-heading"><h3><span class="ar-only">اختر المتجر</span><span class="en-only">Choose a store</span></h3><p><span class="ar-only">اختر مصدراً لعرض تطبيقاته فقط.</span><span class="en-only">Choose a source to view only its applications.</span></p></div>
+      <div class="store-groups">
+        <section class="store-group" aria-labelledby="group-android"><h4 id="group-android"><span class="ar-only">متاجر Android العالمية</span><span class="en-only">Global Android stores</span></h4><div class="store-picker-grid">
+          <a class="store-picker-card" href="https://play.google.com/store" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=play.google.com&amp;sz=96" alt=""><strong>Google Play</strong><span>Android · عالمي</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.apkmirror.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=apkmirror.com&amp;sz=96" alt=""><strong>APKMirror</strong><span>Android · عالمي</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://apkpure.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=apkpure.com&amp;sz=96" alt=""><strong>APKPure</strong><span>Android · عالمي</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://en.uptodown.com/android" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=uptodown.com&amp;sz=96" alt=""><strong>Uptodown</strong><span>Android · عالمي</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.aptoide.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=aptoide.com&amp;sz=96" alt=""><strong>Aptoide</strong><span>Android · عالمي</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.amazon.com/gp/mas/get/android" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=amazon.com&amp;sz=96" alt=""><strong>Amazon Appstore</strong><span>Android · عالمي</span><small>بحث في المتجر الأصلي</small></a>
+          <button class="store-picker-card" type="button" data-store-source="fdroid"><img src="https://www.google.com/s2/favicons?domain=f-droid.org&amp;sz=96" alt=""><strong>F-Droid</strong><span>Android · مفتوح المصدر</span><small data-source-count="fdroid">—</small></button>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-regional-android"><h4 id="group-regional-android"><span class="ar-only">متاجر Android الإقليمية ومتاجر الشركات</span><span class="en-only">Regional and device-maker Android stores</span></h4><div class="store-picker-grid">
+          <a class="store-picker-card" href="https://appgallery.huawei.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=appgallery.huawei.com&amp;sz=96" alt=""><strong>Huawei AppGallery</strong><span>Huawei · عالمي وإقليمي</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://galaxystore.samsung.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=galaxystore.samsung.com&amp;sz=96" alt=""><strong>Samsung Galaxy Store</strong><span>Samsung · Android</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://global.app.mi.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=mi.com&amp;sz=96" alt=""><strong>Xiaomi GetApps</strong><span>Xiaomi · Android</span><small>فتح المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://store.oppomobile.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=oppomobile.com&amp;sz=96" alt=""><strong>OPPO App Market</strong><span>OPPO · Android</span><small>فتح المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://appstore.vivo.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=vivo.com&amp;sz=96" alt=""><strong>Vivo App Store</strong><span>vivo · Android</span><small>فتح المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.onestore.co.kr/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=onestore.co.kr&amp;sz=96" alt=""><strong>ONE Store</strong><span>كوريا · Android</span><small>فتح المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.taptap.io/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=taptap.io&amp;sz=96" alt=""><strong>TapTap</strong><span>ألعاب · Android</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.qoo-app.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=qoo-app.com&amp;sz=96" alt=""><strong>QooApp</strong><span>ألعاب · آسيا</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.honor.com/global/tech/honor-app-market/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=honor.com&amp;sz=96" alt=""><strong>HONOR App Market</strong><span>HONOR · عالمي وإقليمي</span><small>فتح السوق الرسمي</small></a>
+          <a class="store-picker-card" href="https://zhushou.360.cn/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=360.cn&amp;sz=96" alt=""><strong>360 Mobile Assistant</strong><span>الصين · Android</span><small>فتح المصدر الأصلي</small></a>
+          <a class="store-picker-card" href="https://mobile.baidu.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=baidu.com&amp;sz=96" alt=""><strong>Baidu Mobile Assistant</strong><span>الصين · Android</span><small>فتح المصدر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.wandoujia.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=wandoujia.com&amp;sz=96" alt=""><strong>Wandoujia</strong><span>الصين · Android</span><small>فتح المصدر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.rustore.ru/en" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=rustore.ru&amp;sz=96" alt=""><strong>RuStore</strong><span>روسيا · Android وHarmonyOS</span><small>تصفح الكتالوج الرسمي</small></a>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-android-alt"><h4 id="group-android-alt"><span class="ar-only">متاجر Android البديلة والمفتوحة</span><span class="en-only">Alternative and open Android stores</span></h4><div class="store-picker-grid">
+          <button class="store-picker-card" type="button" data-store-source="izzyondroid"><img src="https://www.google.com/s2/favicons?domain=izzysoft.de&amp;sz=96" alt=""><strong>IzzyOnDroid</strong><span>مستودع Android مفتوح</span><small data-source-count="izzyondroid">—</small></button>
+          <a class="store-picker-card" href="https://accrescent.app/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=accrescent.app&amp;sz=96" alt=""><strong>Accrescent</strong><span>متجر Android بديل</span><small>فتح المصدر الأصلي</small></a>
+          <a class="store-picker-card" href="https://auroraoss.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=auroraoss.com&amp;sz=96" alt=""><strong>Aurora Store</strong><span>عميل بديل لـ Google Play</span><small>فتح المصدر الأصلي</small></a>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-ios"><h4 id="group-ios"><span class="ar-only">متاجر iPhone وiPad</span><span class="en-only">iPhone and iPad stores</span></h4><div class="store-picker-grid">
+          <button class="store-picker-card" type="button" data-store-source="apple-itunes"><img src="https://www.google.com/s2/favicons?domain=apple.com&amp;sz=96" alt=""><strong>Apple App Store</strong><span>iPhone · iPad</span><small data-source-count="apple-itunes">—</small></button>
+          <a class="store-picker-card" href="https://altstore.io/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=altstore.io&amp;sz=96" alt=""><strong>AltStore</strong><span>iOS · PAL حسب المنطقة / Classic عالميًا</span><small>اكتشاف التطبيقات والمصادر</small></a>
+          <a class="store-picker-card" href="https://skich.app/store" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=skich.app&amp;sz=96" alt=""><strong>Skich Store</strong><span>iOS وAndroid · متجر ألعاب</span><small>تصفح متجر الألعاب</small></a>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-windows"><h4 id="group-windows"><span class="ar-only">متاجر Windows</span><span class="en-only">Windows stores</span></h4><div class="store-picker-grid">
+          <a class="store-picker-card" href="https://apps.microsoft.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=apps.microsoft.com&amp;sz=96" alt=""><strong>Microsoft Store</strong><span>Windows</span><small>بحث في المتجر الأصلي</small></a>
+          <button class="store-picker-card" type="button" data-store-source="winget-run-community"><img src="https://www.google.com/s2/favicons?domain=winget.run&amp;sz=96" alt=""><strong>WinGet</strong><span>Windows · Community</span><small data-source-count="winget-run-community">—</small></button>
+          <a class="store-picker-card" href="https://community.chocolatey.org/packages" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=chocolatey.org&amp;sz=96" alt=""><strong>Chocolatey</strong><span>Windows</span><small>بحث في الحزم الأصلية</small></a>
+          <a class="store-picker-card" href="https://www.npackd.org/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=npackd.org&amp;sz=96" alt=""><strong>Npackd</strong><span>Windows · Software manager</span><small>تصفح حزم البرامج</small></a>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-linux"><h4 id="group-linux"><span class="ar-only">متاجر Linux</span><span class="en-only">Linux stores</span></h4><div class="store-picker-grid">
+          <button class="store-picker-card" type="button" data-store-source="flathub"><img src="https://www.google.com/s2/favicons?domain=flathub.org&amp;sz=96" alt=""><strong>Flathub</strong><span>Linux · Flatpak</span><small data-source-count="flathub">—</small></button>
+          <button class="store-picker-card" type="button" data-store-source="snap-store"><img src="https://www.google.com/s2/favicons?domain=snapcraft.io&amp;sz=96" alt=""><strong>Snap Store</strong><span>Linux · Snap</span><small data-source-count="snap-store">—</small></button>
+          <button class="store-picker-card" type="button" data-store-source="arch-linux"><img src="https://www.google.com/s2/favicons?domain=archlinux.org&amp;sz=96" alt=""><strong>Arch Linux Packages</strong><span>Linux · Arch</span><small data-source-count="arch-linux">—</small></button>
+          <button class="store-picker-card" type="button" data-store-source="debian-packages"><img src="https://www.google.com/s2/favicons?domain=debian.org&amp;sz=96" alt=""><strong>Debian Packages</strong><span>Linux · Debian</span><small data-source-count="debian-packages">—</small></button>
+          <a class="store-picker-card" href="https://apps.ubuntu.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=ubuntu.com&amp;sz=96" alt=""><strong>Ubuntu App Center</strong><span>Linux · Ubuntu</span><small>فتح المصدر الأصلي</small></a>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-macos"><h4 id="group-macos"><span class="ar-only">متاجر macOS</span><span class="en-only">macOS stores</span></h4><div class="store-picker-grid">
+          <button class="store-picker-card" type="button" data-store-source="apple-macos"><img src="https://www.google.com/s2/favicons?domain=apple.com&amp;sz=96" alt=""><strong>Mac App Store</strong><span>macOS</span><small data-source-count="apple-macos">—</small></button>
+          <button class="store-picker-card" type="button" data-store-source="homebrew-cask"><img src="https://www.google.com/s2/favicons?domain=brew.sh&amp;sz=96" alt=""><strong>Homebrew</strong><span>macOS · Cask</span><small data-source-count="homebrew-cask">—</small></button>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-games"><h4 id="group-games"><span class="ar-only">متاجر الألعاب</span><span class="en-only">Game stores</span></h4><div class="store-picker-grid">
+          <button class="store-picker-card" type="button" data-store-source="steam"><img src="https://www.google.com/s2/favicons?domain=steampowered.com&amp;sz=96" alt=""><strong>Steam</strong><span>PC · Windows · macOS · Linux</span><small data-source-count="steam">—</small></button>
+          <a class="store-picker-card" href="https://store.epicgames.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=epicgames.com&amp;sz=96" alt=""><strong>Epic Games Store</strong><span>PC · Games</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.gog.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=gog.com&amp;sz=96" alt=""><strong>GOG</strong><span>PC · DRM-free games</span><small>بحث في المتجر الأصلي</small></a>
+          <a class="store-picker-card" href="https://www.ea.com/ea-app" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=ea.com&amp;sz=96" alt=""><strong>EA app</strong><span>Windows وmacOS · ألعاب</span><small>فتح منصة EA الرسمية</small></a>
+          <a class="store-picker-card" href="https://itch.io/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=itch.io&amp;sz=96" alt=""><strong>itch.io</strong><span>PC وWeb · ألعاب مستقلة</span><small>تصفح الألعاب الأصلية</small></a>
+        </div></section>
+        <section class="store-group" aria-labelledby="group-web"><h4 id="group-web"><span class="ar-only">تطبيقات الويب</span><span class="en-only">Web applications</span></h4><div class="store-picker-grid">
+          <button class="store-picker-card" type="button" data-store-source="mta-curated-web"><img src="images/mta-logo-square.png" alt=""><strong>MTA Web Apps</strong><span>Web applications</span><small data-source-count="mta-curated-web">—</small></button>
+          <a class="store-picker-card" href="https://www.producthunt.com/" target="_blank" rel="noopener noreferrer"><img src="https://www.google.com/s2/favicons?domain=producthunt.com&amp;sz=96" alt=""><strong>Product Hunt</strong><span>اكتشاف منتجات وتطبيقات الويب</span><small>بحث في المصدر الأصلي</small></a>
+        </div></section>
+      </div>
+    </section>
+    <div class="catalogue-view" id="catalogue-view" hidden>
+      <button class="store-back-button" id="store-back" type="button">← <span class="ar-only">العودة إلى المتاجر</span><span class="en-only">Back to stores</span></button>
+      <div class="selected-store-heading" id="selected-store-heading"></div>
     <div class="apps-toolbar">
       <label class="apps-search"><span aria-hidden="true">⌕</span><input id="app-search" type="search" placeholder="ابحث باسم التطبيق أو وصفه..." aria-label="Search apps"></label>
       <select id="platform-filter" aria-label="Filter by platform"><option value="all">كل المنصات / All platforms</option><option value="Android">Android</option><option value="iOS">iOS</option><option value="Windows">Windows</option><option value="macOS">macOS</option><option value="Linux">Linux</option><option value="Web">Web</option></select>
@@ -57,7 +127,7 @@
       <select id="developer-filter" aria-label="Filter by developer"><option value="all">جميع المطورين / All developers</option><option value="MTA TECHNOLOGIES">MTA TECHNOLOGIES</option><option value="Third-party">مطورون آخرون / Other developers</option></select>
     </div>
     <div class="apps-grid" id="apps-grid">
-      <article class="app-card" data-name="MTA Net Blocker" data-description="تحكم في اتصال التطبيقات بالإنترنت" data-platform="Android" data-category="Security" data-developer="MTA TECHNOLOGIES">
+      <article class="app-card" data-name="MTA Net Blocker" data-description="تحكم في اتصال التطبيقات بالإنترنت" data-platform="Android" data-category="Security" data-developer="MTA TECHNOLOGIES" data-source="mta-curated-web">
         <div class="app-card-top"><div class="app-icon app-icon-image"><img src="images/apps/mta-net-blocker.svg?v=20261114-brand1" alt="MTA Net Blocker icon" width="64" height="64"></div><span class="app-status status-live"><span class="ar-only">متاح</span><span class="en-only">Available</span></span></div>
         <div class="app-card-meta">MTA TECHNOLOGIES · ANDROID</div>
         <h3>MTA Net Blocker</h3>
@@ -68,6 +138,7 @@
       <div class="apps-empty" id="apps-empty" hidden><strong><span class="ar-only">لا توجد نتائج مطابقة</span><span class="en-only">No matching apps</span></strong><p><span class="ar-only">جرّب تغيير كلمات البحث أو عوامل التصفية.</span><span class="en-only">Try changing your search or filters.</span></p></div>
     </div>
     <div class="load-more-wrap" id="catalogue-sentinel" aria-hidden="true"><button class="btn btn-outline catalogue-fallback-button" id="load-more-apps" type="button" hidden>تحميل المزيد من التطبيقات</button></div>
+    </div>
     <div class="directory-note"><strong><span class="ar-only">دليل التطبيقات العالمي</span><span class="en-only">GLOBAL APP DIRECTORY</span></strong><p><span class="ar-only">يعرض المتجر التطبيقات المفهرسة من مصادرها العامة عبر المنصات المدعومة، مع روابط صفحاتها الأصلية. تتحدث النتائج على دفعات لتسهيل التصفح والبحث.</span><span class="en-only">The directory displays indexed applications from public catalogues across supported platforms, linking to their original listing pages. Results load in batches for faster browsing and search.</span></p></div>
   </section>
   <section class="container store-directory-section">
@@ -97,5 +168,5 @@
 <div><h3><span class="ar-only">المنظومة</span><span class="en-only">Ecosystem</span></h3><a href="apps.html">Marketplace / المتجر</a><a href="developer-portal.html">Developer Portal / المطورون</a><a href="developer-certification.html">Developer Certification / اعتماد المطورين</a><a href="marketplace-policy.html">Marketplace Policy</a></div>
 <div><h3><span class="ar-only">السياسات</span><span class="en-only">Legal</span></h3><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a><a href="cookies.html">Cookies</a></div>
 </div><div class="corp-footer-bottom"><span>© 2026 MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
-<script src="js/main.js"></script><script src="marketplace-config.js?v=same-origin-api1"></script><script src="js/apps.js?v=same-origin-api1"></script><script src="js/external-catalogs.js"></script>
+<script src="js/main.js"></script><script src="marketplace-config.js?v=same-origin-api1"></script><script src="js/apps.js?v=all-stores2"></script><script src="js/external-catalogs.js"></script>
 </body></html>

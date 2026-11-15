@@ -10,7 +10,7 @@ module.exports = defineConfig({
   timeout: 120_000,
   expect: { timeout: 20_000 },
   use: {
-    baseURL: process.env.MTA_BASE_URL || 'https://www.mtahqq.dpdns.org',
+    baseURL: process.env.MTA_BASE_URL || 'https://feature-store-specific-marke.mta-technologies-website.pages.dev',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

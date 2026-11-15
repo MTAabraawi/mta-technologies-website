@@ -20,14 +20,16 @@ http.createServer((req, res) => {
   res.setHeader('content-type', 'application/json; charset=utf-8');
   res.setHeader('cache-control', 'no-store');
   if (url.pathname === '/api/v1/catalog-stats') {
-    res.end(JSON.stringify({ total, platforms: { android: total }, sources: { 'ci-fixture': total }, metadata_only: true }));
+    res.end(JSON.stringify({ total, platforms: { android: total }, sources: { 'fdroid': total, 'mta-curated-web': total, 'ci-fixture': total }, metadata_only: true }));
     return;
   }
   if (url.pathname === '/api/v1/apps') {
     const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit') || 50)));
     const offset = Math.max(0, Number(url.searchParams.get('offset') || 0));
-    res.setHeader('x-total-count', String(total));
-    res.end(JSON.stringify(rows.slice(offset, offset + limit)));
+    const requestedSource = url.searchParams.get('source');
+    const filtered = requestedSource ? rows.map(row => ({ ...row, source: requestedSource })) : rows;
+    res.setHeader('x-total-count', String(filtered.length));
+    res.end(JSON.stringify(filtered.slice(offset, offset + limit)));
     return;
   }
   res.statusCode = 404;

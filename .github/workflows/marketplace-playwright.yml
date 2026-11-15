@@ -1,0 +1,17 @@
+name: Marketplace Branch Preview (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  note:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain supported browser verification
+        run: |
+          echo "Automatic marketplace browser verification is performed by marketplace-e2e.yml."
+          echo "That workflow starts Cloudflare Pages Functions locally and uses a deterministic catalogue fixture."
+          echo "This manual-only workflow replaces tests against a potentially stale branch-preview alias."
