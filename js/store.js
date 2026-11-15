@@ -61,7 +61,7 @@ else{
  logo.src=logoUrl;logo.alt=store.name+" logo";logo.onerror=()=>{logo.src="images/mta-logo-square.png"};
  official.href=store.url;
  $("store-platforms").replaceChildren(...store.platforms.map(p=>{const s=document.createElement("span");s.textContent=p;return s}));
- const connected=!!store.source;
+ const connected=!!store.source;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
  status.textContent=store.mode==="live"?copy("مصدر متصل","Connected catalogue"):store.mode==="partial"?copy("تكامل جزئي","Partial integration"):copy("كتالوج خارجي · غير مفهرس بعد","External catalogue · not indexed yet");
  status.classList.toggle("is-connected",connected);
  if(!connected){const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
@@ -75,7 +75,7 @@ function makeCard(app){
  const iconUrl=safe(app.icon_url||"");icon.src=iconUrl||"images/mta-logo-square.png";icon.onerror=()=>{icon.onerror=null;icon.src="images/mta-logo-square.png"};
  const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;top.append(icon,badge);
  const h=document.createElement("h3");h.textContent=app.name||"Application";
- const meta=document.createElement("p");meta.className="store-app-meta";meta.textContent=[app.developer,app.platform,app.category].filter(Boolean).join(" · ");
+ const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
  const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
  let details=null;const fullDescription=String(app.description||"").trim();
  if(fullDescription&&fullDescription!==String(app.summary||"").trim()){
@@ -87,7 +87,7 @@ function makeCard(app){
  if(category&&categorySelect&&!Array.from(categorySelect.options).some(o=>o.value===category)){
   const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option);
  }
- const tags=document.createElement("div");tags.className="store-app-tags";[app.platform,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});
+ const tags=document.createElement("div");tags.className="store-app-tags";[platformLabel,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});const price=app.metadata_json?.price;if(price&&Number.isFinite(Number(price.final))&&price.currency){const p=document.createElement("span");p.className="store-app-price";p.textContent=Number(price.final)===0?copy("مجاني","Free"):(Number(price.final)/100).toLocaleString(undefined,{style:"currency",currency:String(price.currency)});tags.append(p)}
  const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
  card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,link);return card;
 }
