@@ -133,3 +133,11 @@ test('store picker requests and displays only the selected catalogue source', as
   await expect(page.locator('#store-picker')).toBeVisible();
   await expect(page.locator('#catalogue-view')).toBeHidden();
 });
+
+
+test('Snap Store remains an external link until its catalogue source is indexed', async ({ page }) => {
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('[data-store-source="snap-store"]')).toHaveCount(0);
+  const snapLinks = page.locator('.store-picker-card[href*="snapcraft.io"]');
+  await expect(snapLinks).toHaveCount(1);
+});
