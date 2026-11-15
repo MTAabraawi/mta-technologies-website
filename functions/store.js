@@ -116,8 +116,8 @@ export async function onRequest(context) {
         html = html.replace('<p id="store-results-note"><span class="ar-only">نحمّل بيانات التطبيقات المتاحة من المصدر.</span><span class="en-only">Loading available application metadata.</span></p>',
           '<p id="store-results-note">يعرض هذا القسم عينة أولية من ' + count.toLocaleString("en-US") + ' سجلاً مفهرساً من مصدر ' + escapeHtml(store.name) + '. تُحمّل بقية النتائج على دفعات.</p>');
         html = html.replace('<div class="store-live-count" id="store-count">—</div>', '<div class="store-live-count" id="store-count">' + count.toLocaleString("en-US") + ' تطبيق مفهرس</div>');
-        html = html.replace(/<div class="store-app-grid" id="store-app-grid">[\\s\\S]*?<\\/div>/,
-          '<div class="store-app-grid" id="store-app-grid">' + apps.map(app => makeCard(app, storeKey, store)).join("") + '</div>');
+        const loadingGrid = '<div class="store-app-grid" id="store-app-grid"><div class="store-loading"><span class="store-spinner"></span><span class="ar-only">جارٍ تحميل التطبيقات...</span><span class="en-only">Loading apps...</span></div></div>';
+        html = html.replace(loadingGrid, '<div class="store-app-grid" id="store-app-grid">' + apps.map(app => makeCard(app, storeKey, store)).join("") + '</div>');
         const schema = {
           "@context": "https://schema.org", "@type": "CollectionPage",
           "name": title, "description": description, "url": canonical,
