@@ -28,9 +28,23 @@ export async function onRequest({ request, env }) {
     const response = await fetch(upstream.toString(), {
       method: "GET",
       headers: { "accept": "application/json" },
-      redirect: "error",
+      redirect: "manual",
       cf: { cacheTtl: 0, cacheEverything: false }
     });
+
+    if (response.status >= 300 && response.status < 400) {
+      return new Response(JSON.stringify({
+        detail: "Unexpected redirect from application catalogue upstream",
+        code: "CATALOGUE_UPSTREAM_REDIRECT"
+      }), {
+        status: 502,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "cache-control": "no-store",
+          "x-content-type-options": "nosniff"
+        }
+      });
+    }
 
     const headers = new Headers(response.headers);
     headers.set("cache-control", "no-store, no-cache, must-revalidate");
