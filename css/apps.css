@@ -144,3 +144,14 @@ html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex S
 .selected-store-heading h3{font-size:1.4rem;margin-bottom:.25rem}
 @media(max-width:760px){.store-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:480px){.store-picker-grid{grid-template-columns:1fr}.store-picker-card{display:grid;grid-template-columns:48px 1fr;align-items:center;column-gap:.8rem}.store-picker-card img{grid-row:span 3}.store-picker-card small{grid-column:2}}
+
+/* Grouped global store directory */
+.store-groups{display:grid;gap:1.6rem}
+.store-group{padding:1.2rem;border:1px solid var(--border-color);border-radius:18px;background:var(--bg-surface)}
+.store-group h4{font-size:1.05rem;font-weight:850;margin:0 0 1rem;color:var(--text-primary)}
+.store-group .store-picker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.store-group .store-picker-card{min-height:150px;text-decoration:none}
+.store-group .store-picker-card small{color:var(--accent-blue)}
+.store-group .store-picker-card:focus-visible{outline:2px solid var(--accent-blue);outline-offset:3px}
+@media(max-width:760px){.store-group .store-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.store-group .store-picker-grid{grid-template-columns:1fr}.store-group .store-picker-card{min-height:unset}}
