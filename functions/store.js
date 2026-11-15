@@ -62,7 +62,7 @@ function setMeta(html, name, content) {
 }
 function setCanonical(html, canonical) {
   const tag = '<link rel="canonical" href="' + escapeHtml(canonical) + '">';
-  const re = /<link\\s+rel=["']canonical["'][^>]*>/i;
+  const re = /<link\s+rel=["']canonical["'][^>]*>/i;
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
 }
 export async function onRequest(context) {
@@ -104,7 +104,7 @@ export async function onRequest(context) {
         const description = store.description + " تصفح " + count.toLocaleString("en-US") +
           " سجلاً مفهرساً، وابحث حسب الاسم والمنصة والتصنيف. MTA يعرض بيانات المصدر وروابط الناشر الأصلية ولا يستضيف ملفات التثبيت.";
         const title = store.name + " | دليل التطبيقات | MTA TECHNOLOGIES";
-        html = html.replace(/<title>[^<]*<\\/title>/i, "<title>" + escapeHtml(title) + "</title>");
+        html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
         html = setMeta(html, "description", description);
         html = setMeta(html, "robots", "index,follow");
         html = setCanonical(html, canonical);
