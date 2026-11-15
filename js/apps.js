@@ -239,6 +239,7 @@
   let nextOffset = 0;
   let catalogueExhausted = false;
   let engineTotal = 0;
+  let globalEngineTotal = 0;
   let activeQuery = "";
   let engineLoading = false;
   let catalogueObserver = null;
@@ -289,6 +290,7 @@
       const reportedTotal = Number(response.headers.get("X-Total-Count") || 0);
       if (payload.length === 0) catalogueExhausted = true;
       if (reportedTotal) engineTotal = reportedTotal;
+      if (stats && activeSource && reportedTotal) stats.textContent = reportedTotal.toLocaleString() + " " + text("تطبيقاً في هذا المتجر", "apps in this store");
       addApps(payload, engineApps);
       nextOffset += payload.length;
       if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
@@ -369,6 +371,7 @@
         }
         const data = await response.json();
         const globalTotal = Number(data.total || 0);
+        if (globalTotal) globalEngineTotal = globalTotal;
         if (stats && !activeSource && globalTotal) stats.textContent = globalTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
         document.querySelectorAll("[data-source-count]").forEach(element => {
         const amount = Number((data.sources || {})[element.dataset.sourceCount] || 0);
@@ -435,7 +438,7 @@
     engineApps.length = 0;
     renderDynamicApps();
     if (connection) connection.textContent = text("اختر متجراً لعرض تطبيقاته.", "Choose a store to browse its apps.");
-    if (stats) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+    if (stats) stats.textContent = globalEngineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
   });
   category.addEventListener("change", filter);
   developer.addEventListener("change", filter);
@@ -469,6 +472,5 @@
     }
   }
   filter();
-  loadCurated();
   loadEngine();
 })();
