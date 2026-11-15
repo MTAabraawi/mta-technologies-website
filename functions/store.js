@@ -82,6 +82,7 @@ export async function onRequest(context) {
   const storeKey = url.searchParams.get("store") || "";
   const store = CONNECTED_STORES[storeKey];
   let html = await response.text();
+  html = setMeta(html, "619f1190208d7f523c5c4821e0ea466e7fffb394", "619f1190208d7f523c5c4821e0ea466e7fffb394");
   const canonicalOrigin = (env && env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
   const canonical = canonicalOrigin + url.pathname + "?store=" + encodeURIComponent(storeKey);
   if (!store) {
