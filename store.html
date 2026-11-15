@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>متجر التطبيقات | MTA TECHNOLOGIES</title>
+<meta name="description" content="تصفح تطبيقات المتاجر العالمية داخل MTA TECHNOLOGIES. اكتشف التطبيقات المتاحة ومعلوماتها وروابط مصادرها الأصلية.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://www.mtahqq.dpdns.org/store.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="MTA TECHNOLOGIES">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"><link rel="stylesheet" href="css/apps.css"><link rel="stylesheet" href="css/store.css">
+<link rel="icon" href="images/mta-logo-square.png">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PLS74VD22C"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-PLS74VD22C');</script>
+</head>
+<body class="mta-corporate-page store-detail-page">
+<header class="corp-header"><div class="container corp-header-inner">
+<a href="index.html" class="corp-logo"><img src="images/mta-logo-horizontal.png" alt="MTA TECHNOLOGIES"></a>
+<nav class="corp-page-nav" aria-label="Primary navigation"><a href="index.html"><span class="ar-only">الرئيسية</span><span class="en-only">Home</span></a><a href="about.html"><span class="ar-only">من نحن</span><span class="en-only">About</span></a><a href="projects.html"><span class="ar-only">المشاريع</span><span class="en-only">Projects</span></a><a href="apps.html"><span class="ar-only">المتجر</span><span class="en-only">Marketplace</span></a><a href="contact.html"><span class="ar-only">تواصل</span><span class="en-only">Contact</span></a></nav>
+<div class="corp-header-actions"><button class="control-btn" onclick="toggleLanguage()" aria-label="Switch language">EN / عربي</button><button class="control-btn" onclick="toggleTheme()" aria-label="Toggle theme">◐</button></div>
+</div></header>
+<main class="store-main">
+<div class="container store-breadcrumb"><a href="apps.html"><span class="ar-only">متجر التطبيقات</span><span class="en-only">Marketplace</span></a><span> / </span><span id="breadcrumb-store">Store</span></div>
+<section class="store-hero"><div class="container store-hero-inner">
+<div class="store-brand"><div class="store-logo-frame"><img id="store-logo" src="images/mta-logo-square.png" alt=""></div><div><span class="store-kicker">MTA GLOBAL CATALOGUE</span><h1 id="store-title">Store catalogue</h1><p id="store-subtitle"></p></div></div>
+<div class="store-summary"><span class="store-status" id="store-status">Checking integration</span><p id="store-description"></p><div class="store-platform-tags" id="store-platforms"></div><a id="store-official-link" class="btn btn-outline" href="#" target="_blank" rel="noopener noreferrer"><span class="ar-only">زيارة المصدر الرسمي</span><span class="en-only">Visit official source</span> ↗</a></div>
+</div></section>
+<section class="container store-catalogue-section">
+<div class="store-catalogue-heading"><div><span class="apps-eyebrow"><span class="ar-only">كتالوج المتجر</span><span class="en-only">STORE CATALOGUE</span></span><h2><span class="ar-only">التطبيقات والبرامج</span><span class="en-only">Apps & software</span></h2><p id="store-results-note"><span class="ar-only">نحمّل بيانات التطبيقات المتاحة من المصدر.</span><span class="en-only">Loading available application metadata.</span></p></div><div class="store-live-count" id="store-count">—</div></div>
+<div class="store-search-row" id="store-search-row"><label class="store-search"><span>⌕</span><input id="store-search" type="search" placeholder="ابحث باسم التطبيق أو المطور..." aria-label="Search this store"></label><select id="store-platform-filter" aria-label="Filter by platform"><option value="">كل المنصات</option><option value="android">Android</option><option value="ios">iOS</option><option value="windows">Windows</option><option value="macos">macOS</option><option value="linux">Linux</option><option value="web">Web</option></select></div>
+<div class="store-app-grid" id="store-app-grid"><div class="store-loading"><span class="store-spinner"></span><span class="ar-only">جارٍ تحميل التطبيقات...</span><span class="en-only">Loading apps...</span></div></div>
+<div class="store-empty" id="store-empty" hidden></div>
+<div class="store-load-wrap"><button class="btn btn-outline" id="store-load-more" hidden><span class="ar-only">تحميل المزيد</span><span class="en-only">Load more</span></button></div>
+<section class="store-unavailable" id="store-unavailable" hidden><div class="store-unavailable-mark">↗</div><h2><span class="ar-only">هذا المتجر غير متصل آلياً بعد</span><span class="en-only">This store is not connected yet</span></h2><p id="store-unavailable-copy"></p><p class="store-transparency"><span class="ar-only">لن نعرض تطبيقات منسوبة لهذا المتجر دون مصدر بيانات يمكن التحقق منه. نعمل على إضافة تكامل موثوق، ويمكنك حالياً زيارة الكتالوج الأصلي.</span><span class="en-only">We won't attribute apps to this store without verifiable source data. A reliable integration can be added later; for now, you can visit the original catalogue.</span></p><a id="store-unavailable-link" class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer"><span class="ar-only">فتح كتالوج المتجر الأصلي</span><span class="en-only">Open original store catalogue</span> ↗</a></section>
+<div class="store-policy-note"><strong><span class="ar-only">مصادر واضحة وبيانات شفافة</span><span class="en-only">Clear sources. Transparent metadata.</span></strong><p><span class="ar-only">تعرض MTA بيانات تعريفية وروابط الصفحات الأصلية فقط. لا نستضيف ملفات التثبيت ولا نعيد توزيعها. قد تختلف التطبيقات المتاحة حسب البلد والجهاز وسياسات كل متجر.</span><span class="en-only">MTA displays app metadata and original listing links only. We do not host or redistribute installers. Availability may vary by country, device, and each store's policies.</span></p></div>
+</section>
+</main>
+<footer class="corp-footer"><div class="container"><div class="corp-footer-main"><div class="corp-footer-brand"><img src="images/mta-logo-horizontal.png" alt="MTA TECHNOLOGIES"><p><span class="ar-only">منصة لاكتشاف التطبيقات والبرمجيات عبر مصادرها الأصلية.</span><span class="en-only">Discover apps and software through their original sources.</span></p><a href="mailto:mtatechnologies0@gmail.com">mtatechnologies0@gmail.com</a></div><div><h3><span class="ar-only">التصفح</span><span class="en-only">Explore</span></h3><a href="apps.html">Marketplace</a><a href="index.html">Home</a></div><div><h3><span class="ar-only">السياسات</span><span class="en-only">Policies</span></h3><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms</a><a href="contact.html">Contact</a></div></div><div class="corp-footer-bottom"><span>© 2026 MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
+<script src="js/main.js"></script><script src="marketplace-config.js"></script><script src="js/store.js"></script>
+</body></html>
