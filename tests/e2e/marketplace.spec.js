@@ -201,3 +201,21 @@ test('applications without original artwork still receive a visible icon fallbac
   await page.locator('.store-app-card').first().scrollIntoViewIfNeeded();
   await expect(page.locator('.store-app-icon-fallback').first()).toBeVisible({ timeout: 15_000 });
 });
+
+test('all public HTML pages are free of Google AdSense and advertising integrations', async ({ page }) => {
+  const pages = [
+    '/index.html', '/about.html', '/projects.html', '/innovation.html',
+    '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
+    '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
+    '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
+    '/suggestions.html', '/application.html', '/store.html',
+    '/store?store=fdroid'
+  ];
+  const adCode = /pagead2\\.googlesyndication\\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\\.net/i;
+  for (const path of pages) {
+    const response = await page.request.get(path);
+    expect(response.status(), 'Page should load: ' + path).toBe(200);
+    const html = await response.text();
+    expect(html, 'Page must not load ad code: ' + path).not.toMatch(adCode);
+  }
+});
