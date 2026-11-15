@@ -73,7 +73,7 @@ jobs:
           head -c 2000 /tmp/mta-upstream-body.json || true
       - name: Start local Cloudflare Pages with Functions
         run: |
-          nohup npx --yes wrangler@4 pages dev . --ip 127.0.0.1 --port 8788 --var 'MTA_APPLICATIONS_ENGINE_ORIGIN:http://127.0.0.1:8789' > /tmp/mta-pages-dev.log 2>&1 &
+          nohup npx --yes wrangler@4 pages dev . --ip 127.0.0.1 --port 8788 --binding 'MTA_APPLICATIONS_ENGINE_ORIGIN=http://127.0.0.1:8789' > /tmp/mta-pages-dev.log 2>&1 &
           echo $! > /tmp/mta-pages-dev.pid
           for attempt in $(seq 1 60); do
             if curl --fail --silent http://127.0.0.1:8788/apps.html > /dev/null; then
