@@ -91,7 +91,11 @@ function makeCard(app){
  icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else if(icon.parentNode)icon.replaceWith(makeMonogram())};
  const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;
  if(candidates.length){top.append(icon,badge);icon.src=candidates[0]}else{top.append(makeMonogram(),badge)}
- const h=document.createElement("h3");h.textContent=app.name||"Application";
+ const h=document.createElement("h3");
+ const detailParams=new URLSearchParams({source:String(app.source||store.source||""),id:String(app.external_id||app.id||""),name:String(app.name||"Application")});
+ const detailUrl="application.html?"+detailParams.toString();
+ const titleLink=document.createElement("a");titleLink.href=detailUrl;titleLink.textContent=app.name||"Application";titleLink.setAttribute("aria-label",copy("تفاصيل "+(app.name||"التطبيق"),"Details for "+(app.name||"application")));h.append(titleLink);
+ const detailLink=document.createElement("a");detailLink.className="store-app-detail-link";detailLink.href=detailUrl;detailLink.textContent=copy("تفاصيل التطبيق داخل MTA","View app details on MTA");
  const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
  const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
  let details=null;const fullDescription=String(app.description||"").trim();
@@ -106,7 +110,7 @@ function makeCard(app){
  }
  const tags=document.createElement("div");tags.className="store-app-tags";[platformLabel,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});const price=app.metadata_json?.price;if(price&&Number.isFinite(Number(price.final))&&price.currency){const p=document.createElement("span");p.className="store-app-price";p.textContent=Number(price.final)===0?copy("مجاني","Free"):(Number(price.final)/100).toLocaleString(undefined,{style:"currency",currency:String(price.currency)});tags.append(p)}
  const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
- card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,link);return card;
+ card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,detailLink,link);return card;
 }
 function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
 function applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
