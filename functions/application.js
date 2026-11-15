@@ -26,7 +26,7 @@ function canonical(html, url) {
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
 }
 function replaceInner(html, id, value) {
-  const opening = new RegExp("<([a-z][a-z0-9:-]*)\\\\b(?=[^>]*\\\\bid=\\\"" + id + "\\\")[^>]*>", "i");
+  const opening = new RegExp('<([a-z][a-z0-9:-]*)\\b(?=[^>]*\\bid="' + id + '")[^>]*>', "i");
   const match = opening.exec(html);
   if (!match) return html;
   const tag = match[1];
@@ -35,8 +35,8 @@ function replaceInner(html, id, value) {
   token.lastIndex = match.index;
   let depth = 0, closeStart = -1, item;
   while ((item = token.exec(html))) {
-    if (/^<\\\\//.test(item[0])) depth--;
-    else if (!/\\\\/>$/.test(item[0])) depth++;
+    if (/^<\\//.test(item[0])) depth--;
+    else if (!/\\/>$/.test(item[0])) depth++;
     if (depth === 0) { closeStart = item.index; break; }
   }
   if (closeStart < 0) return html;
