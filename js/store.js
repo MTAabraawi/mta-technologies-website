@@ -81,8 +81,8 @@ function makeCard(app){
  const iconUrl=safe(app.icon_url||""),pageUrl=safe(app.app_url||app.source_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\\./,""):""}catch{}
  const candidates=[iconUrl,host?"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=128":"",host?"https://icons.duckduckgo.com/ip3/"+encodeURIComponent(host)+".ico":""].filter((v,i,a)=>v&&a.indexOf(v)===i);let iconIndex=0;
  const monogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();icon.replaceWith(mark)};
- icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else monogram()};if(candidates.length)icon.src=candidates[0];else monogram();
- const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;top.append(icon,badge);
+ icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else monogram()};if(candidates.length)icon.src=candidates[0];else icon.dataset.iconMissing="true";
+ const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;top.append(icon,badge);if(!candidates.length)monogram();
  const h=document.createElement("h3");h.textContent=app.name||"Application";
  const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
  const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
