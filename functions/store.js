@@ -82,7 +82,8 @@ export async function onRequest(context) {
   const storeKey = url.searchParams.get("store") || "";
   const store = CONNECTED_STORES[storeKey];
   let html = await response.text();
-  const canonical = url.origin + url.pathname + "?store=" + encodeURIComponent(storeKey);
+  const canonicalOrigin = (env && env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
+  const canonical = canonicalOrigin + url.pathname + "?store=" + encodeURIComponent(storeKey);
   if (!store) {
     html = setMeta(html, "robots", "noindex,follow");
     html = setCanonical(html, canonical);
