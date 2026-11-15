@@ -152,6 +152,27 @@ test('connected store pages become indexable while unconnected stores stay out o
   await expect(page.locator('#store-unavailable')).toBeVisible();
 });
 
+test('catalogue cards open dedicated in-site application profiles before the original source', async ({ page }) => {
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  const card = page.locator('.store-app-card').first();
+  await expect(card).toBeVisible({ timeout: 15_000 });
+  await card.locator('.store-app-detail-link').click();
+  await expect(page).toHaveURL(/application\.html\?source=fdroid/);
+  await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  await expect(page.locator('#application-source-link')).toHaveAttribute('href', 'https://example.org/apps/1');
+  await expect(page.locator('#application-description')).toBeVisible();
+});
+
+test('global theme tokens provide readable contrast on dark and light themes', async ({ page }) => {
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  const dark = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim());
+  expect(dark.toLowerCase()).toBe('#d2dce9');
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+  const light = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--text-secondary').trim());
+  expect(light.toLowerCase()).toBe('#334155');
+});
+
 test('applications without original artwork still receive a visible icon fallback', async ({ page }) => {
   // Force every image request to fail so the test exercises the complete
   // original-icon -> publisher-favicon -> monogram fallback chain.
