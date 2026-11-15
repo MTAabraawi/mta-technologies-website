@@ -368,8 +368,8 @@
           await new Promise(resolve => setTimeout(resolve, 400 * (attempt + 1)));
         }
         const data = await response.json();
-        engineTotal = Number(data.total || engineTotal || 0);
-        if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+        const globalTotal = Number(data.total || 0);
+        if (stats && !activeSource && globalTotal) stats.textContent = globalTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
         document.querySelectorAll("[data-source-count]").forEach(element => {
         const amount = Number((data.sources || {})[element.dataset.sourceCount] || 0);
         element.textContent = amount.toLocaleString() + " " + text("تطبيق", "apps");
