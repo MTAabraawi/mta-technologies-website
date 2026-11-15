@@ -29,7 +29,7 @@ test('all store cards open internal MTA store pages, never external stores direc
   await expect(cards).toHaveCount(44);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
-    expect(href).toMatch(/^store\.html\?store=/);
+    expect(href).toMatch(/^store\\?store=/);
     await expect(card).not.toHaveAttribute('target', '_blank');
   }
 });
@@ -44,7 +44,7 @@ test('F-Droid opens an internal branded catalogue and displays indexed applicati
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="fdroid"]').click();
-  await expect(page).toHaveURL(/store\.html\?store=fdroid/);
+  await expect(page).toHaveURL(/store\?store=fdroid/);
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('#store-logo')).toBeVisible();
   await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 60_000 });
@@ -55,7 +55,7 @@ test('F-Droid opens an internal branded catalogue and displays indexed applicati
 test('external-only stores show an internal store profile before offering the original catalogue', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="google-play"]').click();
-  await expect(page).toHaveURL(/store\.html\?store=google-play/);
+  await expect(page).toHaveURL(/store\?store=google-play/);
   await expect(page.locator('#store-title')).toHaveText('Google Play');
   await expect(page.locator('#store-unavailable')).toBeVisible();
   await expect(page.locator('#store-unavailable-link')).toHaveAttribute('href', 'https://play.google.com/store');
@@ -73,9 +73,11 @@ test('marketplace includes the MTA Net Blocker first-party product listing', asy
 
 test('connected store cards show live indexed counts from catalogue statistics', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('[data-source-count="fdroid"]')).toContainText(/4,?996/);
-  await expect(page.locator('[data-source-count="flathub"]')).toContainText(/1,?000/);
-  await expect(page.locator('[data-source-count="homebrew-cask"]')).toContainText(/7,?834/);
+  const stats = await page.evaluate(async () => (await fetch('/api/v1/catalog-stats', { cache: 'no-store' })).json());
+  for (const source of ['fdroid', 'flathub', 'homebrew-cask']) {
+    const actual = await page.locator('[data-source-count="' + source + '"]').getAttribute('data-count');
+    expect(Number(actual)).toBe(Number(stats.sources[source] || 0));
+  }
 });
 
 test('public catalogue can be paginated without duplicate source identities', async ({ page }) => {
