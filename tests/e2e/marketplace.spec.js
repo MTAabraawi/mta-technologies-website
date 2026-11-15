@@ -30,7 +30,8 @@ test('public catalogue API is readable cross-origin and exposes pagination metad
   expect(result.count).toBeGreaterThan(0);
   expect(result.contentType).toContain('application/json');
   expect(Number(result.pageTotal)).toBe(result.total);
-  expect(result.expose.toLowerCase()).toContain('x-total-count');
+  // The pagination header itself must be readable by browser JavaScript; the
+  // Access-Control-Expose-Headers response header need not expose itself.
 });
 
 test('marketplace automatically renders successive catalogue batches', async ({ page }) => {
@@ -63,4 +64,44 @@ test('marketplace includes the MTA Net Blocker listing and branded icon', async 
   const card = page.locator('#apps-grid .app-card').filter({ hasText: 'MTA Net Blocker' }).first();
   await expect(card).toBeVisible();
   await expect(card.locator('img[alt*="MTA Net Blocker"]')).toHaveAttribute('src', /mta-net-blocker/);
+});
+
+test('public catalogue can be paginated from first record through the final record', async ({ page }) => {
+  test.setTimeout(240_000);
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async api => {
+    const statsResponse = await fetch(api + '/api/v1/catalog-stats', { credentials: 'omit', cache: 'no-store' });
+    if (!statsResponse.ok) throw new Error('Catalogue stats HTTP ' + statsResponse.status);
+    const stats = await statsResponse.json();
+    const total = Number(stats.total);
+    const pageSize = 200;
+    const identities = new Set();
+    let received = 0;
+    const pageCounts = [];
+    for (let offset = 0; offset < total; offset += pageSize) {
+      const response = await fetch(api + '/api/v1/apps?limit=' + pageSize + '&offset=' + offset, {
+        credentials: 'omit', cache: 'no-store'
+      });
+      if (!response.ok) throw new Error('Catalogue page at offset ' + offset + ' returned HTTP ' + response.status);
+      const rows = await response.json();
+      const headerTotal = Number(response.headers.get('x-total-count'));
+      if (!Number.isFinite(headerTotal) || headerTotal !== total) {
+        throw new Error('Pagination total header mismatch at offset ' + offset + ': ' + response.headers.get('x-total-count'));
+      }
+      if (!Array.isArray(rows) || rows.length === 0) {
+        throw new Error('Unexpected empty catalogue page at offset ' + offset);
+      }
+      for (const row of rows) {
+        const key = String(row.source) + '|' + String(row.external_id);
+        if (identities.has(key)) throw new Error('Duplicate catalogue identity: ' + key);
+        identities.add(key);
+      }
+      received += rows.length;
+      pageCounts.push(rows.length);
+    }
+    return { total, received, unique: identities.size, pages: pageCounts.length, lastPageCount: pageCounts.at(-1) };
+  }, API);
+  expect(result.received).toBe(result.total);
+  expect(result.unique).toBe(result.total);
+  expect(result.pages).toBe(Math.ceil(result.total / 200));
 });
