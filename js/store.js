@@ -78,9 +78,9 @@ function makeCard(app){
  const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();
  const top=document.createElement("div");top.className="store-app-top";
  const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.alt=(app.name||"App")+" icon";
- const pageUrl=safe(app.app_url||app.source_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\./,""):""}catch{}
  let metadata=app.metadata_json&&typeof app.metadata_json==="object"?app.metadata_json:{};
  if(typeof app.metadata_json==="string"){try{metadata=JSON.parse(app.metadata_json)}catch{metadata={}}}
+ const pageUrl=safe(app.app_url||metadata.homepage||metadata.website||metadata.homepage_url||metadata.project_url||metadata.publisher_url||app.source_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\./,""):""}catch{}
  const iconObject=metadata.icon&&typeof metadata.icon==="object"?metadata.icon:{};
  const iconCollection=metadata.icons&&typeof metadata.icons==="object"?Object.values(metadata.icons):[];
  const metadataIcons=[metadata.icon_url,metadata.iconUrl,metadata.icon,iconObject.url,iconObject.path,metadata.logo,metadata.image,metadata.image_url,metadata.artworkUrl512,metadata.artworkUrl100,metadata.thumbnail,...iconCollection];
