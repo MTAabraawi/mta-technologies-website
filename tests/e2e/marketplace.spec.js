@@ -216,6 +216,8 @@ test('all public HTML pages are free of Google AdSense and advertising integrati
     const response = await page.request.get(path);
     expect(response.status(), 'Page should load: ' + path).toBe(200);
     const html = await response.text();
-    expect(html, 'Page must not load ad code: ' + path).not.toMatch(adCode);
+    expect(html, 'Page must not load Google AdSense code: ' + path).not.toMatch(adCode);
+    expect(html, 'Page must include HilltopAds ownership verification: ' + path)
+      .toContain('<meta name="619f1190208d7f523c5c4821e0ea466e7fffb394" content="619f1190208d7f523c5c4821e0ea466e7fffb394"');
   }
 });
