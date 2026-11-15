@@ -38,7 +38,7 @@ function makeCard(app, storeKey, store) {
   const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
   let publisherHost = "";
   for (const candidate of [app.app_url, app.source_url, metadata.homepage, metadata.website, metadata.project_url]) {
-    try { publisherHost = new URL(candidate).hostname.replace(/^www\\./, ""); if (publisherHost) break; } catch {}
+    try { publisherHost = new URL(candidate).hostname.replace(/^www\./, ""); if (publisherHost) break; } catch {}
   }
   const icon = safeHttps(app.icon_url || metadata.icon_url || metadata.iconUrl ||
     (typeof metadata.icon === "string" ? metadata.icon : "") || iconObject.url || iconObject.path ||
