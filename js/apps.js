@@ -12,6 +12,19 @@
   const api = String(window.MTA_MARKETPLACE_API || "").replace(/\/$/, "");
   if (!search || !platform || !category || !developer || !grid || !empty || !count) return;
 
+  const storePicker = document.getElementById("store-picker");
+  const catalogueView = document.getElementById("catalogue-view");
+  const backToStores = document.getElementById("store-back");
+  const selectedStoreHeading = document.getElementById("selected-store-heading");
+  let activeSource = "";
+  const storeInfo = {
+    "fdroid": ["F-Droid", "تطبيقات Android مفتوحة المصدر", "Open-source Android apps"],
+    "apple-itunes": ["Apple App Store", "تطبيقات iPhone وiPad", "iPhone and iPad apps"],
+    "flathub": ["Flathub", "تطبيقات Linux عبر Flatpak", "Linux apps via Flatpak"],
+    "homebrew-cask": ["Homebrew", "تطبيقات macOS", "macOS applications"],
+    "winget-run-community": ["WinGet", "برامج Windows", "Windows software"],
+    "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"]
+  };
   const isEnglish = () => document.documentElement.lang === "en";
   const text = (ar, en) => isEnglish() ? en : ar;
   const safeHttpsUrl = value => {
@@ -67,6 +80,7 @@
     card.dataset.platform = platforms.join(",");
     card.dataset.category = cat;
     card.dataset.developer = dev;
+    card.dataset.source = String(app.source || app.source_key || "mta-curated-web");
 
     const top = document.createElement("div");
     top.className = "app-card-top";
@@ -166,6 +180,7 @@
         .join(" ").toLocaleLowerCase();
       const supported = card.dataset.platform.split(",").map(value => value.trim());
       const matches = searchable.includes(query)
+        && (!activeSource || card.dataset.source === activeSource)
         && (platform.value === "all" || supported.includes(platform.value))
         && (category.value === "all" || card.dataset.category === category.value)
         && (developer.value === "all" || (developer.value === "MTA TECHNOLOGIES"
@@ -229,7 +244,7 @@
   let catalogueObserver = null;
   const catalogueSentinel = document.getElementById("catalogue-sentinel");
   async function fetchEnginePage() {
-    if (!api || engineLoading || catalogueExhausted) return [];
+    if (!api || !activeSource || engineLoading || catalogueExhausted) return [];
     const button = document.getElementById("load-more-apps");
     engineLoading = true;
     if (button) {
@@ -240,6 +255,7 @@
     try {
       const params = new URLSearchParams({limit:String(pageSize),offset:String(nextOffset)});
       if (activeQuery) params.set("q", activeQuery);
+      params.set("source", activeSource);
       if (platform.value !== "all") params.set("platform", platform.value.toLowerCase());
       const requestUrl = api + "/api/v1/apps?" + params.toString();
       let response = null;
@@ -321,7 +337,7 @@
     }
   }
   async function reloadEngine() {
-    if (!api) return;
+    if (!api || !activeSource) return;
     nextOffset = 0;
     catalogueExhausted = false;
     engineApps.length = 0;
@@ -354,7 +370,11 @@
         const data = await response.json();
         engineTotal = Number(data.total || engineTotal || 0);
         if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
-        document.querySelectorAll("[data-catalog-platform]").forEach(element => {
+        document.querySelectorAll("[data-source-count]").forEach(element => {
+        const amount = Number((data.sources || {})[element.dataset.sourceCount] || 0);
+        element.textContent = amount.toLocaleString() + " " + text("تطبيق", "apps");
+      });
+      document.querySelectorAll("[data-catalog-platform]").forEach(element => {
           const key = element.dataset.catalogPlatform;
           const amount = Number((data.platforms || {})[key] || 0);
           element.textContent = amount.toLocaleString() + " " + platformName(key);
@@ -366,7 +386,7 @@
     })();
 
     try {
-      await fetchEnginePage();
+      if (activeSource) await fetchEnginePage();
       await statsTask;
     } catch (error) {
       console.warn("MTA Applications Engine app records unavailable", error);
@@ -387,6 +407,36 @@
     }
   }
 
+  function chooseStore(source) {
+    if (!storeInfo[source]) return;
+    activeSource = source;
+    const info = storeInfo[source];
+    if (storePicker) storePicker.hidden = true;
+    if (catalogueView) catalogueView.hidden = false;
+    if (selectedStoreHeading) selectedStoreHeading.innerHTML = "<h3>" + info[0] + "</h3><p>" + text(info[1], info[2]) + "</p>";
+    if (platform) platform.value = "all";
+    if (search) search.value = "";
+    activeQuery = "";
+    if (category) category.value = "all";
+    if (developer) developer.value = "all";
+    if (connection) connection.textContent = text("جارٍ تحميل تطبيقات هذا المتجر...", "Loading this store's applications...");
+    reloadEngine().catch(() => {});
+    filter();
+  }
+  storePicker?.querySelectorAll("[data-store-source]").forEach(button => {
+    button.addEventListener("click", () => chooseStore(button.dataset.storeSource));
+  });
+  backToStores?.addEventListener("click", () => {
+    activeSource = "";
+    if (catalogueView) catalogueView.hidden = true;
+    if (storePicker) storePicker.hidden = false;
+    nextOffset = 0;
+    catalogueExhausted = false;
+    engineApps.length = 0;
+    renderDynamicApps();
+    if (connection) connection.textContent = text("اختر متجراً لعرض تطبيقاته.", "Choose a store to browse its apps.");
+    if (stats) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+  });
   category.addEventListener("change", filter);
   developer.addEventListener("change", filter);
   platform.addEventListener("change", () => reloadEngine().catch(() => {}));
