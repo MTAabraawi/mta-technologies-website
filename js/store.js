@@ -90,7 +90,8 @@ function makeCard(app){
  const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
  card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,link);return card;
 }
-function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}\nfunction applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
+function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
+function applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
 async function fetchPage(reset=false){
  if(!store?.source||loading||exhausted||!API)return;
  if(reset){offset=0;exhausted=false;total=0;grid.replaceChildren();$("store-empty").hidden=true}
