@@ -31,9 +31,7 @@
 
 These are product goals and implementation criteria. They do not mean MTA currently exceeds the referenced platforms in catalogue size, ranking quality, curation, installation, update delivery or trust infrastructure.
 
-## AdSense and search readiness
-
-Google's AdSense guidance emphasizes unique, relevant content, clear navigation and a useful visitor experience. Store descriptions alone are not enough: MTA should keep building original platform explainers, app comparisons, compatibility notes and independently written reviews, while clearly distinguishing editorial content from imported source metadata.
+## Search readiness
 
 For indexing, the sitemap must list canonical, indexable URLs only. The production check should verify the exact sitemap.xml URL returns HTTP 200 with XML content, that robots.txt declares that same absolute URL, and that every listed URL resolves directly to its canonical page. Search Console submission is a separate account action and cannot be confirmed from a local test.
 
@@ -44,6 +42,5 @@ For indexing, the sitemap must list canonical, indexable URLs only. The producti
 - Apple developer featuring and collections: https://developer.apple.com/app-store/getting-featured/
 - Flathub documentation: https://docs.flathub.org/
 - Microsoft Store app discovery: https://apps.microsoft.com/
-- Google AdSense site readiness: https://support.google.com/adsense/answer/7299563
 - Google sitemap creation and submission: https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap
 - Google canonical URL guidance: https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls
