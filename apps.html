@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css?v=863aa90">
-  <link rel="stylesheet" href="css/apps.css?v=20261115-continuous2">
+  <link rel="stylesheet" href="css/apps.css?v=store-picker1">
   <link rel="stylesheet" href="css/external-catalogs.css">
   <link rel="icon" type="image/png" href="images/mta-logo-square.png">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLS74VD22C"></script>
@@ -50,6 +50,23 @@
   <section class="container directory-section" id="directory">
     <div class="directory-heading"><div><span class="apps-eyebrow"><span class="ar-only">دليل التطبيقات</span><span class="en-only">APPLICATION DIRECTORY</span></span><h2><span class="ar-only">ابحث واكتشف</span><span class="en-only">Find what you need</span></h2></div><div class="directory-count-wrap"><span class="directory-count" id="app-count">1 تطبيق</span><span class="catalog-total" id="catalog-stats"><span class="ar-only">15,326 تطبيقاً مفهرساً</span><span class="en-only">15,326 indexed applications</span></span></div></div>
     <div class="catalog-connection" role="status" aria-live="polite"><span id="catalog-connection">جارٍ الاتصال بمحرك التطبيقات العالمي...</span><strong>MTA GLOBAL CATALOG</strong></div>
+    <section class="store-picker" id="store-picker" aria-label="Choose an app store">
+      <div class="store-picker-heading"><h3><span class="ar-only">اختر المتجر</span><span class="en-only">Choose a store</span></h3><p><span class="ar-only">اختر مصدراً لعرض تطبيقاته فقط.</span><span class="en-only">Choose a source to view only its applications.</span></p></div>
+      <div class="store-picker-grid">
+        <button class="store-picker-card" type="button" data-store-source="fdroid"><img src="https://www.google.com/s2/favicons?domain=f-droid.org&amp;sz=96" alt=""><strong>F-Droid</strong><span>Android · Open source</span><small data-source-count="fdroid">—</small></button>
+        <button class="store-picker-card" type="button" data-store-source="apple-itunes"><img src="https://www.google.com/s2/favicons?domain=apple.com&amp;sz=96" alt=""><strong>Apple App Store</strong><span>iPhone · iPad</span><small data-source-count="apple-itunes">—</small></button>
+        <button class="store-picker-card" type="button" data-store-source="flathub"><img src="https://www.google.com/s2/favicons?domain=flathub.org&amp;sz=96" alt=""><strong>Flathub</strong><span>Linux · Flatpak</span><small data-source-count="flathub">—</small></button>
+        <button class="store-picker-card" type="button" data-store-source="homebrew-cask"><img src="https://www.google.com/s2/favicons?domain=brew.sh&amp;sz=96" alt=""><strong>Homebrew</strong><span>macOS</span><small data-source-count="homebrew-cask">—</small></button>
+        <button class="store-picker-card" type="button" data-store-source="winget-run-community"><img src="https://www.google.com/s2/favicons?domain=winget.run&amp;sz=96" alt=""><strong>WinGet</strong><span>Windows</span><small data-source-count="winget-run-community">—</small></button>
+        <button class="store-picker-card" type="button" data-store-source="mta-curated-web"><img src="images/mta-logo-square.png" alt=""><strong>MTA Web Apps</strong><span>Web applications</span><small data-source-count="mta-curated-web">—</small></button>
+        <div class="store-picker-card is-coming-soon" aria-disabled="true"><img src="https://www.google.com/s2/favicons?domain=play.google.com&amp;sz=96" alt=""><strong>Google Play</strong><span>Android</span><small><span class="ar-only">قريباً · يحتاج ربط مصدر بيانات</span><span class="en-only">Coming soon · data source needed</span></small></div>
+        <div class="store-picker-card is-coming-soon" aria-disabled="true"><img src="https://www.google.com/s2/favicons?domain=appgallery.huawei.com&amp;sz=96" alt=""><strong>Huawei AppGallery</strong><span>Android · HarmonyOS</span><small><span class="ar-only">قريباً</span><span class="en-only">Coming soon</span></small></div>
+        <div class="store-picker-card is-coming-soon" aria-disabled="true"><img src="https://www.google.com/s2/favicons?domain=galaxystore.samsung.com&amp;sz=96" alt=""><strong>Samsung Galaxy Store</strong><span>Android</span><small><span class="ar-only">قريباً</span><span class="en-only">Coming soon</span></small></div>
+      </div>
+    </section>
+    <div class="catalogue-view" id="catalogue-view" hidden>
+      <button class="store-back-button" id="store-back" type="button">← <span class="ar-only">العودة إلى المتاجر</span><span class="en-only">Back to stores</span></button>
+      <div class="selected-store-heading" id="selected-store-heading"></div>
     <div class="apps-toolbar">
       <label class="apps-search"><span aria-hidden="true">⌕</span><input id="app-search" type="search" placeholder="ابحث باسم التطبيق أو وصفه..." aria-label="Search apps"></label>
       <select id="platform-filter" aria-label="Filter by platform"><option value="all">كل المنصات / All platforms</option><option value="Android">Android</option><option value="iOS">iOS</option><option value="Windows">Windows</option><option value="macOS">macOS</option><option value="Linux">Linux</option><option value="Web">Web</option></select>
@@ -57,7 +74,7 @@
       <select id="developer-filter" aria-label="Filter by developer"><option value="all">جميع المطورين / All developers</option><option value="MTA TECHNOLOGIES">MTA TECHNOLOGIES</option><option value="Third-party">مطورون آخرون / Other developers</option></select>
     </div>
     <div class="apps-grid" id="apps-grid">
-      <article class="app-card" data-name="MTA Net Blocker" data-description="تحكم في اتصال التطبيقات بالإنترنت" data-platform="Android" data-category="Security" data-developer="MTA TECHNOLOGIES">
+      <article class="app-card" data-name="MTA Net Blocker" data-description="تحكم في اتصال التطبيقات بالإنترنت" data-platform="Android" data-category="Security" data-developer="MTA TECHNOLOGIES" data-source="mta-curated-web">
         <div class="app-card-top"><div class="app-icon app-icon-image"><img src="images/apps/mta-net-blocker.svg?v=20261114-brand1" alt="MTA Net Blocker icon" width="64" height="64"></div><span class="app-status status-live"><span class="ar-only">متاح</span><span class="en-only">Available</span></span></div>
         <div class="app-card-meta">MTA TECHNOLOGIES · ANDROID</div>
         <h3>MTA Net Blocker</h3>
@@ -68,6 +85,7 @@
       <div class="apps-empty" id="apps-empty" hidden><strong><span class="ar-only">لا توجد نتائج مطابقة</span><span class="en-only">No matching apps</span></strong><p><span class="ar-only">جرّب تغيير كلمات البحث أو عوامل التصفية.</span><span class="en-only">Try changing your search or filters.</span></p></div>
     </div>
     <div class="load-more-wrap" id="catalogue-sentinel" aria-hidden="true"><button class="btn btn-outline catalogue-fallback-button" id="load-more-apps" type="button" hidden>تحميل المزيد من التطبيقات</button></div>
+    </div>
     <div class="directory-note"><strong><span class="ar-only">دليل التطبيقات العالمي</span><span class="en-only">GLOBAL APP DIRECTORY</span></strong><p><span class="ar-only">يعرض المتجر التطبيقات المفهرسة من مصادرها العامة عبر المنصات المدعومة، مع روابط صفحاتها الأصلية. تتحدث النتائج على دفعات لتسهيل التصفح والبحث.</span><span class="en-only">The directory displays indexed applications from public catalogues across supported platforms, linking to their original listing pages. Results load in batches for faster browsing and search.</span></p></div>
   </section>
   <section class="container store-directory-section">
@@ -97,5 +115,5 @@
 <div><h3><span class="ar-only">المنظومة</span><span class="en-only">Ecosystem</span></h3><a href="apps.html">Marketplace / المتجر</a><a href="developer-portal.html">Developer Portal / المطورون</a><a href="developer-certification.html">Developer Certification / اعتماد المطورين</a><a href="marketplace-policy.html">Marketplace Policy</a></div>
 <div><h3><span class="ar-only">السياسات</span><span class="en-only">Legal</span></h3><a href="privacy-policy.html">Privacy Policy</a><a href="terms.html">Terms of Use</a><a href="disclaimer.html">Disclaimer</a><a href="cookies.html">Cookies</a></div>
 </div><div class="corp-footer-bottom"><span>© 2026 MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
-<script src="js/main.js"></script><script src="marketplace-config.js?v=same-origin-api1"></script><script src="js/apps.js?v=same-origin-api1"></script><script src="js/external-catalogs.js"></script>
+<script src="js/main.js"></script><script src="marketplace-config.js?v=same-origin-api1"></script><script src="js/apps.js?v=store-picker1"></script><script src="js/external-catalogs.js"></script>
 </body></html>
