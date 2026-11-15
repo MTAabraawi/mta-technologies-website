@@ -35,8 +35,8 @@ function replaceInner(html, id, value) {
   token.lastIndex = match.index;
   let depth = 0, closeStart = -1, item;
   while ((item = token.exec(html))) {
-    if (/^<\\//.test(item[0])) depth--;
-    else if (!/\\/>$/.test(item[0])) depth++;
+    if (item[0].startsWith("</")) depth--;
+    else if (!item[0].endsWith("/>")) depth++;
     if (depth === 0) { closeStart = item.index; break; }
   }
   if (closeStart < 0) return html;
