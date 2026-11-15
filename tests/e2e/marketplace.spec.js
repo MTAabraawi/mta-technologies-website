@@ -117,7 +117,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"]')).toHaveAttribute('data-catalogue-state', 'connected');
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
-  await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('Coming soon');
+  await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
   await expect(page.locator('.store-picker-card')).toHaveCount(44);
 });
 
@@ -150,4 +150,13 @@ test('connected store pages become indexable while unconnected stores stay out o
   await expect(page.locator('#store-title')).toHaveText('Google Play');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
   await expect(page.locator('#store-unavailable')).toBeVisible();
+});
+
+test('applications without original artwork still receive a visible icon fallback', async ({ page }) => {
+  await page.route('https://example.org/icon.png', route => route.abort());
+  await page.route('https://www.google.com/s2/favicons/**', route => route.abort());
+  await page.route('https://icons.duckduckgo.com/**', route => route.abort());
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('.store-app-icon-fallback').first()).toBeVisible({ timeout: 15_000 });
 });
