@@ -31,7 +31,7 @@ function replaceInner(html, id, value) {
   if (!match) return html;
   const tag = match[1];
   const contentStart = match.index + match[0].length;
-  const token = new RegExp("<\\\\/?"+tag+"\\\\b[^>]*>", "gi");
+  const token = new RegExp("<\\/?"+tag+"\\b[^>]*>", "gi");
   token.lastIndex = match.index;
   let depth = 0, closeStart = -1, item;
   while ((item = token.exec(html))) {
