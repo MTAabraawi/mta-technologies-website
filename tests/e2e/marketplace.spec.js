@@ -44,7 +44,7 @@ test('F-Droid opens an internal branded catalogue and displays indexed applicati
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="fdroid"]').click();
-  await expect(page).toHaveURL(/store\?store=fdroid/);
+  await expect(page).toHaveURL(/\/application\?source=fdroid(?:&|$)/);
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('#store-logo')).toBeVisible();
   await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 60_000 });
@@ -55,7 +55,7 @@ test('F-Droid opens an internal branded catalogue and displays indexed applicati
 test('external-only stores show an internal store profile before offering the original catalogue', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="google-play"]').click();
-  await expect(page).toHaveURL(/store\?store=google-play/);
+  await expect(page).toHaveURL(/\/application\?source=fdroid(?:&|$)/);
   await expect(page.locator('#store-title')).toHaveText('Google Play');
   await expect(page.locator('#store-unavailable')).toBeVisible();
   await expect(page.locator('#store-unavailable-link')).toHaveAttribute('href', 'https://play.google.com/store');
@@ -173,7 +173,7 @@ test('catalogue cards open dedicated in-site application profiles before the ori
   const card = page.locator('.store-app-card').first();
   await expect(card).toBeVisible({ timeout: 15_000 });
   await card.locator('.store-app-detail-link').click();
-  await expect(page).toHaveURL(/\/application\?source=fdroid\//);
+  await expect(page).toHaveURL(/\/application\?source=fdroid(?:&|$)/);
   await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
   await expect(page.locator('#application-source-link')).toHaveAttribute('href', 'https://example.org/apps/1');
