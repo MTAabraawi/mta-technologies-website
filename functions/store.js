@@ -34,7 +34,16 @@ function makeCard(app, storeKey, store) {
     "&store=" + encodeURIComponent(storeKey) +
     "&id=" + encodeURIComponent(id) +
     "&name=" + encodeURIComponent(name);
-  const icon = safeHttps(app.icon_url);
+  const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); } catch { return {}; } })();
+  const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
+  let publisherHost = "";
+  for (const candidate of [app.app_url, app.source_url, metadata.homepage, metadata.website, metadata.project_url]) {
+    try { publisherHost = new URL(candidate).hostname.replace(/^www\\./, ""); if (publisherHost) break; } catch {}
+  }
+  const icon = safeHttps(app.icon_url || metadata.icon_url || metadata.iconUrl ||
+    (typeof metadata.icon === "string" ? metadata.icon : "") || iconObject.url || iconObject.path ||
+    metadata.logo || metadata.image || metadata.image_url || metadata.artworkUrl512) ||
+    (publisherHost ? "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(publisherHost) + "&sz=256" : "");
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "APP";
   const original = safeHttps(app.source_url || app.app_url) || store.url || "#";
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
@@ -42,7 +51,7 @@ function makeCard(app, storeKey, store) {
   const summary = app.summary || app.description || "لا يتوفر وصف مختصر في بيانات المصدر.";
   return '<article class="store-app-card">' +
     '<div class="store-app-top">' +
-      (icon ? '<img class="store-app-icon" loading="lazy" decoding="async" src="' + escapeHtml(icon) + '" alt="' + escapeHtml(name) + ' icon">' :
+      (icon ? '<img class="store-app-icon" loading="lazy" decoding="async" src="' + escapeHtml(icon) + '" alt="' + escapeHtml(name) + ' icon" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="store-app-icon-fallback" hidden aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>' :
         '<span class="store-app-icon-fallback" aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>') +
       '<span class="store-app-source">' + escapeHtml(source) + '</span>' +
     '</div>' +
