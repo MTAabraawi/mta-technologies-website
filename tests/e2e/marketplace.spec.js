@@ -136,10 +136,10 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
     const response = await page.request.get(url.pathname + url.search, { maxRedirects: 0 });
     expect(response.status(), 'Sitemap URL should resolve directly: ' + location).toBe(200);
     const body = await response.text();
-    const canonical = body.match(/<link\\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i);
+    const canonical = body.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
     expect(canonical, 'Sitemap page must declare a canonical: ' + location).not.toBeNull();
     expect(canonical[1], 'Sitemap URL must equal its canonical: ' + location).toBe(location);
-    expect(body).not.toMatch(/<meta\\s+name=["']robots["']\\s+content=["']noindex/i);
+    expect(body).not.toMatch(/<meta\s+name=["']robots["']\s+content=["']noindex/i);
   }
   const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
   expect(robots.status()).toBe(200);
