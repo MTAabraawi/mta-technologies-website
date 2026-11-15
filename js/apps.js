@@ -293,7 +293,9 @@
       if (stats && activeSource && reportedTotal) stats.textContent = reportedTotal.toLocaleString() + " " + text("تطبيقاً في هذا المتجر", "apps in this store");
       addApps(payload, engineApps);
       nextOffset += payload.length;
-      if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + text("تطبيقاً مفهرساً", "indexed applications");
+      if (stats && engineTotal) stats.textContent = engineTotal.toLocaleString() + " " + (activeSource
+        ? text("تطبيقاً في هذا المتجر", "apps in this store")
+        : text("تطبيقاً مفهرساً", "indexed applications"));
       if (button) {
         button.hidden = payload.length < pageSize || (engineTotal > 0 && nextOffset >= engineTotal);
         if (catalogueExhausted) button.hidden = true;
