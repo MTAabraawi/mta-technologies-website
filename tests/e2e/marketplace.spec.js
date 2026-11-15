@@ -154,9 +154,11 @@ test('connected store pages become indexable while unconnected stores stay out o
 
 test('applications without original artwork still receive a visible icon fallback', async ({ page }) => {
   await page.route('https://example.org/icon.png', route => route.abort());
+  await page.route('https://www.mtahqq.dpdns.org/images/mta-net-blocker-icon.png', route => route.abort());
   await page.route('https://www.google.com/s2/favicons/**', route => route.abort());
   await page.route('https://icons.duckduckgo.com/**', route => route.abort());
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 15_000 });
+  await page.locator('.store-app-card').first().scrollIntoViewIfNeeded();
   await expect(page.locator('.store-app-icon-fallback').first()).toBeVisible({ timeout: 15_000 });
 });
