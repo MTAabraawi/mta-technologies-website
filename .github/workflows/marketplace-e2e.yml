@@ -52,7 +52,20 @@ jobs:
         run: npm install
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
+      - name: Start local Cloudflare Pages with Functions
+        run: |
+          nohup npx --yes wrangler@4 pages dev . --port 8788 > /tmp/mta-pages-dev.log 2>&1 &
+          echo $! > /tmp/mta-pages-dev.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8788/apps.html > /dev/null; then
+              break
+            fi
+            sleep 2
+          done
+          curl --fail http://127.0.0.1:8788/apps.html > /dev/null
       - name: Run marketplace browser tests
+        env:
+          MTA_BASE_URL: http://127.0.0.1:8788
         run: npm run test:e2e
       - name: Upload Playwright report and diagnostics
         if: always()
