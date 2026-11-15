@@ -1,50 +1,17 @@
-name: Marketplace Playwright
+name: Marketplace Branch Preview (manual)
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "apps.html"
-      - "js/apps.js"
-      - "css/**"
-      - "marketplace-config.js"
-      - "tests/e2e/**"
-      - "playwright.config.js"
-      - "package.json"
-      - ".github/workflows/marketplace-playwright.yml"
-  push:
-    branches: [feature/store-specific-marketplace]
-    paths:
-      - "apps.html"
-      - "js/apps.js"
-      - "css/**"
-      - "marketplace-config.js"
-      - "tests/e2e/**"
-      - "playwright.config.js"
-      - "package.json"
-      - ".github/workflows/marketplace-playwright.yml"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-concurrency:
-  group: marketplace-playwright-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  chromium:
+  note:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install dependencies
-        run: npm install
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-      - name: Run marketplace tests against Cloudflare branch preview
-        env:
-          MTA_BASE_URL: https://feature-store-specific-marke.mta-technologies-website.pages.dev
-        run: npm run test:e2e
+      - name: Explain supported browser verification
+        run: |
+          echo "Automatic marketplace browser verification is performed by marketplace-e2e.yml."
+          echo "That workflow starts Cloudflare Pages Functions locally and uses a deterministic catalogue fixture."
+          echo "This manual-only workflow replaces tests against a potentially stale branch-preview alias."
