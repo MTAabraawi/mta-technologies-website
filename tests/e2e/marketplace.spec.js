@@ -135,6 +135,11 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
     expect(url.hostname).toBe('www.mtahqq.dpdns.org');
     const response = await page.request.get(url.pathname + url.search, { maxRedirects: 0 });
     expect(response.status(), 'Sitemap URL should resolve directly: ' + location).toBe(200);
+    const body = await response.text();
+    const canonical = body.match(/<link\\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i);
+    expect(canonical, 'Sitemap page must declare a canonical: ' + location).not.toBeNull();
+    expect(canonical[1], 'Sitemap URL must equal its canonical: ' + location).toBe(location);
+    expect(body).not.toMatch(/<meta\\s+name=["']robots["']\\s+content=["']noindex/i);
   }
   const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
   expect(robots.status()).toBe(200);
@@ -150,6 +155,17 @@ test('connected store pages become indexable while unconnected stores stay out o
   await expect(page.locator('#store-title')).toHaveText('Google Play');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
   await expect(page.locator('#store-unavailable')).toBeVisible();
+});
+
+test('connected store pages are server-rendered with a unique canonical and visible catalogue', async ({ page }) => {
+  // Disable external and local scripts to verify the first HTML response is useful to crawlers.
+  await page.route('**/*.js', route => route.abort());
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#store-title')).toHaveText('F-Droid');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'http://127.0.0.1:8788/store?store=fdroid');
+  await expect(page.locator('.store-app-card')).toHaveCount(12);
+  await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
 });
 
 test('catalogue cards open dedicated in-site application profiles before the original source', async ({ page }) => {
