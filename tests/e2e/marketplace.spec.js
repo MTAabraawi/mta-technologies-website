@@ -29,7 +29,7 @@ test('all store cards open internal MTA store pages, never external stores direc
   await expect(cards).toHaveCount(44);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
-    expect(href).toMatch(/^store\\?store=/);
+    expect(href.startsWith('store?store=')).toBe(true);
     await expect(card).not.toHaveAttribute('target', '_blank');
   }
 });
