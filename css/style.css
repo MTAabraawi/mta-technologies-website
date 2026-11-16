@@ -1246,3 +1246,54 @@ textarea {
     min-height: 260px;
   }
 }
+
+/* Legacy corporate pages: keep the full navigation usable on phones without a hamburger */
+@media (max-width: 768px) {
+  header .nav-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    height: auto;
+    min-height: 68px;
+    gap: .5rem;
+    padding-top: .55rem;
+    padding-bottom: .55rem;
+  }
+  header .nav-bar > nav {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+  }
+  header .nav-bar .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .35rem .85rem;
+    width: 100%;
+  }
+  header .nav-bar .nav-links a {
+    font-size: .72rem;
+    white-space: normal;
+  }
+  header .nav-bar .brand-logo-img {
+    width: min(42vw, 170px);
+    height: 42px;
+    object-fit: contain;
+  }
+  header .nav-bar .nav-actions {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .35rem;
+  }
+}
+@media (max-width: 380px) {
+  header .nav-bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  header .nav-bar .nav-actions,
+  header .nav-bar .nav-links {
+    justify-content: flex-start;
+  }
+}
