@@ -15,6 +15,8 @@ const lastKnownSources={
  "snap-store":413,
  "arch-linux":608,
  "debian-packages":10,
+ "alpine-linux":29202,
+ "jetbrains-marketplace":285,
  "homebrew-cask":7839,
  "steam":82,
  "mta-curated-web":7
