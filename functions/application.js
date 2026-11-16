@@ -1,7 +1,7 @@
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const STORE_NAMES = {
   "fdroid":"F-Droid","izzyondroid":"IzzyOnDroid","apple-app-store":"Apple App Store",
-  "mac-app-store":"Mac App Store","winget":"WinGet","flathub":"Flathub",
+  "mac-app-store":"Mac App Store","winget":"WinGet","chocolatey":"Chocolatey","bluejetty-app-index":"Blue Jetty App Index","openuse":"OpenUse","flathub":"Flathub",
   "snap-store":"Snap Store","arch-linux":"Arch Linux Packages",
   "debian-packages":"Debian Packages","homebrew":"Homebrew Cask",
   "steam":"Steam","mta-web-apps":"MTA Web Apps"

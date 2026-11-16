@@ -26,7 +26,7 @@ test('marketplace API is served from the same origin', async ({ page }) => {
 test('all store cards open internal MTA store pages, never external stores directly', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const cards = page.locator('.store-picker-card');
-  await expect(cards).toHaveCount(52);
+  await expect(cards).toHaveCount(54);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
     expect(href.startsWith('store?store=')).toBe(true);
@@ -62,6 +62,20 @@ test('external-only stores show an internal store profile before offering the or
   await expect(page.locator('#store-unavailable-link')).toHaveAttribute('target', '_blank');
 });
 
+test('new open catalogues and Chocolatey open dedicated in-site catalogue pages', async ({ page }) => {
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  for (const [key, title] of [
+    ['bluejetty-app-index', 'Blue Jetty App Index'],
+    ['openuse', 'OpenUse Software Catalog'],
+    ['chocolatey', 'Chocolatey']
+  ]) {
+    await page.locator('[data-store-key="' + key + '"]').click();
+    await expect(page.locator('#store-title')).toHaveText(title);
+    await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 30_000 });
+    await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  }
+});
+
 test('marketplace includes the MTA Net Blocker first-party product listing', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const card = page.locator('.mta-product-card');
@@ -74,7 +88,7 @@ test('marketplace includes the MTA Net Blocker first-party product listing', asy
 test('connected store cards show live indexed counts from catalogue statistics', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const stats = await page.evaluate(async () => (await fetch('/api/v1/catalog-stats', { cache: 'no-store' })).json());
-  for (const source of ['fdroid', 'flathub', 'homebrew-cask']) {
+  for (const source of ['fdroid', 'flathub', 'homebrew-cask', 'bluejetty', 'openuse', 'chocolatey']) {
     const actual = await page.locator('[data-source-count="' + source + '"]').getAttribute('data-count');
     expect(Number(actual)).toBe(Number(stats.sources[source] || 0));
   }
@@ -118,7 +132,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(52);
+  await expect(page.locator('.store-picker-card')).toHaveCount(54);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
