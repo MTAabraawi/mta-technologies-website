@@ -50,7 +50,7 @@ function arrange(sources,stale){
   for(const card of cards){
    const badge=card.querySelector("[data-source-count]")||card.querySelector(".store-card-state");
    const key=badge?.dataset.sourceCount||"";
-   const count=Number(sources[key]||0)||Number(lastKnownSources[key]||0);
+   const count=stale?Number(lastKnownSources[key]||0):Number(sources[key]||0);
    if(count>0){
     if(badge){
      badge.className="store-card-state is-connected";
