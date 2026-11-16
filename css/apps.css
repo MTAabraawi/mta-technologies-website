@@ -169,3 +169,76 @@ html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex S
 .store-card-state.is-connected{color:#D9F99D!important}
 .store-card-state.is-coming-soon{color:#D2DCE9!important}
 [data-theme="light"] .store-card-state.is-coming-soon{color:#334155!important}
+
+
+/* 2026-11-16: narrow-screen catalogue layout safeguards */
+.apps-main,
+.directory-section,
+.store-picker,
+.store-groups,
+.store-group,
+.apps-toolbar,
+.apps-grid,
+.store-picker-grid,
+.store-picker-card {
+  min-width: 0;
+  max-width: 100%;
+}
+.apps-hero .container,
+.directory-section > *,
+.store-group > * {
+  min-width: 0;
+}
+.apps-search input,
+.app-card h3,
+.app-card p,
+.store-picker-card strong,
+.store-picker-card span,
+.store-picker-card small {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .apps-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .apps-search {
+    grid-column: 1 / -1;
+  }
+  .apps-grid,
+  .store-picker-grid,
+  .store-group .store-picker-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .store-group {
+    padding: .9rem;
+  }
+}
+@media (max-width: 520px) {
+  .apps-toolbar,
+  .apps-grid,
+  .store-picker-grid,
+  .store-group .store-picker-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .apps-search {
+    grid-column: auto;
+  }
+  .store-picker-card {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: center;
+    column-gap: .8rem;
+  }
+  .store-picker-card img {
+    grid-row: 1 / span 3;
+  }
+  .store-picker-card small {
+    grid-column: 2;
+  }
+  .catalogue-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .catalogue-summary-item:last-child {
+    grid-column: 1 / -1;
+  }
+}
