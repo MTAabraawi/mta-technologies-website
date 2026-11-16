@@ -26,7 +26,7 @@ test('marketplace API is served from the same origin', async ({ page }) => {
 test('all store cards open internal MTA store pages, never external stores directly', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const cards = page.locator('.store-picker-card');
-  await expect(cards).toHaveCount(51);
+  await expect(cards).toHaveCount(52);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
     expect(href.startsWith('store?store=')).toBe(true);
