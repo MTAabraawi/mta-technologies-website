@@ -17,14 +17,14 @@ function renderSourceMetadata(app){
   ["rating","التقييم","Rating"],["recentRating","التقييم الحديث","Recent rating"],["ratingCount","عدد التقييمات","Rating count"],
   ["rating1StarCount","تقييم نجمة واحدة","1-star ratings"],["rating2StarCount","تقييم نجمتين","2-star ratings"],
   ["rating3StarCount","تقييم ثلاث نجوم","3-star ratings"],["rating4StarCount","تقييم أربع نجوم","4-star ratings"],
-  ["rating5StarCount","تقييم خمس نجوم","5-star ratings"],["commentCount","عدد التعليقات","Comment count"],
+  ["rating5StarCount","تقييم خمس نجوم","5-star ratings"],["plusOneCount","عدد +1","Google +1 count"],["commentCount","عدد التعليقات","Comment count"],["launchTime","تاريخ إطلاق التطبيق","App launch date"],["infoRefreshTime","آخر تحديث لبيانات AppBrain","AppBrain metadata refresh"],
   ["contentAdvisoryRating","التصنيف العمري في Apple","Apple age rating"],
   ["developerEmail","بريد المطور المنشور","Published developer email"],
   ["developerAddress","عنوان المطور المنشور","Published developer address"],
   ["lastAppUpdateTime","آخر تحديث لدى المتجر","Store last update"]
  ];
  const dateValue=v=>{if(v==null||v==="")return v;const n=Number(v);if(Number.isFinite(n)&&n>1000000000){const d=new Date(n*1000);return Number.isNaN(d.getTime())?v:d.toLocaleDateString(en()?"en":"ar",{year:"numeric",month:"short",day:"numeric"})}return v};
- for(const [key,ar,eng] of fields){let v=m[key];if(key==="lastAppUpdateTime")v=dateValue(v);if(key==="apkSize"&&Number.isFinite(Number(v)))v=(Number(v)/1048576).toFixed(2)+" MB";if(v!==undefined&&v!==null&&String(value(v)).trim()!=="")factExtra(en()?eng:ar,value(v))}
+ for(const [key,ar,eng] of fields){let v=m[key];if(["lastAppUpdateTime","launchTime","infoRefreshTime"].includes(key))v=dateValue(v);if(key==="apkSize"&&Number.isFinite(Number(v)))v=(Number(v)/1048576).toFixed(2)+" MB";if(v!==undefined&&v!==null&&String(value(v)).trim()!=="")factExtra(en()?eng:ar,value(v))}
  function factExtra(label,v){const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=String(v);facts.append(dt,dd)}
  const linkFields=[["website","موقع التطبيق","App website"],["appStoreUrl","رابط المتجر","Store listing"],["youtubeUrl","فيديو التطبيق","App video"]];
  for(const [key,ar,eng] of linkFields){const href=safe(m[key]);if(href){const a=document.createElement("a");a.href=href;a.target="_blank";a.rel="noopener noreferrer";a.textContent=en()?eng:ar;const wrap=document.createElement("p");wrap.className="application-metadata-link";wrap.append(a);lists.append(wrap)}}
