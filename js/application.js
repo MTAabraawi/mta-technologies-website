@@ -3,6 +3,37 @@ const api=String(window.MTA_MARKETPLACE_API||"").replace(/\/$/,""),params=new UR
 const $=id=>document.getElementById(id),en=()=>document.documentElement.lang==="en",w=(ar,eng)=>en()?eng:ar,safe=value=>{try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch{return""}};
 function metadata(value){if(value&&typeof value==="object")return value;if(typeof value==="string"){try{return JSON.parse(value)}catch{}}return{}}
 function fact(label,value){if(value==null||String(value).trim()==="")return;const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=String(value);$("application-facts").append(dt,dd)}
+function renderSourceMetadata(app){
+ const m=metadata(app.metadata_json),root=$("application-source-metadata"),facts=$("application-extra-facts"),lists=$("application-metadata-lists"),shots=$("application-screenshots");
+ facts.replaceChildren();lists.replaceChildren();shots.replaceChildren();
+ const value=(v)=>Array.isArray(v)?v.filter(x=>x!=null&&String(x).trim()).join(", "):v&&typeof v==="object"?(v.final!=null?[v.final,v.currency].filter(Boolean).join(" "):JSON.stringify(v)):v;
+ const fields=[
+  ["versionString","الإصدار","Version"],["versionCode","رمز الإصدار","Version code"],
+  ["price","السعر","Price"],["apkSize","حجم ملف التطبيق","App / IPA size"],
+  ["maturityLevel","مستوى النضج العمري","Maturity level"],["minSdkVersion","أدنى إصدار Android","Minimum Android SDK"],
+  ["maxSdkVersion","أقصى إصدار Android","Maximum Android SDK"],["supportsApp2SD","دعم التخزين الخارجي","External storage support"],
+  ["downloadsCategory","فئة التنزيلات","Downloads category"],["estimatedDownloads","التنزيلات التقديرية","Estimated downloads"],
+  ["estimatedRecentDownloads","التنزيلات خلال آخر 30 يوماً","Estimated downloads (30 days)"],
+  ["rating","التقييم","Rating"],["recentRating","التقييم الحديث","Recent rating"],["ratingCount","عدد التقييمات","Rating count"],
+  ["rating1StarCount","تقييم نجمة واحدة","1-star ratings"],["rating2StarCount","تقييم نجمتين","2-star ratings"],
+  ["rating3StarCount","تقييم ثلاث نجوم","3-star ratings"],["rating4StarCount","تقييم أربع نجوم","4-star ratings"],
+  ["rating5StarCount","تقييم خمس نجوم","5-star ratings"],["commentCount","عدد التعليقات","Comment count"],
+  ["contentAdvisoryRating","التصنيف العمري في Apple","Apple age rating"],
+  ["developerEmail","بريد المطور المنشور","Published developer email"],
+  ["developerAddress","عنوان المطور المنشور","Published developer address"],
+  ["lastAppUpdateTime","آخر تحديث لدى المتجر","Store last update"]
+ ];
+ const dateValue=v=>{if(v==null||v==="")return v;const n=Number(v);if(Number.isFinite(n)&&n>1000000000){const d=new Date(n*1000);return Number.isNaN(d.getTime())?v:d.toLocaleDateString(en()?"en":"ar",{year:"numeric",month:"short",day:"numeric"})}return v};
+ for(const [key,ar,eng] of fields){let v=m[key];if(key==="lastAppUpdateTime")v=dateValue(v);if(key==="apkSize"&&Number.isFinite(Number(v)))v=(Number(v)/1048576).toFixed(2)+" MB";if(v!==undefined&&v!==null&&String(value(v)).trim()!=="")factExtra(en()?eng:ar,value(v))}
+ function factExtra(label,v){const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=String(v);facts.append(dt,dd)}
+ const linkFields=[["website","موقع التطبيق","App website"],["appStoreUrl","رابط المتجر","Store listing"],["youtubeUrl","فيديو التطبيق","App video"]];
+ for(const [key,ar,eng] of linkFields){const href=safe(m[key]);if(href){const a=document.createElement("a");a.href=href;a.target="_blank";a.rel="noopener noreferrer";a.textContent=en()?eng:ar;const wrap=document.createElement("p");wrap.className="application-metadata-link";wrap.append(a);lists.append(wrap)}}
+ const listFields=[["permissions","الأذونات","Permissions"],["libraries","المكتبات المستخدمة","Libraries"]];
+ for(const [key,ar,eng] of listFields){const vals=Array.isArray(m[key])?m[key]:[];if(!vals.length)continue;const box=document.createElement("div"),title=document.createElement("h3"),ul=document.createElement("ul");box.className="application-metadata-list";title.textContent=en()?eng:ar;vals.forEach(v=>{const li=document.createElement("li");li.textContent=String(v);ul.append(li)});box.append(title,ul);lists.append(box)}
+ const imageUrls=[m.featureGraphicUrl,...(Array.isArray(m.screenshotUrls)?m.screenshotUrls:[])].map(safe).filter(Boolean);
+ if(imageUrls.length){const title=document.createElement("h3");title.className="application-screenshots-title";title.textContent=en()?"Store images and screenshots":"صور ولقطات التطبيق من المتجر";shots.append(title);const grid=document.createElement("div");grid.className="application-screenshots-grid";imageUrls.forEach((url,i)=>{const a=document.createElement("a"),img=document.createElement("img");a.href=url;a.target="_blank";a.rel="noopener noreferrer";img.src=url;img.loading="lazy";img.alt=(app.name||"Application")+" "+(i===0&&m.featureGraphicUrl?"feature graphic":"screenshot "+i);a.append(img);grid.append(a)});shots.append(grid)}
+ root.hidden=!(facts.children.length||lists.children.length||shots.children.length);
+}
 function iconList(app){const m=metadata(app.metadata_json),obj=m.icon&&typeof m.icon==="object"?m.icon:{},icons=Array.isArray(m.icons)?m.icons:Object.values(m.icons&&typeof m.icons==="object"?m.icons:{});let host="";for(const v of [m.homepage,m.website,m.project_url,app.app_url,app.source_url]){try{host=new URL(v).hostname.replace(/^www\./,"");if(host)break}catch{}}
 const list=[app.icon_url,m.icon_url,m.iconUrl,typeof m.icon==="string"?m.icon:"",obj.url,obj.path,m.logo,m.image,m.image_url,m.artworkUrl512,m.artworkUrl100,m.thumbnail,...icons.map(x=>typeof x==="string"?x:(x?.url||x?.path||""))].map(safe).filter(Boolean);
 if(host)list.push("https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=256","https://icons.duckduckgo.com/ip3/"+encodeURIComponent(host)+".ico","https://"+host+"/favicon.ico");
@@ -25,7 +56,7 @@ const missing=[];if(!app.developer)missing.push(w("اسم المطور","develop
 $("application-data-quality").textContent=missing.length?w("حقول لم يوفرها المصدر لهذا السجل: "+missing.join("، ")+". لذلك لا نعرضها كحقائق مؤكدة، ويمكنك مراجعة صفحة الناشر لمزيد من التفاصيل.","Fields not supplied by this source: "+missing.join(", ")+". MTA does not present missing fields as verified facts; consult the publisher listing for more details."):w("تتضمن بيانات المصدر الحقول الأساسية المتاحة لهذا السجل. تبقى متطلبات التوافق والتوفر النهائي خاضعة للناشر.","The source provides the main metadata fields available for this listing. Final compatibility and availability remain subject to the publisher.");
 $("application-description").textContent=description||w("لم يقدم المصدر وصفاً تفصيلياً لهذا التطبيق. راجع صفحة الناشر الأصلية لمعرفة الوظائف والإصدارات الحالية.","The source did not provide a full description. Visit the original publisher listing for current features and versions.");
 [app.platform,app.category,app.license].filter(Boolean).forEach(v=>{const span=document.createElement("span");span.textContent=v;$("application-tags").append(span)});
-fact(w("المطور","Developer"),app.developer);fact(w("المنصة","Platform"),app.platform);fact(w("التصنيف","Category"),app.category);fact(w("الترخيص","Licence"),app.license);fact(w("مصدر البيانات","Catalogue source"),app.source||source);fact(w("معرّف المصدر","Source ID"),app.external_id||app.id);fact(w("آخر تحديث","Last updated"),app.updated_at||app.last_updated);schema(app)}
+fact(w("المطور","Developer"),app.developer);fact(w("المنصة","Platform"),app.platform);fact(w("التصنيف","Category"),app.category);fact(w("الترخيص","Licence"),app.license);fact(w("مصدر البيانات","Catalogue source"),app.source||source);fact(w("معرّف المصدر","Source ID"),app.external_id||app.id);fact(w("آخر تحديث","Last updated"),app.updated_at||app.last_updated);renderSourceMetadata(app);schema(app)}
 load().catch(error=>{console.warn("Application detail unavailable",error);$("application-name").textContent=requestedName||w("التطبيق غير متاح","Application unavailable");$("application-error").hidden=false;$("application-error").textContent=w("تعذر العثور على بيانات موثوقة لهذا التطبيق حالياً. ارجع إلى صفحة المتجر وحاول مرة أخرى.","We could not retrieve verified details for this application. Return to the store page and retry.")});
 window.addEventListener("mta:languagechange",()=>{document.title=($("application-name").textContent||"Application")+" | MTA TECHNOLOGIES"});
 })();
