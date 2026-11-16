@@ -45,6 +45,7 @@ const stores={
 "ea-app":{name:"EA app",platforms:["Windows","macOS"],url:"https://www.ea.com/ea-app",host:"ea.com",mode:"external",desc:"منصة EA للألعاب والخدمات المرتبطة بها."},
 "itch-io":{name:"itch.io",platforms:["Windows","macOS","Linux","Web"],url:"https://itch.io/",host:"itch.io",mode:"external",desc:"منصة ألعاب مستقلة ومحتوى رقمي من المطورين."},
 "mta-web-apps":{name:"MTA Web Apps",platforms:["Web"],url:"https://www.mtahqq.dpdns.org/apps.html",host:"mtahqq.dpdns.org",source:"mta-curated-web",mode:"live",desc:"تطبيقات ويب مدرجة في دليل MTA التحريري."},
+"firefox-addons":{name:"Firefox Add-ons",platforms:["Firefox"],url:"https://addons.mozilla.org/firefox/",host:"addons.mozilla.org",source:"firefox-addons",mode:"live",desc:"Mozilla add-on catalogue."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
