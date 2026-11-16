@@ -11,7 +11,7 @@ function repairStoreLogos(){
     try{const u=new URL(img.src);domain=u.searchParams.get("domain")||u.hostname.replace(/^www\./,"")}catch{}
     if(domain){img.src="https://icons.duckduckgo.com/ip3/"+encodeURIComponent(domain)+".ico";return}
    }
-   if(!img.dataset.brandFallback){img.dataset.brandFallback="1";img.src="images/mta-logo-square.png"}
+   if(!img.dataset.brandFallback){img.dataset.brandFallback="1";img.src="images/mta-logo-square.webp"}
   });
  });
 }
