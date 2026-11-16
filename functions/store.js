@@ -1,5 +1,12 @@
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const CONNECTED_STORES = {
+  "google-play": { name: "Google Play", source: "google-play", platforms: ["Android"], description: "دليل بيانات تطبيقات Google Play عند تفعيل موصل AppBrain بمفتاح API صالح. روابط التنزيل تبقى إلى Google Play الأصلي." },
+  "firefox-addons": { name: "Firefox Add-ons", source: "firefox-addons", platforms: ["Firefox", "Browser extensions"], description: "كتالوج إضافات Firefox من واجهة Mozilla Add-ons العامة، مع بيانات المطور والتقييم والتنزيلات." },
+  "wordpress-plugins": { name: "WordPress Plugin Directory", source: "wordpress-plugins", platforms: ["WordPress", "Web"], description: "دليل إضافات WordPress من واجهة WordPress.org الرسمية، مع بيانات الإصدارات والتقييمات والتثبيتات النشطة." },
+  "homebrew-formulae": { name: "Homebrew Formulae", source: "homebrew-formulae", platforms: ["macOS", "Linux"], description: "كتالوج حزم Homebrew/core، ويشمل أدوات سطر الأوامر والمكتبات وبرامج المطورين." },
+  "scoop": { name: "Scoop Buckets", source: "scoop", platforms: ["Windows"], description: "كتالوج بيانات Scoop من مستودعات main وextras وgames وversions الرسمية على GitHub." },
+  "alpine-linux": { name: "Alpine Linux Packages", source: "alpine-linux", platforms: ["Linux"], description: "فهرس حزم Alpine Linux من أرشيفات APKINDEX الرسمية لمستودعي main وcommunity." },
+
   "fdroid": { name: "F-Droid", source: "fdroid", platforms: ["Android"], description: "مستودع تطبيقات Android الحرة ومفتوحة المصدر. تعرض هذه الصفحة سجلات الحزم المتاحة من فهرس F-Droid، مع معلومات الترخيص وروابط المشروع عندما يوفرها المصدر." },
   "izzyondroid": { name: "IzzyOnDroid", source: "izzyondroid", platforms: ["Android"], description: "مستودع إضافي لتطبيقات Android الحرة. نفصل سجلاته عن المستودعات الأخرى ونوضح مصدر كل تطبيق وروابطه الأصلية." },
   "apple-app-store": { name: "Apple App Store", source: "apple-itunes", platforms: ["iOS", "iPadOS"], description: "دليل نتائج تطبيقات Apple المتاحة عبر فهرس البحث العام. قد تختلف النتائج والأسعار والإتاحة حسب بلد متجر Apple." },
