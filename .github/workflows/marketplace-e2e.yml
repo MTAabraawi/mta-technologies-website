@@ -6,6 +6,7 @@ on:
     branches: [main, feature/global-store-catalog-expansion]
     paths:
       - 'apps.html'
+      - 'store.html'
       - 'js/apps.js'
       - 'js/store.js'
       - 'css/apps.css'
