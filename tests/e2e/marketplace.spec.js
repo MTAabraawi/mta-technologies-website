@@ -118,7 +118,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(44);
+  await expect(page.locator('.store-picker-card')).toHaveCount(52);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
