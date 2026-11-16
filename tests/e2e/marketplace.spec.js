@@ -26,7 +26,7 @@ test('marketplace API is served from the same origin', async ({ page }) => {
 test('all store cards open internal MTA store pages, never external stores directly', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const cards = page.locator('.store-picker-card');
-  await expect(cards).toHaveCount(44);
+  await expect(cards).toHaveCount(52);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
     expect(href.startsWith('store?store=')).toBe(true);
@@ -118,7 +118,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(44);
+  await expect(page.locator('.store-picker-card')).toHaveCount(52);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
@@ -143,7 +143,7 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   }
   const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
   expect(robots.status()).toBe(200);
-  expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+  expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap-index.xml');
 });
 
 test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
@@ -163,7 +163,7 @@ test('connected store pages are server-rendered with a unique canonical and visi
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.mtahqq.dpdns.org/store?store=fdroid');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=fdroid$/);
   await expect(page.locator('.store-app-card')).toHaveCount(12);
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
 });

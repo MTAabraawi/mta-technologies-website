@@ -45,6 +45,14 @@ const stores={
 "ea-app":{name:"EA app",platforms:["Windows","macOS"],url:"https://www.ea.com/ea-app",host:"ea.com",mode:"external",desc:"منصة EA للألعاب والخدمات المرتبطة بها."},
 "itch-io":{name:"itch.io",platforms:["Windows","macOS","Linux","Web"],url:"https://itch.io/",host:"itch.io",mode:"external",desc:"منصة ألعاب مستقلة ومحتوى رقمي من المطورين."},
 "mta-web-apps":{name:"MTA Web Apps",platforms:["Web"],url:"https://www.mtahqq.dpdns.org/apps.html",host:"mtahqq.dpdns.org",source:"mta-curated-web",mode:"live",desc:"تطبيقات ويب مدرجة في دليل MTA التحريري."},
+"firefox-addons":{name:"Firefox Add-ons",platforms:["Firefox"],url:"https://addons.mozilla.org/firefox/",host:"addons.mozilla.org",source:"firefox-addons",mode:"live",desc:"Mozilla add-on catalogue."},
+"wordpress-plugins":{name:"WordPress Plugins",platforms:["WordPress","Web"],url:"https://wordpress.org/plugins/",host:"wordpress.org",source:"wordpress-plugins",mode:"live",desc:"Official WordPress plugin catalogue."},
+"homebrew-formulae":{name:"Homebrew Formulae",platforms:["macOS","Linux"],url:"https://formulae.brew.sh/formula/",host:"formulae.brew.sh",source:"homebrew-formulae",mode:"live",desc:"Homebrew core formula catalogue."},
+"scoop":{name:"Scoop Buckets",platforms:["Windows"],url:"https://scoop.sh/",host:"scoop.sh",source:"scoop",mode:"live",desc:"Scoop package manifests from official buckets."},
+"alpine-linux":{name:"Alpine Linux Packages",platforms:["Linux"],url:"https://pkgs.alpinelinux.org/packages",host:"pkgs.alpinelinux.org",source:"alpine-linux",mode:"live",desc:"Alpine Linux package index."},
+"jetbrains-marketplace":{name:"JetBrains Marketplace",platforms:["IntelliJ IDEA","PyCharm","WebStorm"],url:"https://plugins.jetbrains.com/",host:"plugins.jetbrains.com",source:"jetbrains-marketplace",mode:"live",desc:"JetBrains IDE plugin marketplace."},
+"gnome-extensions":{name:"GNOME Extensions",platforms:["Linux","GNOME Shell"],url:"https://extensions.gnome.org/",host:"extensions.gnome.org",source:"gnome-extensions",mode:"live",desc:"GNOME Shell extensions catalogue."},
+"fedora-packages":{name:"Fedora Packages",platforms:["Linux","Fedora"],url:"https://packages.fedoraproject.org/",host:"packages.fedoraproject.org",source:"fedora-packages",mode:"live",desc:"Official Fedora RPM package index with package names and original detail pages."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
