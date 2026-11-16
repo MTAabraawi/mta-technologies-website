@@ -17,6 +17,7 @@ const lastKnownSources={
  "debian-packages":10,
  "alpine-linux":29202,
  "jetbrains-marketplace":285,
+ "homebrew-formulae":8732,
  "homebrew-cask":7839,
  "steam":82,
  "mta-curated-web":7
