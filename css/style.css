@@ -1206,3 +1206,43 @@ textarea {
     grid-column: auto;
   }
 }
+
+/* Mobile stability and accessibility refinements */
+.corp-logo img,
+.corp-footer-brand img,
+.brand-logo-img {
+  width: 190px;
+  height: 48px;
+  object-fit: contain;
+}
+.corp-core img {
+  width: 100%;
+  height: 84px;
+  object-fit: contain;
+}
+.corp-section-index span,
+.corp-hero-foot .container,
+.corp-footer-bottom {
+  color: #AAB9CC;
+}
+.mta-ad-slot {
+  width: min(100%, 320px);
+  min-height: 270px;
+}
+@media (max-width: 680px) {
+  .corp-logo img,
+  .brand-logo-img {
+    width: min(40vw, 150px);
+    height: 42px;
+  }
+  .corp-footer-brand img {
+    width: min(70vw, 190px);
+    height: 48px;
+  }
+  .corp-core img {
+    height: 70px;
+  }
+  .mta-ad-slot {
+    min-height: 260px;
+  }
+}
