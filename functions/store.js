@@ -1,5 +1,8 @@
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const CONNECTED_STORES = {
+  "jetbrains-marketplace": { name: "JetBrains Marketplace", source: "jetbrains-marketplace", platforms: ["IntelliJ IDEA", "PyCharm", "WebStorm", "IDE plugins"], description: "كتالوج إضافات JetBrains مع بيانات الناشر والتنزيلات والتقييمات وروابط صفحات الإضافات الأصلية." },
+  "gnome-extensions": { name: "GNOME Extensions", source: "gnome-extensions", platforms: ["Linux", "GNOME Shell"], description: "كتالوج إضافات GNOME Shell من دليل GNOME الرسمي، مع التوافق والإصدارات والتنزيلات عند توفرها." },
+
   "google-play": { name: "Google Play", source: "google-play", platforms: ["Android"], description: "دليل بيانات تطبيقات Google Play عند تفعيل موصل AppBrain بمفتاح API صالح. روابط التنزيل تبقى إلى Google Play الأصلي." },
   "firefox-addons": { name: "Firefox Add-ons", source: "firefox-addons", platforms: ["Firefox", "Browser extensions"], description: "كتالوج إضافات Firefox من واجهة Mozilla Add-ons العامة، مع بيانات المطور والتقييم والتنزيلات." },
   "wordpress-plugins": { name: "WordPress Plugin Directory", source: "wordpress-plugins", platforms: ["WordPress", "Web"], description: "دليل إضافات WordPress من واجهة WordPress.org الرسمية، مع بيانات الإصدارات والتقييمات والتثبيتات النشطة." },
