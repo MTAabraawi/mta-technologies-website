@@ -70,7 +70,7 @@ function arrange(sources,stale){
  const connected=makeGroup("store-connected-group","المتاجر التي تتوفر تطبيقاتها الآن · مرتبة حسب العدد","Stores with indexed apps · ranked by count");
  live.sort((a,b)=>b.count-a.count||a.card.textContent.localeCompare(b.card.textContent)).forEach(item=>connected.grid.append(item.card));
  const upcoming=makeGroup("store-coming-soon-group","متاجر أخرى · نعمل على توفير بياناتها","More stores · integrations in progress");
- coming.sort((a,b)=>a.card?.textContent?.localeCompare(b.card?.textContent)||0).forEach(card=>upcoming.grid.append(card));
+ coming.sort((a,b)=>a.textContent.localeCompare(b.textContent)).forEach(card=>upcoming.grid.append(card));
  wrapper.replaceChildren();
  if(live.length)wrapper.append(connected.section);
  if(coming.length)wrapper.append(upcoming.section);
