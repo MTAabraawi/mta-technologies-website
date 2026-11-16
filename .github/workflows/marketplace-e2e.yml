@@ -3,7 +3,7 @@ name: MTA Marketplace E2E
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    branches: [main, feature/global-store-catalog-expansion]
     paths:
       - 'apps.html'
       - 'js/apps.js'
