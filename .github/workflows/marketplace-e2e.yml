@@ -18,7 +18,7 @@ on:
   schedule:
     - cron: '23 */6 * * *'
   push:
-    branches: [main]
+    branches: [main, feature/global-store-catalog-expansion]
     paths:
       - 'apps.html'
       - 'js/apps.js'
