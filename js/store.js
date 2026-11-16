@@ -52,6 +52,7 @@ const stores={
 "alpine-linux":{name:"Alpine Linux Packages",platforms:["Linux"],url:"https://pkgs.alpinelinux.org/packages",host:"pkgs.alpinelinux.org",source:"alpine-linux",mode:"live",desc:"Alpine Linux package index."},
 "jetbrains-marketplace":{name:"JetBrains Marketplace",platforms:["IntelliJ IDEA","PyCharm","WebStorm"],url:"https://plugins.jetbrains.com/",host:"plugins.jetbrains.com",source:"jetbrains-marketplace",mode:"live",desc:"JetBrains IDE plugin marketplace."},
 "gnome-extensions":{name:"GNOME Extensions",platforms:["Linux","GNOME Shell"],url:"https://extensions.gnome.org/",host:"extensions.gnome.org",source:"gnome-extensions",mode:"live",desc:"GNOME Shell extensions catalogue."},
+"fedora-packages":{name:"Fedora Packages",platforms:["Linux","Fedora"],url:"https://packages.fedoraproject.org/",host:"packages.fedoraproject.org",source:"fedora-packages",mode:"live",desc:"Official Fedora RPM package index with package names and original detail pages."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
