@@ -1,5 +1,7 @@
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const CONNECTED_STORES = {
+  "fedora-packages": { name: "Fedora Packages", source: "fedora-packages", platforms: ["Linux", "Fedora"], description: "فهرس حزم Fedora الرسمي، مع أسماء الحزم وروابط صفحات التفاصيل الأصلية." },
+
   "jetbrains-marketplace": { name: "JetBrains Marketplace", source: "jetbrains-marketplace", platforms: ["IntelliJ IDEA", "PyCharm", "WebStorm", "IDE plugins"], description: "كتالوج إضافات JetBrains مع بيانات الناشر والتنزيلات والتقييمات وروابط صفحات الإضافات الأصلية." },
   "gnome-extensions": { name: "GNOME Extensions", source: "gnome-extensions", platforms: ["Linux", "GNOME Shell"], description: "كتالوج إضافات GNOME Shell من دليل GNOME الرسمي، مع التوافق والإصدارات والتنزيلات عند توفرها." },
 
