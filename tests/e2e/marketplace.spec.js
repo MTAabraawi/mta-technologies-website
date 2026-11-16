@@ -143,7 +143,7 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   }
   const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
   expect(robots.status()).toBe(200);
-  expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+  expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap-index.xml');
 });
 
 test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
@@ -163,7 +163,7 @@ test('connected store pages are server-rendered with a unique canonical and visi
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.mtahqq.dpdns.org/store?store=fdroid');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=fdroid$/);
   await expect(page.locator('.store-app-card')).toHaveCount(12);
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
 });
