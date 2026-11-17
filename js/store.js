@@ -106,12 +106,15 @@ function makeCard(app){
  const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.alt=(app.name||"App")+" icon";
  let metadata=app.metadata_json&&typeof app.metadata_json==="object"?app.metadata_json:{};
  if(typeof app.metadata_json==="string"){try{metadata=JSON.parse(app.metadata_json)}catch{metadata={}}}
- const pageUrl=safe(metadata.homepage||metadata.website||metadata.homepage_url||metadata.project_url||metadata.publisher_url||app.app_url||app.source_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\./,""):""}catch{}
+ const pageUrl=safe(metadata.homepage||metadata.website||metadata.homepage_url||metadata.project_url||metadata.publisher_url||metadata.publisher_website||metadata.publisherWebsite||app.app_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\./,""):""}catch{}
  const iconObject=metadata.icon&&typeof metadata.icon==="object"?metadata.icon:{};
  const iconCollection=metadata.icons&&typeof metadata.icons==="object"?Object.values(metadata.icons):[];
  const metadataIcons=[metadata.icon_url,metadata.iconUrl,metadata.icon,iconObject.url,iconObject.path,metadata.logo,metadata.image,metadata.image_url,metadata.artworkUrl512,metadata.artworkUrl100,metadata.thumbnail,...iconCollection];
  const iconUrl=safe(app.icon_url||"");
- const candidates=[iconUrl,...metadataIcons.map(value=>safe(typeof value==="string"?value:(value&&typeof value==="object"?(value.url||value.path||""):""))),host?"https://www.google.com/s2/favicons?domain="+encodeURIComponent(host)+"&sz=256":"",host?"https://icons.duckduckgo.com/ip3/"+encodeURIComponent(host)+".ico":"",host?"https://"+host+"/favicon.ico":""].filter((v,i,a)=>v&&a.indexOf(v)===i);
+ const catalogueHosts=["play.google.com","apps.apple.com","itunes.apple.com","apps.microsoft.com","store.steampowered.com","steamcommunity.com","addons.mozilla.org","plugins.jetbrains.com","wordpress.org","flathub.org","snapcraft.io","community.chocolatey.org","packages.fedoraproject.org","pkgs.alpinelinux.org","archlinux.org","packages.debian.org","packages.ubuntu.com","formulae.brew.sh","brew.sh","scoop.sh","winget.run","openuse.app","apt.izzysoft.de","f-droid.org"];
+ const isCatalogueHost=host&&catalogueHosts.some(domain=>host===domain||host.endsWith("."+domain));
+ const faviconHost=host&&!isCatalogueHost?host:"";
+ const candidates=[iconUrl,...metadataIcons.map(value=>safe(typeof value==="string"?value:(value&&typeof value==="object"?(value.url||value.path||""):""))),faviconHost?"https://www.google.com/s2/favicons?domain="+encodeURIComponent(faviconHost)+"&sz=256":"",faviconHost?"https://icons.duckduckgo.com/ip3/"+encodeURIComponent(faviconHost)+".ico":"",faviconHost?"https://"+faviconHost+"/favicon.ico":""].filter((v,i,a)=>v&&a.indexOf(v)===i);
  let iconIndex=0;
  const makeMonogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();return mark};
  icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else if(icon.parentNode)icon.replaceWith(makeMonogram())};
