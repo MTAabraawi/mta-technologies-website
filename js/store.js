@@ -123,10 +123,10 @@ function makeCard(app){
  const h=document.createElement("h3");
  const detailParams=new URLSearchParams({source:String(app.source||store.source||""),store:key,id:String(app.external_id||app.id||""),name:String(app.name||"Application")});
  const detailUrl="application.html?"+detailParams.toString();
- const titleLink=document.createElement("a");titleLink.href=detailUrl;titleLink.textContent=app.name||"Application";titleLink.setAttribute("aria-label",copy("تفاصيل "+(app.name||"التطبيق"),"Details for "+(app.name||"application")));h.append(titleLink);
- const detailLink=document.createElement("a");detailLink.className="store-app-detail-link";detailLink.href=detailUrl;detailLink.textContent=copy("تفاصيل التطبيق داخل MTA","View app details on MTA");
+ const titleLink=document.createElement("a");titleLink.href=detailUrl;titleLink.textContent=app.name||"Application";titleLink.setAttribute("aria-label",copy("تفاصيل "+(app.name||"العنصر"),"Details for "+(app.name||"catalogue item")));h.append(titleLink);
+ const detailLink=document.createElement("a");detailLink.className="store-app-detail-link";detailLink.href=detailUrl;detailLink.textContent=copy("تفاصيل العنصر داخل MTA","View item details on MTA");
  const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
- const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
+ const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا العنصر في بيانات المصدر.","No short description is available for this item in the source metadata.");
  let details=null;const fullDescription=String(app.description||"").trim();
  if(fullDescription&&fullDescription!==String(app.summary||"").trim()){
   details=document.createElement("details");details.className="store-app-details";
@@ -138,7 +138,7 @@ function makeCard(app){
   const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option);
  }
  const tags=document.createElement("div");tags.className="store-app-tags";[platformLabel,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});const price=app.metadata_json?.price;if(price&&Number.isFinite(Number(price.final))&&price.currency){const p=document.createElement("span");p.className="store-app-price";p.textContent=Number(price.final)===0?copy("مجاني","Free"):(Number(price.final)/100).toLocaleString(undefined,{style:"currency",currency:String(price.currency)});tags.append(p)}
- const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
+ const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض العنصر في مصدره الأصلي ↗","View original source listing ↗");
  card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,detailLink,link);return card;
 }
 function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
@@ -155,10 +155,10 @@ async function fetchPage(reset=false){
   const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" سجل مفهرس","Connected · "+total.toLocaleString()+" indexed records"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
-  if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
+  if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد عناصر مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching items or no indexed records are currently available for this source."))}
   items.forEach(app=>grid.append(makeCard(app)));applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,36).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
   if(items.length<36||(total&&offset>=total))exhausted=true;
-  count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
+  count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("عنصر معروض","items shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
   load.hidden=exhausted;load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
  }catch(e){console.error("Store catalogue fetch failed",e);if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
