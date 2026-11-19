@@ -3,7 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:sitemap": "node scripts/validate-sitemap.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.56.1"
