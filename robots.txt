@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.mtahqq.dpdns.org/sitemap-index.xml
+
+Sitemap: https://www.mtahqq.dpdns.org/sitemap.xml
