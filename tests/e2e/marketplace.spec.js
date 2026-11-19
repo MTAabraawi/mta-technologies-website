@@ -34,6 +34,20 @@ test('all store cards open internal MTA store pages, never external stores direc
   }
 });
 
+
+test('marketplace groups package and library repositories without removing stores', async ({ page }) => {
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  const packageGroup = page.locator('[aria-labelledby="group-packages"]');
+  await expect(packageGroup).toBeVisible();
+  await expect(packageGroup.locator('[data-store-key]')).toHaveCount(5);
+  for (const key of ['arch-linux', 'debian-packages', 'fedora-packages', 'alpine-linux', 'homebrew-formulae']) {
+    await expect(packageGroup.locator('[data-store-key="' + key + '"]')).toHaveCount(1);
+  }
+  await expect(page.locator('[aria-labelledby="group-linux"] [data-store-key]')).toHaveCount(3);
+  await expect(page.locator('[aria-labelledby="group-macos"] [data-store-key]')).toHaveCount(2);
+  await expect(page.locator('.store-picker-card')).toHaveCount(54);
+});
+
 test('F-Droid opens an internal branded catalogue and displays indexed applications', async ({ page }) => {
   const requests = [];
   const errors = [];
