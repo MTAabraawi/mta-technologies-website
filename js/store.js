@@ -101,6 +101,18 @@ else{
 
 let offset=0,total=0,loading=false,exhausted=false,query="",timer=null,autoLoadPaused=false,autoLoadObserver=null;
 const initialServerRenderedCount=grid.querySelectorAll(".store-app-card").length;
+function populateCategoryOptionsFromRenderedCards(){
+ const select=$("store-category-filter");
+ if(!select)return;
+ const known=new Set(Array.from(select.options).map(option=>option.value));
+ grid.querySelectorAll(".store-app-card").forEach(card=>{
+  const category=String(card.dataset.category||"").trim();
+  if(!category||known.has(category))return;
+  const option=document.createElement("option");
+  option.value=category;option.textContent=category;select.append(option);known.add(category);
+ });
+}
+populateCategoryOptionsFromRenderedCards();
 let indexedTotal=0;
 function makeCard(app){
  const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();
