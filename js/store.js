@@ -158,7 +158,7 @@ function makeCard(app){
 function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
 function applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
 async function fetchPage(reset=false){
- if(!store?.source||loading||exhausted||!API)return;
+ if(!store?.source||loading||(!reset&&exhausted)||!API)return;
  let keepServerRendered=false;
  if(reset){autoLoadPaused=false;keepServerRendered=!query&&!platform.value&&initialServerRenderedCount>0;offset=0;exhausted=false;total=indexedTotal;if(!keepServerRendered)grid.replaceChildren();$("store-empty").hidden=true}
  loading=true;load.hidden=false;load.disabled=true;load.textContent=copy("جارٍ التحميل...","Loading...");
