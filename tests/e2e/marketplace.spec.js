@@ -60,6 +60,31 @@ test('store catalogue automatically appends the next page when the user reaches 
   await expect(cards.first().locator('h3')).toHaveText(firstApp);
 });
 
+test('store search and category/platform filters narrow results and can be cleared', async ({ page }) => {
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  const visibleCards = page.locator('.store-app-card:not([hidden])');
+  await expect(visibleCards).toHaveCount(12, { timeout: 30_000 });
+
+  await page.locator('#store-search').fill('MTA Net Blocker');
+  await expect(visibleCards).toHaveCount(1, { timeout: 15_000 });
+  await expect(visibleCards.first()).toContainText('MTA Net Blocker');
+
+  await page.locator('#store-search').fill('');
+  await expect(visibleCards).toHaveCount(12, { timeout: 15_000 });
+
+  const category = page.locator('#store-category-filter');
+  await expect(category.locator('option[value="utilities"]')).toHaveCount(1);
+  await category.selectOption('utilities');
+  await expect(visibleCards).toHaveCount(6);
+  await category.selectOption('');
+  await expect(visibleCards).toHaveCount(12);
+
+  await page.locator('#store-platform-filter').selectOption('ios');
+  await expect(visibleCards).toHaveCount(0, { timeout: 15_000 });
+  await page.locator('#store-platform-filter').selectOption('');
+  await expect(visibleCards).toHaveCount(12, { timeout: 15_000 });
+});
+
 test('external-only stores show an internal store profile before offering the original catalogue', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="google-play"]').click();

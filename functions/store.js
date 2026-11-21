@@ -64,7 +64,8 @@ function makeCard(app, storeKey, store) {
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
   const meta = [app.developer, platform, app.category].filter(Boolean).join(" · ");
   const summary = app.summary || app.description || "لا يتوفر وصف مختصر في بيانات المصدر.";
-  return '<article class="store-app-card">' +
+  const category = String(app.category || "Other").split(",")[0].trim();
+  return '<article class="store-app-card" data-category="' + escapeHtml(category) + '" data-platform="' + escapeHtml(String(app.platform || "").toLowerCase()) + '">' +
     '<div class="store-app-top">' +
       (icon ? '<img class="store-app-icon" loading="lazy" decoding="async" src="' + escapeHtml(icon) + '" alt="' + escapeHtml(name) + ' icon" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="store-app-icon-fallback" hidden aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>' :
         '<span class="store-app-icon-fallback" aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>') +
