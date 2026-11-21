@@ -34,21 +34,18 @@ test('all store cards open internal MTA store pages, never external stores direc
   }
 });
 
-test('F-Droid opens an internal branded catalogue and displays indexed applications', async ({ page }) => {
-  const requests = [];
+test('F-Droid opens an internal branded catalogue and displays server-rendered applications', async ({ page }) => {
   const errors = [];
-  page.on('request', request => {
-    const url = new URL(request.url());
-    if (url.pathname === '/api/v1/apps') requests.push(url);
-  });
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="fdroid"]').click();
   await expect(page).toHaveURL(/\/store\?store=fdroid/);
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('#store-logo')).toBeVisible();
-  await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 60_000 });
-  await expect.poll(() => requests.some(url => url.searchParams.get('source') === 'fdroid')).toBe(true);
+  // Pages Functions render the first page into the HTML, so the catalogue
+  // must be usable without a redundant browser-side request.
+  await expect(page.locator('.store-app-card')).toHaveCount(12, { timeout: 60_000 });
+  await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
   expect(errors).toEqual([]);
 });
 

@@ -184,11 +184,29 @@ async function fetchPage(reset=false){
  finally{loading=false;load.disabled=false}
 }
 if(store?.source){
- fetch(API+"/api/v1/catalog-stats",{cache:"no-store",credentials:"omit"}).then(r=>{if(!r.ok)throw Error("stats HTTP "+r.status);return r.json()}).then(data=>{
-  const available=Number((data.sources||{})[store.source]||0);
-  if(available>0){indexedTotal=available;total=available;status.textContent=copy("متصل · "+available.toLocaleString()+" سجل مفهرس","Connected · "+available.toLocaleString()+" indexed records");status.classList.add("is-connected");const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";fetchPage(true)}
-  else{status.textContent=copy("نعمل على توفيرها قريباً","Coming soon");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("نعمل على ربط هذا المتجر بمصدر بيانات يمكن التحقق منه. سنعرض التطبيقات هنا عندما تصبح بياناتها متاحة.","We are working to connect this store to a verifiable data source. Its apps will appear here once indexed data is available.");$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("هذا المتجر غير مفهرس حالياً داخل MTA.","This store is not currently indexed by MTA.")}
- }).catch(error=>{console.warn("Store statistics unavailable",error);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";status.textContent=copy("تعذر التحقق من الاتصال","Connection could not be verified");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("تعذر التحقق من بيانات هذا المتجر حالياً. سنعرض التطبيقات بعد استعادة الاتصال والتحقق من المصدر.","We could not verify this store's catalogue right now. Listings will appear after the source connection is restored and verified.");$("store-unavailable-link").href=store.url});
- load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));}
+ if(initialServerRenderedCount>0){
+  // The Pages Function already rendered a usable first page. Do not gate
+  // visible catalogue content on a second browser-side stats request.
+  offset=initialServerRenderedCount;
+  status.textContent=copy("متصل · التطبيقات الأولية جاهزة","Connected · initial listings ready");
+  status.classList.add("is-connected");
+  const robots=document.querySelector("meta[name=robots]");
+  if(robots)robots.content="index,follow";
+  load.hidden=false;load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
+ }else{
+  // If server rendering was unavailable, try the stats endpoint and then
+  // the apps endpoint independently instead of hiding the catalogue area.
+  fetch(API+"/api/v1/catalog-stats",{cache:"no-store",credentials:"omit"}).then(r=>{if(!r.ok)throw Error("stats HTTP "+r.status);return r.json()}).then(data=>{
+   const available=Number((data.sources||{})[store.source]||0);
+   if(available>0){indexedTotal=available;total=available;status.textContent=copy("متصل · "+available.toLocaleString()+" سجل مفهرس","Connected · "+available.toLocaleString()+" indexed records");status.classList.add("is-connected");const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";fetchPage(true)}
+   else{status.textContent=copy("نعمل على توفيرها قريباً","Coming soon");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("لا توجد سجلات مفهرسة لهذا المصدر حالياً.","No indexed records are currently available for this source.");$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("هذا المتجر غير مفهرس حالياً داخل MTA.","This store is not currently indexed by MTA.")}
+  }).catch(error=>{
+   console.warn("Store statistics unavailable; trying app listings directly",error);
+   status.textContent=copy("جارٍ محاولة الاتصال بكتالوج التطبيقات","Retrying catalogue connection");
+   fetchPage(true);
+  });
+ }
+ load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));
+}
 window.addEventListener("mta:languagechange",()=>{if(store){document.title=store.name+" | MTA TECHNOLOGIES"}});
 })();
