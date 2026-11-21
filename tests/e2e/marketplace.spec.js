@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const trackingAndAdHosts = [
+const trackingAndAdHosts = /(^|\.)(googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|googlesyndication\.com|googleadservices\.com|acscdn\.com|embellishedcoffee\.com)$/i;
   'googletagmanager.com',
   'google-analytics.com',
   'analytics.google.com',
@@ -22,6 +22,19 @@ test.beforeEach(async ({ page }) => {
     if (isTrackingOrAdHost(hostname)) return route.abort();
     return route.continue();
   });
+});
+
+test('local test guard recognizes analytics and advertising hosts', async () => {
+  for (const host of [
+    'googletagmanager.com', 'www.googletagmanager.com',
+    'google-analytics.com', 'www.google-analytics.com',
+    'doubleclick.net', 'pagead2.googlesyndication.com',
+    'acscdn.com', 'embellishedcoffee.com', 'sub.embellishedcoffee.com'
+  ]) {
+    expect(trackingAndAdHosts.test(host)).toBe(true);
+  }
+  expect(trackingAndAdHosts.test('127.0.0.1')).toBe(false);
+  expect(trackingAndAdHosts.test('www.mtahqq.dpdns.org')).toBe(false);
 });
 
 test('marketplace API is served from the same origin', async ({ page }) => {
