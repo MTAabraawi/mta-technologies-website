@@ -53,7 +53,6 @@ export async function onRequest(context) {
   const url = new URL(context.request.url);
   if (url.pathname !== "/application" && url.pathname !== "/application.html") return response;
   let html = await response.text();
-  html = meta(html, "619f1190208d7f523c5c4821e0ea466e7fffb394", "619f1190208d7f523c5c4821e0ea466e7fffb394");
   const source = url.searchParams.get("source") || "";
   const store = url.searchParams.get("store") || source;
   const id = url.searchParams.get("id") || "";

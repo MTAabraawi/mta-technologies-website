@@ -65,9 +65,9 @@
     }
     </script>
 
-    <meta name="619f1190208d7f523c5c4821e0ea466e7fffb394" content="619f1190208d7f523c5c4821e0ea466e7fffb394" />
-      <meta name="referrer" content="no-referrer-when-downgrade" />
-  </head>
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+</head>
   <body>
     <!-- Header -->
     <header>
@@ -113,8 +113,8 @@
   <span class="en-only">1. Cookies and Similar Technologies</span>
 </h2>
 <p style="margin-bottom: 1.5rem;">
-  <span class="ar-only">قد يستخدم الموقع ملفات تعريف الارتباط أو تقنيات تخزين مشابهة لتشغيل الوظائف وتذكر تفضيلات الواجهة، مثل اللغة ونمط الألوان. وقد تستخدم Google Analytics تقنيات مماثلة لتحليل الزيارات. كما قد تستخدم HilltopAds وشركاؤها ملفات تعريف الارتباط أو تقنيات مشابهة لتقديم الإعلانات وقياس أدائها وتكرارها وفق إعدادات الشبكة وسياساتها.</span>
-  <span class="en-only">The website may use cookies or similar storage technologies to support functions and remember interface preferences, such as language and theme. Google Analytics may use similar technologies to measure visits. HilltopAds and its partners may also use cookies or similar technologies to deliver ads, measure performance, and limit ad frequency, subject to the network’s settings and policies.</span>
+  <span class="ar-only">قد يستخدم الموقع ملفات تعريف الارتباط أو تقنيات تخزين مشابهة لتشغيل الوظائف وتذكر تفضيلات الواجهة، مثل اللغة ونمط الألوان. وقد تستخدم Google Analytics تقنيات مماثلة لتحليل الزيارات. كما قد تستخدم Adcash وشركاؤها ملفات تعريف الارتباط أو تقنيات مشابهة وإشارات الويب لأغراض عرض الإعلانات وقياس أدائها، وفق سياسة Adcash وإعدادات الخدمة.</span>
+  <span class="en-only">The website may use cookies or similar storage technologies to support functions and remember interface preferences, such as language and theme. Google Analytics may use similar technologies to measure visits. Adcash and its partners may also use cookies, similar technologies, or web beacons to serve and measure advertisements, as described in Adcash’s privacy policy and service settings.</span>
 </p>
 
 <h3 style="color: #38BDF8; margin-bottom: 0.5rem;">
@@ -131,8 +131,8 @@
   <span class="en-only">3. Advertising and Ad-Tracking Cookies</span>
 </h3>
 <p>
-  <span class="ar-only">قد يعرض الموقع إعلانات عبر HilltopAds. وقد تستخدم الشبكة أو مزودو الخدمات المرتبطون بها ملفات تعريف الارتباط أو تقنيات مماثلة لتقديم الإعلانات وقياس أدائها وتكرارها، وفق إعدادات الشبكة وسياساتها. كما قد تستخدم Google Analytics تقنيات قياس الزيارات وفق إعداداتها الموضحة في سياسة الخصوصية.</span>
-  <span class="en-only">The website may display advertisements through HilltopAds. The network or its service providers may use cookies or similar technologies to deliver ads, measure performance, and limit ad frequency, subject to the network's settings and policies. Google Analytics may also use measurement technologies as described in the Privacy Policy.</span>
+  <span class="ar-only">قد يعرض الموقع إعلانات عبر Adcash. ووفقاً لسياسة Adcash، قد تستخدم الشبكة ملفات تعريف الارتباط أو تقنيات مماثلة وإشارات الويب، وقد تجمع بيانات تقنية وإحصائية مرتبطة بعرض الإعلان، مثل عنوان IP ومعلومات المتصفح ونظام التشغيل والموقع الجغرافي التقريبي وأنماط استخدام الموقع. وتذكر Adcash أن الإحصاءات التي تشاركها مع عملائها تكون مجهولة الهوية. كما قد تستخدم Google Analytics تقنيات قياس الزيارات وفق إعداداتها الموضحة في سياسة الخصوصية.</span>
+  <span class="en-only">The website may display advertisements through Adcash. According to Adcash’s privacy policy, the network may use cookies, similar technologies, or web beacons and may collect technical and statistical data related to ad delivery, such as IP address, browser and operating-system information, approximate geography, and website usage patterns. Adcash states that statistics shared with its customers are anonymized. Google Analytics may also use measurement technologies as described in the Privacy Policy.</span>
 </p>
 
 
@@ -141,7 +141,21 @@
 
     </main>
 
-<aside class="mta-ad-slot" aria-label="Advertisement"><span class="mta-ad-label">إعلان / Advertisement</span><script>(function(wctl){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=wctl||{};s.src="\/\/embellishedcoffee.com\/b.XyV\/sHdCGtln0jY\/Wycm\/senmV9nuzZuU\/l\/kYPjTIcG2CM\/jKkS1nM-T\/cvtdNUz\/Y\/ytO\/TwU\/yaMOQj";s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})</script></aside>
+<aside class="mta-ad-slot" aria-label="Advertisement">
+  <span class="mta-ad-label"><span class="ar-only">إعلان</span><span class="en-only">Advertisement</span></span>
+  <script type="text/javascript">
+    (function () {
+      var isDesktop = window.matchMedia
+        ? window.matchMedia('(min-width: 768px)').matches
+        : window.innerWidth >= 768;
+      if (window.aclib && typeof window.aclib.runBanner === 'function') {
+        window.aclib.runBanner({
+          zoneId: isDesktop ? '12478774' : '12478782'
+        });
+      }
+    })();
+  </script>
+</aside>
 
 
 
@@ -207,7 +221,7 @@
     </footer>
     <script src="js/main.js"></script>
   
-<script>(function(aqudtji){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=aqudtji||{};s.src="\/\/embellishedcoffee.com\/b.XjVqsxdlGylS0_YQWGcf\/pe-mA9-uzZEUqlfkRPgTscF2DMNj\/ks1\/MvzzMwthN\/zzY\/yzODTUUSzCNdwC";s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})</script>
-<script>(function(lytru){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=lytru||{};s.src="\/\/embellishedcoffee.com\/b.XGVfsTd-G\/lk0hYVWXcY\/desmx9IusZ\/U-lmkkPuTucj2lMRj\/ks1GNGDbkIt\/NUz\/Yyy\/OATgUQ1JMZwK";s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})</script>
+
+
 </body>
 </html>
