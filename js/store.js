@@ -100,6 +100,8 @@ else{
 }
 
 let offset=0,total=0,loading=false,exhausted=false,query="",timer=null;
+const initialServerRenderedCount=grid.querySelectorAll(".store-app-card").length;
+let indexedTotal=0;
 function makeCard(app){
  const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();
  const top=document.createElement("div");top.className="store-app-top";
@@ -145,7 +147,8 @@ function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textCo
 function applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
 async function fetchPage(reset=false){
  if(!store?.source||loading||exhausted||!API)return;
- if(reset){offset=0;exhausted=false;total=0;grid.replaceChildren();$("store-empty").hidden=true}
+ let keepServerRendered=false;
+ if(reset){keepServerRendered=!query&&!platform.value&&initialServerRenderedCount>0;offset=0;exhausted=false;total=indexedTotal;if(!keepServerRendered)grid.replaceChildren();$("store-empty").hidden=true}
  loading=true;load.hidden=false;load.disabled=true;load.textContent=copy("جارٍ التحميل...","Loading...");
  try{
   const p=new URLSearchParams({source:store.source,limit:"12",offset:String(offset)});
@@ -168,6 +171,7 @@ async function fetchPage(reset=false){
   }
   if(!response||!response.ok)throw lastError||new Error("Catalogue request failed");
   const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
+  if(keepServerRendered)grid.replaceChildren();
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" سجل مفهرس","Connected · "+total.toLocaleString()+" indexed records"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
   if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
@@ -176,13 +180,13 @@ async function fetchPage(reset=false){
   count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
   load.hidden=exhausted;load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
- }catch(e){console.error("Store catalogue fetch failed",e);if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
+ }catch(e){console.error("Store catalogue fetch failed",e);if(keepServerRendered){offset=initialServerRenderedCount;status.textContent=copy("تعذر تحديث الاتصال؛ نعرض التطبيقات المحمّلة مسبقاً.","Live refresh failed; showing preloaded applications.");status.classList.add("is-connected");count.textContent=initialServerRenderedCount.toLocaleString()+" "+copy("تطبيقات معروضة","apps shown");$("store-results-note").textContent=copy("تعذر تحديث الدفعة الآن، لكن التطبيقات المحمّلة مسبقاً ما زالت متاحة. يمكنك إعادة المحاولة لتحميل المزيد.","The latest batch could not be refreshed, but preloaded applications remain available. Retry to load more.");}else if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
  finally{loading=false;load.disabled=false}
 }
 if(store?.source){
  fetch(API+"/api/v1/catalog-stats",{cache:"no-store",credentials:"omit"}).then(r=>{if(!r.ok)throw Error("stats HTTP "+r.status);return r.json()}).then(data=>{
   const available=Number((data.sources||{})[store.source]||0);
-  if(available>0){status.textContent=copy("متصل · "+available.toLocaleString()+" سجل مفهرس","Connected · "+available.toLocaleString()+" indexed records");status.classList.add("is-connected");const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";fetchPage(true)}
+  if(available>0){indexedTotal=available;total=available;status.textContent=copy("متصل · "+available.toLocaleString()+" سجل مفهرس","Connected · "+available.toLocaleString()+" indexed records");status.classList.add("is-connected");const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";fetchPage(true)}
   else{status.textContent=copy("نعمل على توفيرها قريباً","Coming soon");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("نعمل على ربط هذا المتجر بمصدر بيانات يمكن التحقق منه. سنعرض التطبيقات هنا عندما تصبح بياناتها متاحة.","We are working to connect this store to a verifiable data source. Its apps will appear here once indexed data is available.");$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("هذا المتجر غير مفهرس حالياً داخل MTA.","This store is not currently indexed by MTA.")}
  }).catch(error=>{console.warn("Store statistics unavailable",error);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";status.textContent=copy("تعذر التحقق من الاتصال","Connection could not be verified");$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=copy("تعذر التحقق من بيانات هذا المتجر حالياً. سنعرض التطبيقات بعد استعادة الاتصال والتحقق من المصدر.","We could not verify this store's catalogue right now. Listings will appear after the source connection is restored and verified.");$("store-unavailable-link").href=store.url});
  load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));}
