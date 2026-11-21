@@ -16,6 +16,10 @@ function jsonError(status, error, headers = {}) {
   });
 }
 
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export async function onRequest({ request }) {
   const incoming = new URL(request.url);
 
@@ -36,11 +40,39 @@ export async function onRequest({ request }) {
   if (acceptLanguage) headers.set("Accept-Language", acceptLanguage);
 
   try {
-    const upstream = await fetch(new Request(upstreamUrl, {
-      method: request.method,
-      headers,
-      redirect: "manual"
-    }));
+    let upstream = null;
+    let lastError = null;
+
+    // Retry transient upstream failures at the edge as well as in the
+    // browser. This protects both catalogue pages and the initial stats call.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        upstream = await fetch(new Request(upstreamUrl, {
+          method: request.method,
+          headers,
+          redirect: "manual"
+        }));
+
+        const retryable = upstream.status === 429 || upstream.status >= 500;
+        if (!retryable || attempt === 2) break;
+
+        // Release the failed response before retrying.
+        try {
+          await upstream.body?.cancel();
+        } catch {
+          // Ignore cancellation errors; the next attempt is still safe.
+        }
+      } catch (error) {
+        lastError = error;
+        if (attempt === 2) throw error;
+      }
+
+      await wait(300 * (attempt + 1));
+    }
+
+    if (!upstream) {
+      throw lastError || new Error("Catalogue upstream request failed");
+    }
 
     // Preserve the engine's JSON body and pagination headers (including
     // X-Total-Count), while preventing stale catalogue pages at the edge.
@@ -57,7 +89,7 @@ export async function onRequest({ request }) {
   } catch (error) {
     console.error("MTA catalogue API upstream request failed", error);
     return jsonError(502, "Catalogue service temporarily unavailable", {
-      "Retry-After": "15"
+      "Retry-After": "5"
     });
   }
 }
