@@ -45,7 +45,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: marketplace-e2e
+  group: marketplace-e2e-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
