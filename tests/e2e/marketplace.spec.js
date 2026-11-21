@@ -240,7 +240,8 @@ test('all site pages and store/application routes use the shared Adcash Display 
     '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
     '/suggestions.html', '/application.html', '/store.html',
     '/contact-thanks.html', '/404.html',
-    '/store?store=fdroid', '/store?store=google-play'
+    '/store?store=fdroid', '/store?store=google-play',
+    '/application?source=fdroid&id=1&name=MTA%20Net%20Blocker'
   ];
   const hilltop = /hilltop\s*ads?|hilltopads?\.(?:com|net)|hilltopads?/i;
   for (const path of pages) {
@@ -256,14 +257,21 @@ test('all site pages and store/application routes use the shared Adcash Display 
 });
 
 test('shared Adcash initializer selects the correct Display zone without exposing code as text', async ({ page }) => {
+  await page.route('**/acscdn.com/script/aclib.js', route => route.fulfill({
+    status: 200,
+    contentType: 'application/javascript',
+    body: "window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneId = options.zoneId; } };"
+  }));
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('.mta-ad-slot')).toBeVisible();
   await expect(page.locator('.mta-ad-slot')).toHaveAttribute('data-ad-status', 'requested');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneId)).toBe('12478774');
   await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
   await expect(page.locator('.mta-ad-slot')).not.toContainText('zoneId');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneId)).toBe('12478782');
   await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
   await expect(page.locator('.mta-ad-slot')).not.toContainText('12478782');
 });
