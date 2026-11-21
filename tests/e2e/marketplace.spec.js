@@ -49,6 +49,17 @@ test('F-Droid opens an internal branded catalogue and displays server-rendered a
   expect(errors).toEqual([]);
 });
 
+test('store catalogue automatically appends the next page when the user reaches the list end', async ({ page }) => {
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  const cards = page.locator('.store-app-card');
+  await expect(cards).toHaveCount(12, { timeout: 60_000 });
+  const firstApp = await cards.first().locator('h3').innerText();
+  const loadMore = page.locator('#store-load-more');
+  await loadMore.scrollIntoViewIfNeeded();
+  await expect(cards).toHaveCount(24, { timeout: 60_000 });
+  await expect(cards.first().locator('h3')).toHaveText(firstApp);
+});
+
 test('external-only stores show an internal store profile before offering the original catalogue', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="google-play"]').click();

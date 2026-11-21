@@ -99,7 +99,7 @@ else{
  if(!connected){const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
 }
 
-let offset=0,total=0,loading=false,exhausted=false,query="",timer=null;
+let offset=0,total=0,loading=false,exhausted=false,query="",timer=null,autoLoadPaused=false,autoLoadObserver=null;
 const initialServerRenderedCount=grid.querySelectorAll(".store-app-card").length;
 let indexedTotal=0;
 function makeCard(app){
@@ -148,7 +148,7 @@ function applyLocalFilters(){const selected=$("store-category-filter")?.value||"
 async function fetchPage(reset=false){
  if(!store?.source||loading||exhausted||!API)return;
  let keepServerRendered=false;
- if(reset){keepServerRendered=!query&&!platform.value&&initialServerRenderedCount>0;offset=0;exhausted=false;total=indexedTotal;if(!keepServerRendered)grid.replaceChildren();$("store-empty").hidden=true}
+ if(reset){autoLoadPaused=false;keepServerRendered=!query&&!platform.value&&initialServerRenderedCount>0;offset=0;exhausted=false;total=indexedTotal;if(!keepServerRendered)grid.replaceChildren();$("store-empty").hidden=true}
  loading=true;load.hidden=false;load.disabled=true;load.textContent=copy("جارٍ التحميل...","Loading...");
  try{
   const p=new URLSearchParams({source:store.source,limit:"12",offset:String(offset)});
@@ -170,7 +170,7 @@ async function fetchPage(reset=false){
    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
   }
   if(!response||!response.ok)throw lastError||new Error("Catalogue request failed");
-  const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
+  const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");autoLoadPaused=false;
   if(keepServerRendered)grid.replaceChildren();
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" سجل مفهرس","Connected · "+total.toLocaleString()+" indexed records"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
@@ -180,8 +180,15 @@ async function fetchPage(reset=false){
   count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
   load.hidden=exhausted;load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
- }catch(e){console.error("Store catalogue fetch failed",e);if(keepServerRendered){offset=initialServerRenderedCount;status.textContent=copy("تعذر تحديث الاتصال؛ نعرض التطبيقات المحمّلة مسبقاً.","Live refresh failed; showing preloaded applications.");status.classList.add("is-connected");count.textContent=initialServerRenderedCount.toLocaleString()+" "+copy("تطبيقات معروضة","apps shown");$("store-results-note").textContent=copy("تعذر تحديث الدفعة الآن، لكن التطبيقات المحمّلة مسبقاً ما زالت متاحة. يمكنك إعادة المحاولة لتحميل المزيد.","The latest batch could not be refreshed, but preloaded applications remain available. Retry to load more.");}else if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
- finally{loading=false;load.disabled=false}
+ }catch(e){autoLoadPaused=true;console.error("Store catalogue fetch failed",e);if(keepServerRendered){offset=initialServerRenderedCount;status.textContent=copy("تعذر تحديث الاتصال؛ نعرض التطبيقات المحمّلة مسبقاً.","Live refresh failed; showing preloaded applications.");status.classList.add("is-connected");count.textContent=initialServerRenderedCount.toLocaleString()+" "+copy("تطبيقات معروضة","apps shown");$("store-results-note").textContent=copy("تعذر تحديث الدفعة الآن، لكن التطبيقات المحمّلة مسبقاً ما زالت متاحة. يمكنك إعادة المحاولة لتحميل المزيد.","The latest batch could not be refreshed, but preloaded applications remain available. Retry to load more.");}else if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
+ finally{loading=false;load.disabled=false;if(autoLoadObserver){autoLoadObserver.unobserve(load);if(!load.hidden&&!autoLoadPaused)autoLoadObserver.observe(load)}}
+}
+function setupAutomaticLoading(){
+ if(!load||!("IntersectionObserver" in window))return;
+ autoLoadObserver=new IntersectionObserver(entries=>{
+  if(entries.some(entry=>entry.isIntersecting)&&!loading&&!exhausted&&!autoLoadPaused)fetchPage(false);
+ },{root:null,rootMargin:"700px 0px",threshold:0});
+ if(!load.hidden)autoLoadObserver.observe(load);
 }
 if(store?.source){
  if(initialServerRenderedCount>0){
@@ -206,7 +213,7 @@ if(store?.source){
    fetchPage(true);
   });
  }
- load.addEventListener("click",()=>fetchPage(false));$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));
+ load.addEventListener("click",()=>{autoLoadPaused=false;fetchPage(false)});setupAutomaticLoading();$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));
 }
 window.addEventListener("mta:languagechange",()=>{if(store){document.title=store.name+" | MTA TECHNOLOGIES"}});
 })();
