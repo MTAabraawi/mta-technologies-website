@@ -1,16 +1,28 @@
 const { test, expect } = require('@playwright/test');
-const trackingAndAdHosts = /(^|\\.)((googletagmanager\\.com)|(google-analytics\\.com)|(analytics\\.google\\.com)|(doubleclick\\.net)|(googlesyndication\\.com)|(googleadservices\\.com)|(acscdn\\.com)|(embellishedcoffee\\.com))$/i;
+const trackingAndAdHosts = [
+  'googletagmanager.com',
+  'google-analytics.com',
+  'analytics.google.com',
+  'doubleclick.net',
+  'googlesyndication.com',
+  'googleadservices.com',
+  'acscdn.com',
+  'embellishedcoffee.com'
+];
+
+function isTrackingOrAdHost(hostname) {
+  return trackingAndAdHosts.some(domain => hostname === domain || hostname.endsWith('.' + domain));
+}
 
 // Browser tests use only the local Pages server. Never send test pageviews or
 // ad requests to third-party analytics/ad networks.
 test.beforeEach(async ({ page }) => {
   await page.route('**/*', async route => {
     const hostname = new URL(route.request().url()).hostname.toLowerCase();
-    if (trackingAndAdHosts.test(hostname)) return route.abort();
+    if (isTrackingOrAdHost(hostname)) return route.abort();
     return route.continue();
   });
 });
-
 
 test('marketplace API is served from the same origin', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
