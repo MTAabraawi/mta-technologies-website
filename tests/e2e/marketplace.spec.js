@@ -213,7 +213,7 @@ test('applications without original artwork still receive a visible icon fallbac
   await expect(page.locator('.store-app-icon-fallback').first()).toBeVisible({ timeout: 15_000 });
 });
 
-test('all public HTML pages are free of Google AdSense and advertising integrations', async ({ page }) => {
+test('all public HTML pages are free of Google AdSense integrations', async ({ page }) => {
   const pages = [
     '/index.html', '/about.html', '/projects.html', '/innovation.html',
     '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
@@ -229,4 +229,41 @@ test('all public HTML pages are free of Google AdSense and advertising integrati
     const html = await response.text();
     expect(html, 'Page must not load ad code: ' + path).not.toMatch(adCode);
   }
+});
+
+
+test('all site pages and store/application routes use the shared Adcash Display placement', async ({ page }) => {
+  const pages = [
+    '/index.html', '/about.html', '/projects.html', '/innovation.html',
+    '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
+    '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
+    '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
+    '/suggestions.html', '/application.html', '/store.html',
+    '/contact-thanks.html', '/404.html',
+    '/store?store=fdroid', '/store?store=google-play'
+  ];
+  const hilltop = /hilltop\s*ads?|hilltopads?\.(?:com|net)|hilltopads?/i;
+  for (const path of pages) {
+    const response = await page.request.get(path);
+    expect(response.status(), 'Page should load: ' + path).toBe(200);
+    const html = await response.text();
+    expect(html, 'HilltopAds must be absent: ' + path).not.toMatch(hilltop);
+    expect(html, 'Adcash library must be present: ' + path).toContain('acscdn.com/script/aclib.js');
+    expect(html, 'Shared Adcash initializer must be present: ' + path).toContain('js/adcash.js');
+    expect(html, 'A visible ad slot must be present: ' + path).toContain('class="mta-ad-slot"');
+    expect(html, 'Inline banner code must not be embedded in HTML: ' + path).not.toMatch(/aclib\.runBanner\s*\(/i);
+  }
+});
+
+test('shared Adcash initializer selects the correct Display zone without exposing code as text', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.mta-ad-slot')).toBeVisible();
+  await expect(page.locator('.mta-ad-slot')).toHaveAttribute('data-ad-status', 'requested');
+  await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
+  await expect(page.locator('.mta-ad-slot')).not.toContainText('zoneId');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
+  await expect(page.locator('.mta-ad-slot')).not.toContainText('12478782');
 });
