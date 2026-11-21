@@ -34,28 +34,25 @@ test('all store cards open internal MTA store pages, never external stores direc
   }
 });
 
-test('F-Droid opens an internal branded catalogue and displays indexed applications', async ({ page }) => {
-  const requests = [];
+test('F-Droid opens an internal branded catalogue and displays server-rendered applications', async ({ page }) => {
   const errors = [];
-  page.on('request', request => {
-    const url = new URL(request.url());
-    if (url.pathname === '/api/v1/apps') requests.push(url);
-  });
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="fdroid"]').click();
-  await expect(page).toHaveURL(/\/store\?store=fdroid/);
+  await expect(page).toHaveURL(/\\/store\\?store=fdroid/);
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('#store-logo')).toBeVisible();
-  await expect(page.locator('.store-app-card').first()).toBeVisible({ timeout: 60_000 });
-  await expect.poll(() => requests.some(url => url.searchParams.get('source') === 'fdroid')).toBe(true);
+  // The first page is rendered by Pages Functions into the HTML. It must be
+  // usable without requiring a redundant browser-side catalogue request.
+  await expect(page.locator('.store-app-card')).toHaveCount(12, { timeout: 60_000 });
+  await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
   expect(errors).toEqual([]);
 });
 
 test('external-only stores show an internal store profile before offering the original catalogue', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="google-play"]').click();
-  await expect(page).toHaveURL(/\/store\?store=google-play/);
+  await expect(page).toHaveURL(/\\/store\\?store=google-play/);
   await expect(page.locator('#store-title')).toHaveText('Google Play');
   await expect(page.locator('#store-unavailable')).toBeVisible();
   await expect(page.locator('#store-unavailable-link')).toHaveAttribute('href', 'https://play.google.com/store');
@@ -141,7 +138,7 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(sitemap.headers()['content-type']).toContain('xml');
   const xml = await sitemap.text();
   expect(xml.trim().startsWith('<?xml')).toBe(true);
-  const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  const locations = [...xml.matchAll(/<loc>([^<]+)<\\/loc>/g)].map(match => match[1]);
   expect(locations.length).toBeGreaterThan(15);
   expect(new Set(locations).size).toBe(locations.length);
   for (const location of locations) {
@@ -150,10 +147,10 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
     const response = await page.request.get(url.pathname + url.search, { maxRedirects: 0 });
     expect(response.status(), 'Sitemap URL should resolve directly: ' + location).toBe(200);
     const body = await response.text();
-    const canonical = body.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+    const canonical = body.match(/<link\\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i);
     expect(canonical, 'Sitemap page must declare a canonical: ' + location).not.toBeNull();
     expect(canonical[1], 'Sitemap URL must equal its canonical: ' + location).toBe(location);
-    expect(body).not.toMatch(/<meta\s+name=["']robots["']\s+content=["']noindex/i);
+    expect(body).not.toMatch(/<meta\\s+name=["']robots["']\\s+content=["']noindex/i);
   }
   const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
   expect(robots.status()).toBe(200);
@@ -177,7 +174,7 @@ test('connected store pages are server-rendered with a unique canonical and visi
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=fdroid$/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\\/store\\?store=fdroid$/);
   await expect(page.locator('.store-app-card')).toHaveCount(12);
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
 });
@@ -187,7 +184,7 @@ test('catalogue cards open dedicated in-site application profiles before the ori
   const card = page.locator('.store-app-card').first();
   await expect(card).toBeVisible({ timeout: 15_000 });
   await card.locator('.store-app-detail-link').click();
-  await expect(page).toHaveURL(/\/application\?source=fdroid(?:&|$)/);
+  await expect(page).toHaveURL(/\\/application\\?source=fdroid(?:&|$)/);
   await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
   await expect(page.locator('#application-source-link')).toHaveAttribute('href', 'https://example.org/apps/1');
@@ -225,7 +222,7 @@ test('all public HTML pages are free of Google AdSense and advertising integrati
     '/suggestions.html', '/application.html', '/store.html',
     '/store?store=fdroid'
   ];
-  const adCode = /pagead2\.googlesyndication\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\.net/i;
+  const adCode = /pagead2\\.googlesyndication\\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\\.net/i;
   for (const path of pages) {
     const response = await page.request.get(path);
     expect(response.status(), 'Page should load: ' + path).toBe(200);
