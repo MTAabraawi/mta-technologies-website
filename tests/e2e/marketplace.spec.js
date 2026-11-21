@@ -85,6 +85,32 @@ test('store search and category/platform filters narrow results and can be clear
   await expect(visibleCards).toHaveCount(12, { timeout: 15_000 });
 });
 
+test('store pagination ignores duplicate source identities returned by the upstream', async ({ page }) => {
+  await page.route('**/api/v1/apps?**', async route => {
+    const url = new URL(route.request().url());
+    if (url.searchParams.get('offset') !== '12') return route.continue();
+    const firstPageResponse = await page.request.get(
+      'http://127.0.0.1:8788/api/v1/apps?source=fdroid&limit=12&offset=0'
+    );
+    const firstPage = await firstPageResponse.json();
+    const response = await route.fetch();
+    const nextPage = await response.json();
+    await route.fulfill({ response, body: JSON.stringify([firstPage[0], ...nextPage]) });
+  });
+
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  const cards = page.locator('.store-app-card');
+  await expect(cards).toHaveCount(12, { timeout: 30_000 });
+  await page.locator('#store-load-more').scrollIntoViewIfNeeded();
+  await expect(cards).toHaveCount(24, { timeout: 30_000 });
+  const identities = await cards.evaluateAll(elements => elements.map(card => {
+    const link = card.querySelector('.store-app-detail-link');
+    const url = new URL(link.href);
+    return url.searchParams.get('source') + '|' + url.searchParams.get('id');
+  }));
+  expect(new Set(identities).size).toBe(24);
+});
+
 test('external-only stores show an internal store profile before offering the original catalogue', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   await page.locator('[data-store-key="google-play"]').click();

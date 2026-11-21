@@ -60,6 +60,30 @@ const stores={
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
 const grid=$("store-app-grid"), count=$("store-count"), load=$("store-load-more"), search=$("store-search"), platform=$("store-platform-filter");
 const safe=(value)=>{try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch{return""}};
+function appIdentity(app){
+ const source=String(app.source||store?.source||"").trim().toLowerCase();
+ const id=String(app.external_id??app.id??"").trim();
+ if(id)return source+"|id:"+id;
+ const name=String(app.name||"").trim().toLocaleLowerCase();
+ const platform=String(app.platform||"").trim().toLowerCase();
+ return source+"|name:"+name+"|platform:"+platform;
+}
+function cardIdentity(card){
+ if(card.dataset.appKey)return card.dataset.appKey;
+ const link=card.querySelector(".store-app-detail-link,h3 a");
+ if(link){
+  try{
+   const url=new URL(link.href,location.href);
+   return appIdentity({
+    source:url.searchParams.get("source")||store?.source||"",
+    external_id:url.searchParams.get("id")||"",
+    name:url.searchParams.get("name")||card.querySelector("h3")?.textContent||"",
+    platform:card.dataset.platform||""
+   });
+  }catch{}
+ }
+ return appIdentity({name:card.querySelector("h3")?.textContent||"",platform:card.dataset.platform||""});
+}
 const editorialProfiles={
 "fdroid":{ar:["يضم هذا القسم تطبيقات Android الحرة التي تظهر في فهرس F-Droid. ركزنا هنا على إبراز طبيعة البرمجيات مفتوحة المصدر، مع إتاحة البحث بحسب الاسم والتصنيف والمنصة.","يمكن أن تتضمن سجلات F-Droid وصف المشروع والترخيص وروابط المصدر. وجود التطبيق في هذا الفهرس لا يعني بالضرورة أنه متاح في كل بلد أو متوافق مع كل جهاز.","راجع الترخيص وإصدار Android ومتطلبات التطبيق في صفحة المصدر قبل التثبيت؛ يحتفظ MTA بالرابط الأصلي ولا يستضيف ملفات APK."],en:["This catalogue focuses on free and open-source Android software indexed by F-Droid. The page highlights the repository context and supports discovery by name, category and platform.","F-Droid records may include project descriptions, licences and source-code links. A listing does not guarantee availability in every country or compatibility with every device.","Check the licence, Android version and app requirements at the original listing before installing. MTA links to the source and does not host APK files."]},
 "izzyondroid":{ar:["يعرض هذا القسم الحزم التي يفهرسها مستودع IzzyOnDroid، وهو مستودع إضافي لتطبيقات Android الحرة. نفصل نتائجه عن F-Droid حتى يعرف الزائر مصدر كل سجل.","قد تختلف سياسات قبول الحزم وتحديثاتها عن المستودعات الأخرى؛ لذلك نعرض البيانات المتاحة كما وردت ولا ندمجها في كتالوج واحد بلا تمييز.","افحص صفحة الحزمة الأصلية وروابط المشروع والترخيص قبل التثبيت، فقد تتغير حالة الصيانة أو التوفر."],en:["This section lists packages indexed by IzzyOnDroid, an additional repository for free Android apps. Its records remain separate from F-Droid so visitors can identify the source of each listing.","Package acceptance and update practices can differ from other repositories. MTA presents the available metadata without merging distinct catalogues into an ambiguous list.","Review the original package page, project links and licence before installing; maintenance and availability can change."]},
@@ -115,7 +139,7 @@ function populateCategoryOptionsFromRenderedCards(){
 populateCategoryOptionsFromRenderedCards();
 let indexedTotal=0;
 function makeCard(app){
- const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();
+ const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();card.dataset.appKey=appIdentity(app);
  const top=document.createElement("div");top.className="store-app-top";
  const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.alt=(app.name||"App")+" icon";
  let metadata=app.metadata_json&&typeof app.metadata_json==="object"?app.metadata_json:{};
@@ -187,7 +211,8 @@ async function fetchPage(reset=false){
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" سجل مفهرس","Connected · "+total.toLocaleString()+" indexed records"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
   if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
-  items.forEach(app=>grid.append(makeCard(app)));applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,12).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
+  const seen=new Set(Array.from(grid.querySelectorAll(".store-app-card")).map(cardIdentity));
+  items.forEach(app=>{const identity=appIdentity(app);if(seen.has(identity))return;seen.add(identity);grid.append(makeCard(app))});applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,12).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
   if(items.length<12||(total&&offset>=total))exhausted=true;
   count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
