@@ -148,16 +148,31 @@ async function fetchPage(reset=false){
  if(reset){offset=0;exhausted=false;total=0;grid.replaceChildren();$("store-empty").hidden=true}
  loading=true;load.hidden=false;load.disabled=true;load.textContent=copy("جارٍ التحميل...","Loading...");
  try{
-  const p=new URLSearchParams({source:store.source,limit:"36",offset:String(offset)});
+  const p=new URLSearchParams({source:store.source,limit:"12",offset:String(offset)});
   if(query)p.set("q",query);if(platform.value)p.set("platform",platform.value);
-  const response=await fetch(API+"/api/v1/apps?"+p.toString(),{cache:"no-store",credentials:"omit"});
-  if(!response.ok)throw new Error("HTTP "+response.status);
+  const requestUrl=API+"/api/v1/apps?"+p.toString();
+  let response=null,lastError=null;
+  for(let attempt=0;attempt<3;attempt++){
+   const controller=new AbortController();
+   const timeoutId=setTimeout(()=>controller.abort(),45000);
+   try{
+    response=await fetch(requestUrl,{cache:"no-store",credentials:"omit",signal:controller.signal});
+    if(response.ok)break;
+    lastError=new Error("HTTP "+response.status);
+    if(response.status<500&&response.status!==429)throw lastError;
+   }catch(error){
+    lastError=error;
+    if(attempt===2)throw error;
+   }finally{clearTimeout(timeoutId)}
+   if(attempt<2)await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
+  }
+  if(!response||!response.ok)throw lastError||new Error("Catalogue request failed");
   const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" سجل مفهرس","Connected · "+total.toLocaleString()+" indexed records"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
   if(!items.length&&offset===0){exhausted=true;setEmpty(copy("لا توجد تطبيقات مطابقة أو لا توجد سجلات متاحة حالياً لهذا المصدر.","No matching apps or no indexed records are currently available for this source."))}
-  items.forEach(app=>grid.append(makeCard(app)));applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,36).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
-  if(items.length<36||(total&&offset>=total))exhausted=true;
+  items.forEach(app=>grid.append(makeCard(app)));applyLocalFilters();if(reset&&items.length){const schema={"@context":"https://schema.org","@type":"ItemList","name":store.name+" applications","itemListElement":items.slice(0,12).map((app,i)=>({"@type":"ListItem","position":i+1,"item":{"@type":"SoftwareApplication","name":String(app.name||"Application"),"operatingSystem":String(app.platform||store.platforms.join(", ")),"applicationCategory":String(app.category||"Software"),"description":String(app.summary||app.description||"").slice(0,500),"url":safe(app.source_url||app.app_url)||store.url}}))};let ld=document.getElementById("store-itemlist-schema");if(!ld){ld=document.createElement("script");ld.type="application/ld+json";ld.id="store-itemlist-schema";document.head.append(ld)}ld.textContent=JSON.stringify(schema)}offset+=items.length;
+  if(items.length<12||(total&&offset>=total))exhausted=true;
   count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
   load.hidden=exhausted;load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
