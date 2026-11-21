@@ -1,17 +1,8 @@
 const { test, expect } = require('@playwright/test');
-const trackingAndAdHosts = /(^|\.)(googletagmanager\.com|google-analytics\.com|analytics\.google\.com|doubleclick\.net|googlesyndication\.com|googleadservices\.com|acscdn\.com|embellishedcoffee\.com)$/i;
-  'googletagmanager.com',
-  'google-analytics.com',
-  'analytics.google.com',
-  'doubleclick.net',
-  'googlesyndication.com',
-  'googleadservices.com',
-  'acscdn.com',
-  'embellishedcoffee.com'
-];
+const trackingAndAdHosts = /(^|\\.)(googletagmanager\\.com|google-analytics\\.com|analytics\\.google\\.com|doubleclick\\.net|googlesyndication\\.com|googleadservices\\.com|acscdn\\.com|embellishedcoffee\\.com)$/i;
 
 function isTrackingOrAdHost(hostname) {
-  return trackingAndAdHosts.some(domain => hostname === domain || hostname.endsWith('.' + domain));
+  return trackingAndAdHosts.test(hostname);
 }
 
 // Browser tests use only the local Pages server. Never send test pageviews or
