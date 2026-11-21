@@ -9,7 +9,7 @@ const rows = Array.from({ length: total }, (_, i) => ({
   developer: i === 0 ? 'MTA TECHNOLOGIES' : 'Fixture Publisher',
   summary: 'Deterministic catalogue fixture for proxy integration tests',
   description: '',
-  category: 'utilities',
+  category: i % 2 === 0 ? 'utilities' : 'productivity',
   license: null,
   source_url: 'https://example.org/apps/' + (i + 1),
   app_url: 'https://example.org/apps/' + (i + 1),
@@ -27,7 +27,13 @@ http.createServer((req, res) => {
     const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit') || 50)));
     const offset = Math.max(0, Number(url.searchParams.get('offset') || 0));
     const requestedSource = url.searchParams.get('source');
-    const filtered = requestedSource ? rows.map(row => ({ ...row, source: requestedSource })) : rows;
+    const query = String(url.searchParams.get('q') || '').trim().toLocaleLowerCase();
+    const platform = String(url.searchParams.get('platform') || '').trim().toLocaleLowerCase();
+    const matched = rows.filter(row => {
+      const searchable = [row.name, row.developer, row.summary, row.description].join(' ').toLocaleLowerCase();
+      return (!query || searchable.includes(query)) && (!platform || row.platform.toLocaleLowerCase() === platform);
+    });
+    const filtered = requestedSource ? matched.map(row => ({ ...row, source: requestedSource })) : matched;
     res.setHeader('x-total-count', String(filtered.length));
     res.end(JSON.stringify(filtered.slice(offset, offset + limit)));
     return;
