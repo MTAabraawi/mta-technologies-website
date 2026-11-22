@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">MTA Net Blocker</title>
+  <desc id="desc">Blue shield with a network blocking symbol and MTA lettering.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#123b70"/><stop offset="1" stop-color="#071326"/></linearGradient>
+    <linearGradient id="shield" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7dd3fc"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M256 55 405 111v119c0 105-62 181-149 227-87-46-149-122-149-227V111z" fill="url(#shield)" opacity=".18"/>
+  <path d="M256 78 382 125v105c0 87-48 151-126 195-78-44-126-108-126-195V125z" fill="none" stroke="url(#shield)" stroke-width="18" stroke-linejoin="round"/>
+  <circle cx="256" cy="224" r="83" fill="none" stroke="#7dd3fc" stroke-width="18"/>
+  <path d="m196 164 120 120" stroke="#38bdf8" stroke-width="22" stroke-linecap="round"/>
+  <path d="M172 342h168" stroke="#7dd3fc" stroke-width="12" stroke-linecap="round" opacity=".75"/>
+  <text x="256" y="402" fill="#fff" font-family="Arial,sans-serif" font-size="58" font-weight="800" text-anchor="middle" letter-spacing="4">MTA</text>
+</svg>
