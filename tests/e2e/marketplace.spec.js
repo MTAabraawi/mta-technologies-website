@@ -341,27 +341,35 @@ test('all site pages and store/application routes use the shared Adcash Display 
     expect(html, 'HilltopAds must be absent: ' + path).not.toMatch(hilltop);
     expect(html, 'Adcash library must be present: ' + path).toContain('acscdn.com/script/aclib.js');
     expect(html, 'Shared Adcash initializer must be present: ' + path).toContain('js/adcash.js');
-    expect(html, 'A visible ad slot must be present: ' + path).toContain('class="mta-ad-slot"');
+    expect(html, 'Top 728x90 Adcash slot must be present: ' + path).toContain('class="mta-ad-slot mta-ad-slot-top"');
+    expect(html, 'Bottom 300x250 Adcash slot must be present: ' + path).toContain('class="mta-ad-slot mta-ad-slot-bottom"');
+    expect(html, 'Top Adcash zone must be configured: ' + path).toContain('data-ad-zone="12478774"');
+    expect(html, 'Bottom Adcash zone must be configured: ' + path).toContain('data-ad-zone="12478782"');
     expect(html, 'Inline banner code must not be embedded in HTML: ' + path).not.toMatch(/aclib\.runBanner\s*\(/i);
   }
 });
 
-test('shared Adcash initializer selects the correct Display zone without exposing code as text', async ({ page }) => {
+test('shared Adcash initializer requests both Display zones without exposing code as text', async ({ page }) => {
   await page.route('**/acscdn.com/script/aclib.js', route => route.fulfill({
     status: 200,
     contentType: 'application/javascript',
-    body: "window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneId = options.zoneId; } };"
+    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); } };"
   }));
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.mta-ad-slot')).toBeVisible();
-  await expect(page.locator('.mta-ad-slot')).toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneId)).toBe('12478774');
+  const topSlot = page.locator('.mta-ad-slot-top');
+  const bottomSlot = page.locator('.mta-ad-slot-bottom');
+  await expect(topSlot).toBeVisible();
+  await expect(bottomSlot).toBeVisible();
+  await expect(topSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect(bottomSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
   await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
   await expect(page.locator('.mta-ad-slot')).not.toContainText('zoneId');
+  await expect(page.locator('.mta-ad-slot')).not.toContainText('12478782');
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneId)).toBe('12478782');
-  await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
-  await expect(page.locator('.mta-ad-slot')).not.toContainText('12478782');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
+  await expect(page.locator('.mta-ad-slot-top')).toBeVisible();
+  await expect(page.locator('.mta-ad-slot-bottom')).toBeVisible();
 });
