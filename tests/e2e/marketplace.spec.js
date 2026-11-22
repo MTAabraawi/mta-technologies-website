@@ -372,7 +372,7 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
 
   for (const slot of [topSlot, bottomSlot]) {
-    const visibleText = await slot.evaluate(element => element.innerText);
+    const visibleText = await slot.evaluate(element => Array.from(element.childNodes).filter(node => node.nodeType !== Node.ELEMENT_NODE || !["SCRIPT", "STYLE"].includes(node.tagName)).map(node => node.textContent || "").join(" ").trim());
     expect(visibleText).not.toContain('aclib.runBanner');
     expect(visibleText).not.toContain('zoneId');
     expect(visibleText).not.toContain('12478774');
