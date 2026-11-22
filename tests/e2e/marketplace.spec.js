@@ -418,7 +418,8 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   const carousel = page.locator('[data-mta-carousel]');
   await expect(carousel).toBeVisible();
-  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(3);\n  await expect(carousel).toHaveAttribute('data-autoplay', '4200');
+  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(3);
+  await expect(carousel).toHaveAttribute('data-autoplay', '4200');
   await expect(carousel.locator('.mta-cinema-logo img')).toHaveAttribute('src', 'images/mta-logo-square.webp');
   await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible();
   await carousel.locator('[data-carousel-next]').click();
