@@ -372,10 +372,11 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
 
   for (const slot of [topSlot, bottomSlot]) {
-    await expect(slot).not.toContainText('aclib.runBanner');
-    await expect(slot).not.toContainText('zoneId');
-    await expect(slot).not.toContainText('12478774');
-    await expect(slot).not.toContainText('12478782');
+    const visibleText = await slot.evaluate(element => element.innerText);
+    expect(visibleText).not.toContain('aclib.runBanner');
+    expect(visibleText).not.toContain('zoneId');
+    expect(visibleText).not.toContain('12478774');
+    expect(visibleText).not.toContain('12478782');
     await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
   }
 
@@ -389,8 +390,10 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await page.locator('[data-carousel-to="2"]').click();
   await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
-  await expect(mobileTopSlot).not.toContainText('aclib.runBanner');
-  await expect(mobileTopSlot).not.toContainText('zoneId');
+  const mobileVisibleText = await mobileTopSlot.evaluate(element => element.innerText);
+  expect(mobileVisibleText).not.toContain('aclib.runBanner');
+  expect(mobileVisibleText).not.toContain('zoneId');
+  expect(mobileVisibleText).not.toContain('12478782');
   await expect(mobileTopSlot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
   await expect(mobileBottomSlot.locator('iframe')).toHaveCount(0);
 });
