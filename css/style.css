@@ -1305,3 +1305,47 @@ textarea {
     min-height: 278px;
   }
 }
+
+
+/* Adcash: retain both configured banner formats on every viewport. */
+.mta-ad-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 2rem auto;
+  padding: 0;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.mta-ad-slot-top {
+  width: min(100%, 728px);
+  min-height: 118px;
+}
+.mta-ad-slot-bottom {
+  width: min(100%, 300px);
+  min-height: 278px;
+}
+.mta-ad-slot .mta-ad-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+.mta-ad-slot > script {
+  display: block;
+}
+@media (max-width: 767px) {
+  .mta-ad-slot-top {
+    width: 100%;
+    min-height: 118px;
+  }
+  .mta-ad-slot-bottom {
+    width: min(100%, 300px);
+    min-height: 278px;
+  }
+}
