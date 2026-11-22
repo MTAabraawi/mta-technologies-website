@@ -1494,3 +1494,11 @@ textarea {
   .mta-project-feature-grid { grid-template-columns:1fr; }
   .mta-projects-contact { align-items:flex-start; flex-direction:column; padding:1.3rem; }
 }
+
+@media(max-width:768px) {
+  .mta-projects-page .nav-bar { height:auto; min-height:68px; flex-wrap:wrap; gap:.65rem; padding-top:.6rem; padding-bottom:.6rem; }
+  .mta-projects-page .nav-bar nav { order:3; width:100%; min-width:0; }
+  .mta-projects-page .nav-links { display:flex; align-items:center; gap:.9rem; max-width:100%; overflow-x:auto; white-space:nowrap; padding-bottom:.3rem; }
+  .mta-projects-page .nav-links a { font-size:.76rem; }
+  .mta-projects-page .nav-actions { margin-inline-start:auto; }
+}
