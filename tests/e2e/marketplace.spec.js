@@ -441,12 +441,16 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
   await page.goto('/index.html', { waitUntil: 'load' });
   await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
-  // Wait for the external stylesheet cascade and desktop grid to be applied;
-  // DOMContentLoaded alone can run before linked CSS has finished loading.
+  // The project slide is initially hidden; activate it before measuring its grid.
+  await page.locator('[data-carousel-to="1"]').click();
+  const projectSlide = page.locator('.mta-home-slide-projects');
+  await expect(projectSlide).toHaveAttribute('aria-hidden', 'false');
+  await expect(projectSlide).toBeVisible();
+  // Wait for the external stylesheet cascade and visible desktop grid.
   await page.waitForFunction(() => {
-    const stage = document.querySelector('.mta-projects-motion-stage');
+    const stage = document.querySelector('.mta-home-slide-projects .mta-projects-motion-stage');
     const header = document.querySelector('.corp-header-inner');
-    if (!stage || !header) return false;
+    if (!stage || !header || !stage.getClientRects().length) return false;
     const stageStyle = getComputedStyle(stage);
     const headerStyle = getComputedStyle(header);
     return stageStyle.display === 'grid'
@@ -456,8 +460,7 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
   const layout = await page.evaluate(() => ({
     headerColumns: getComputedStyle(document.querySelector('.corp-header-inner')).gridTemplateColumns,
     stageColumnPositions: Array.from(new Set(
-      Array.from(document.querySelector('.mta-projects-motion-stage').children)
-        .filter(card => !card.classList.contains('mta-projects-motion-core'))
+      Array.from(document.querySelectorAll('.mta-home-slide-projects .mta-motion-app'))
         .map(card => Math.round(card.getBoundingClientRect().left))
     )).length,
     carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
