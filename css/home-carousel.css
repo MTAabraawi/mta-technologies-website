@@ -210,3 +210,18 @@
     display:none;
   }
 }
+
+
+/* Keep dynamically executed Adcash source code out of the visible page. */
+.mta-ad-slot > script,
+.mta-ad-slot > script[hidden] {
+  display: none !important;
+}
+
+/* Explicit two-column desktop layout for the cinematic project stage. */
+@media (min-width: 761px) {
+  body.mta-home-refresh .mta-home-slide-projects .mta-projects-motion-stage {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-flow: row;
+  }
+}
