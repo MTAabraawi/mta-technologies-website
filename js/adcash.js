@@ -38,7 +38,9 @@
     // Keep the provider call in a real script node; never inject it as page text.
     var bannerScript = document.createElement("script");
     bannerScript.type = "text/javascript";
-    bannerScript.textContent = "aclib.runBanner({ zoneId: " + JSON.stringify(zoneId) + " });";
+    bannerScript.hidden = true;
+    bannerScript.setAttribute("aria-hidden", "true");
+    bannerScript.text = "aclib.runBanner({ zoneId: " + JSON.stringify(zoneId) + " });";
     slot.appendChild(bannerScript);
     slot.setAttribute("data-ad-status", "requested");
     return true;
