@@ -359,11 +359,13 @@ test('shared Adcash initializer requests both Display zones without exposing cod
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   const topSlot = page.locator('.mta-ad-slot-top');
   const bottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(topSlot).toBeVisible();
+  await expect(topSlot).toHaveCount(1);
   await expect(bottomSlot).toBeVisible();
   await expect(topSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect(bottomSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
+  await page.locator('[data-carousel-to="2"]').click();
+  await expect(topSlot).toBeVisible();
   for (const slot of [topSlot, bottomSlot]) {
     await expect(slot).not.toContainText('aclib.runBanner');
     await expect(slot).not.toContainText('zoneId');
@@ -374,10 +376,12 @@ test('shared Adcash initializer requests both Display zones without exposing cod
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
   const mobileTopSlot = page.locator('.mta-ad-slot-top');
   const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileTopSlot).toBeVisible();
+  await expect(mobileTopSlot).toHaveCount(1);
   await expect(mobileBottomSlot).toBeVisible();
   await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'requested');
+  await page.locator('[data-carousel-to="2"]').click();
+  await expect(mobileTopSlot).toBeVisible();
   for (const slot of [mobileTopSlot, mobileBottomSlot]) {
     await expect(slot).not.toContainText('aclib.runBanner');
     await expect(slot).not.toContainText('12478782');
@@ -399,6 +403,24 @@ test('corporate homepage has a focused hierarchy and introduces all MTA projects
     await expect(page.locator('.mta-home-project-card').filter({ hasText: name })).toHaveCount(1);
   }
   await expect(page.locator('.mta-home-contact')).toBeVisible();
+});
+
+test('cinematic homepage carousel animates the MTA logo, projects, and embedded Adcash slide', async ({ page }) => {
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  const carousel = page.locator('[data-mta-carousel]');
+  await expect(carousel).toBeVisible();
+  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(3);
+  await expect(carousel.locator('.mta-cinema-logo img')).toHaveAttribute('src', 'images/mta-logo-square.webp');
+  await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible();
+  await carousel.locator('[data-carousel-next]').click();
+  await expect(carousel.locator('[data-carousel-slide]').nth(1)).toBeVisible();
+  await expect(carousel.locator('.mta-motion-app')).toHaveCount(4);
+  await carousel.locator('[data-carousel-to="2"]').click();
+  await expect(carousel.locator('[data-carousel-slide]').nth(2)).toBeVisible();
+  await expect(carousel.locator('.mta-ad-slot-top')).toBeVisible();
+  await expect(carousel.locator('.mta-ad-slot-top')).toHaveAttribute('data-ad-zone', '12478774');
+  await carousel.locator('[data-carousel-pause]').click();
+  await expect(carousel.locator('[data-carousel-pause]')).toHaveAttribute('aria-label', 'Play slideshow');
 });
 
 test('project portfolio explains each project and distinguishes release status', async ({ page }) => {
