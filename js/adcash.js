@@ -14,16 +14,7 @@
     return window.matchMedia && window.matchMedia("(max-width: 767px)").matches;
   }
 
-  function shouldSkipSlot(slot) {
-    return document.body.classList.contains("mta-corporate-home") &&
-      slot.classList.contains("mta-ad-slot-bottom") && isMobileViewport();
-  }
-
   function runSlot(slot) {
-    if (shouldSkipSlot(slot)) {
-      slot.setAttribute("data-ad-status", "skipped-responsive");
-      return true;
-    }
     if (!isVisibleSlot(slot)) return false;
     if (slot.getAttribute("data-ad-status") === "requested") return true;
 
@@ -34,14 +25,14 @@
       return false;
     }
 
-    // Adcash detects the banner placement from the parent of this script.
-    // Keep the provider call in a real script node; never inject it as page text.
+    // Adcash uses the executing script's parent as the banner container.
+    // Execute it inside the slot, then remove the source node immediately so
+    // provider code and zone identifiers can never be rendered as page text.
     var bannerScript = document.createElement("script");
     bannerScript.type = "text/javascript";
-    bannerScript.hidden = true;
-    bannerScript.setAttribute("aria-hidden", "true");
     bannerScript.text = "aclib.runBanner({ zoneId: " + JSON.stringify(zoneId) + " });";
     slot.appendChild(bannerScript);
+    if (bannerScript.parentNode) bannerScript.parentNode.removeChild(bannerScript);
     slot.setAttribute("data-ad-status", "requested");
     return true;
   }
@@ -50,8 +41,7 @@
     slots.forEach(runSlot);
   }
 
-  // The carousel's advertising slide starts hidden. Initialize its banner only
-  // after the slide is made visible, otherwise some ad formats measure 0x0.
+  // Hidden carousel slides are initialized only when they become visible.
   window.addEventListener("mta:carouselchange", initializeVisibleSlots);
   window.addEventListener("load", initializeVisibleSlots);
   document.addEventListener("visibilitychange", function () {
@@ -62,7 +52,7 @@
   function waitForAdcash() {
     initializeVisibleSlots();
     var pending = slots.some(function (slot) {
-      return isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested" && slot.getAttribute("data-ad-status") !== "skipped-responsive";
+      return isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested";
     });
     if (!pending) return;
     attempts += 1;
@@ -70,7 +60,7 @@
       window.setTimeout(waitForAdcash, 250);
     } else {
       slots.forEach(function (slot) {
-        if (isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested" && slot.getAttribute("data-ad-status") !== "skipped-responsive") {
+        if (isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested") {
           slot.setAttribute("data-ad-status", "library-unavailable");
         }
       });
