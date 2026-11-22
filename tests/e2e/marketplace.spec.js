@@ -383,3 +383,41 @@ test('shared Adcash initializer requests both Display zones without exposing cod
     await expect(slot).not.toContainText('12478782');
   }
 });
+
+
+test('corporate homepage has a focused hierarchy and introduces all MTA projects', async ({ page }) => {
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('main > section')).toHaveCount(5);
+  await expect(page.locator('main h1')).toHaveCount(1);
+  await expect(page.locator('.mta-home-project-card')).toHaveCount(4);
+  for (const name of [
+    'MTA Net Blocker',
+    'MTA Video Downloader',
+    'MTA University Library Collector',
+    'MTA AI Video Studio'
+  ]) {
+    await expect(page.locator('.mta-home-project-card').filter({ hasText: name })).toHaveCount(1);
+  }
+  await expect(page.locator('.mta-home-contact')).toBeVisible();
+});
+
+test('project portfolio explains each project and distinguishes release status', async ({ page }) => {
+  await page.goto('/projects.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('main h1')).toHaveCount(1);
+  await expect(page.locator('.mta-project-detail')).toHaveCount(4);
+  for (const id of [
+    'mta-net-blocker',
+    'mta-video-downloader',
+    'mta-university-library-collector',
+    'mta-ai-video-studio'
+  ]) {
+    await expect(page.locator('#' + id)).toBeVisible();
+    await expect(page.locator('#' + id + ' h2')).toBeVisible();
+  }
+  await expect(page.locator('#mta-net-blocker .mta-project-state.is-live')).toBeVisible();
+  await expect(page.locator('#mta-video-downloader .mta-project-state.is-progress')).toBeVisible();
+  await expect(page.locator('#mta-university-library-collector .mta-project-state.is-progress')).toBeVisible();
+  await expect(page.locator('#mta-ai-video-studio .mta-project-state.is-research')).toBeVisible();
+  await expect(page.locator('#mta-university-library-collector .mta-project-note')).toContainText('لا يعني');
+  await expect(page.locator('#mta-ai-video-studio .mta-project-note')).toContainText('ليس وصفاً');
+});
