@@ -16,8 +16,10 @@
     return window.matchMedia && window.matchMedia("(max-width: 767px)").matches;
   }
   function requestBanner(slot) {
-    if (!isVisibleSlot(slot) || slot.getAttribute("data-ad-status") === "requested" ||
-        slot.getAttribute("data-ad-status") === "rendered") return false;
+    var currentStatus = slot.getAttribute("data-ad-status");
+    if (!isVisibleSlot(slot) || currentStatus === "requesting" ||
+        currentStatus === "requested" || currentStatus === "creative-inserted" ||
+        currentStatus === "rendered" || currentStatus === "error") return false;
 
     var zoneId = isMobileViewport()
       ? (slot.getAttribute("data-ad-zone-mobile") || slot.getAttribute("data-ad-zone"))
