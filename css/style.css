@@ -1349,3 +1349,148 @@ textarea {
     min-height: 278px;
   }
 }
+
+/* 2026 corporate homepage refresh: calmer hierarchy and fewer competing sections */
+.mta-home-refresh { background:var(--bg-primary); }
+.mta-home-refresh .corp-header { position:sticky; top:0; }
+.mta-home-refresh .corp-header-inner { min-height:78px; gap:1.25rem; }
+.mta-home-refresh .corp-logo img { display:block; width:auto; max-width:205px; max-height:48px; object-fit:contain; }
+.mta-home-refresh .corp-page-nav { display:flex; align-items:center; gap:clamp(.8rem,1.7vw,1.5rem); }
+.mta-home-refresh .corp-page-nav a { color:var(--text-secondary); font-size:.82rem; font-weight:650; text-decoration:none; white-space:nowrap; transition:color .2s ease; }
+.mta-home-refresh .corp-page-nav a:hover { color:var(--accent-blue); }
+.mta-home-refresh .corp-header-actions { display:flex; align-items:center; gap:.5rem; }
+.mta-home-refresh .corp-store-link { display:inline-flex; align-items:center; min-height:40px; padding:.55rem .85rem; border:1px solid rgba(56,189,248,.28); border-radius:10px; color:var(--accent-blue); text-decoration:none; font-size:.78rem; font-weight:750; white-space:nowrap; }
+.mta-home-hero { position:relative; overflow:hidden; padding:clamp(4rem,8vw,7rem) 0 clamp(3rem,5vw,4.5rem); border-bottom:1px solid var(--border-color); }
+.mta-home-hero-glow { position:absolute; width:620px; height:620px; inset-block-start:-310px; inset-inline-start:-180px; border-radius:50%; background:radial-gradient(circle,rgba(37,99,235,.2),transparent 68%); pointer-events:none; }
+.mta-home-hero-inner { position:relative; display:grid; grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr); align-items:center; gap:clamp(2rem,6vw,5.5rem); }
+.mta-home-hero-copy { max-width:720px; }
+.mta-home-eyebrow,.mta-home-kicker,.mta-projects-eyebrow { color:var(--accent-blue); font-size:.72rem; font-weight:800; letter-spacing:.1em; }
+.mta-home-eyebrow { display:inline-flex; align-items:center; gap:.65rem; margin-bottom:1.5rem; }
+.mta-home-dot { width:8px; height:8px; border-radius:50%; background:var(--accent-emerald); box-shadow:0 0 0 5px rgba(16,185,129,.12); }
+.mta-home-hero h1 { margin:0 0 1.25rem; font-size:clamp(2.35rem,5.2vw,4.35rem); font-weight:850; line-height:1.35; letter-spacing:-.045em; }
+.mta-home-hero h1 em,.mta-home-intro h2 em { color:var(--accent-blue); font-style:normal; }
+.mta-home-hero-copy>p { max-width:650px; color:var(--text-secondary); font-size:1rem; line-height:2.1; }
+.mta-home-actions { display:flex; align-items:center; flex-wrap:wrap; gap:1rem; margin-top:1.8rem; }
+.mta-home-secondary,.mta-home-text-link { color:var(--text-primary); font-size:.86rem; font-weight:750; text-decoration:none; }
+.mta-home-secondary:hover,.mta-home-text-link:hover { color:var(--accent-blue); }
+.mta-home-signature { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; margin-top:3rem; padding-top:1rem; border-top:1px solid var(--border-color); color:var(--text-muted); font:700 .62rem 'Plus Jakarta Sans',sans-serif; letter-spacing:.14em; }
+.mta-home-brand-panel { position:relative; display:grid; place-items:center; min-height:350px; }
+.mta-home-brand-frame { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; width:min(100%,440px); min-height:220px; padding:2rem; border:1px solid rgba(56,189,248,.2); border-radius:26px; background:linear-gradient(145deg,rgba(14,22,41,.94),rgba(7,11,20,.72)); box-shadow:0 28px 80px rgba(0,0,0,.24); }
+[data-theme="light"] .mta-home-brand-frame { background:linear-gradient(145deg,#fff,#eff6ff); }
+.mta-home-brand-frame img { display:block; width:100%; max-height:140px; object-fit:contain; }
+.mta-home-brand-caption { margin-top:1.2rem; color:var(--text-muted); font:700 .58rem 'Plus Jakarta Sans',sans-serif; letter-spacing:.13em; text-align:center; }
+.mta-home-frame-corner { position:absolute; top:14px; inset-inline-start:14px; width:20px; height:20px; border-top:2px solid var(--accent-blue); border-inline-start:2px solid var(--accent-blue); }
+.mta-home-orbit { position:absolute; width:330px; height:330px; border:1px solid rgba(56,189,248,.13); border-radius:50%; }
+.mta-home-orbit-one { transform:rotate(28deg) scaleX(1.25); }
+.mta-home-orbit-two { transform:rotate(-35deg) scaleX(.8); border-color:rgba(37,99,235,.2); }
+.mta-home-intro { padding:4.5rem 0; border-bottom:1px solid var(--border-color); }
+.mta-home-intro-grid { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+.mta-home-intro h2,.mta-home-section-head h2,.mta-home-platforms h2,.mta-home-contact h2 { margin-top:.65rem; font-size:clamp(1.7rem,3vw,2.45rem); line-height:1.5; font-weight:850; }
+.mta-home-intro-grid>div:last-child p,.mta-home-section-head p,.mta-home-platforms p,.mta-home-contact p { color:var(--text-secondary); line-height:2; font-size:.92rem; }
+.mta-home-intro-grid>div:last-child p { margin-bottom:1rem; }
+.mta-home-text-link { color:var(--accent-blue); }
+.mta-home-projects { padding:5rem 0; }
+.mta-home-section-head { display:flex; align-items:end; justify-content:space-between; gap:2rem; margin-bottom:2rem; }
+.mta-home-section-head p { margin-top:.45rem; }
+.mta-home-project-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+.mta-home-project-card { display:flex; flex-direction:column; min-width:0; padding:1.6rem; border:1px solid var(--border-color); border-radius:19px; background:var(--bg-surface); transition:border-color .2s,transform .2s; }
+.mta-home-project-card:hover { border-color:var(--border-hover); transform:translateY(-3px); }
+.mta-home-project-featured { background:linear-gradient(145deg,rgba(37,99,235,.13),var(--bg-surface) 60%); border-color:rgba(56,189,248,.28); }
+.mta-home-project-top { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.35rem; }
+.mta-home-project-icon { display:grid; place-items:center; width:48px; height:48px; border-radius:14px; background:rgba(56,189,248,.1); color:var(--accent-blue); font:800 .95rem 'Plus Jakarta Sans',sans-serif; }
+.mta-status { display:inline-flex; align-items:center; padding:.35rem .65rem; border-radius:999px; font-size:.68rem; font-weight:750; }
+.mta-status-live { color:#10B981; background:rgba(16,185,129,.1); }
+.mta-status-progress { color:#60A5FA; background:rgba(96,165,250,.1); }
+.mta-status-research { color:#A78BFA; background:rgba(167,139,250,.1); }
+.mta-home-project-type { color:var(--text-muted); font:700 .62rem 'Plus Jakarta Sans',sans-serif; letter-spacing:.11em; }
+.mta-home-project-card h3 { margin:.55rem 0 .7rem; font-size:1.22rem; font-weight:800; }
+.mta-home-project-card p { color:var(--text-secondary); font-size:.86rem; line-height:1.95; flex:1; }
+.mta-home-card-link { display:inline-flex; align-items:center; gap:.45rem; margin-top:1.3rem; color:var(--accent-blue); font-size:.8rem; font-weight:800; text-decoration:none; }
+.mta-home-platforms { padding:2.7rem 0; border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); background:var(--bg-surface); }
+.mta-home-platforms-inner { display:flex; align-items:center; justify-content:space-between; gap:2rem; }
+.mta-home-platforms-inner>div { max-width:760px; }
+.mta-home-platforms p { margin-top:.5rem; }
+.mta-home-platforms .btn { flex-shrink:0; }
+.mta-home-contact { padding:4rem 0; }
+.mta-home-contact-inner { display:flex; align-items:center; justify-content:space-between; gap:2rem; padding:2.2rem; border:1px solid rgba(56,189,248,.2); border-radius:22px; background:linear-gradient(115deg,rgba(37,99,235,.13),rgba(14,22,41,.5)); }
+.mta-home-contact h2 { margin:.45rem 0; }
+.mta-home-contact p { max-width:650px; }
+.mta-home-contact .btn { flex-shrink:0; }
+@media(max-width:900px) {
+  .mta-home-refresh .corp-page-nav { gap:.7rem; }
+  .mta-home-refresh .corp-page-nav a { font-size:.74rem; }
+  .mta-home-refresh .corp-store-link { display:none; }
+  .mta-home-hero-inner { gap:2rem; }
+  .mta-home-brand-panel { min-height:290px; }
+}
+@media(max-width:700px) {
+  .mta-home-refresh .corp-header-inner { min-height:68px; flex-wrap:wrap; padding-top:.6rem; padding-bottom:.6rem; }
+  .mta-home-refresh .corp-logo img { max-width:155px; max-height:40px; }
+  .mta-home-refresh .corp-page-nav { order:3; width:100%; overflow-x:auto; padding:.35rem 0 .15rem; justify-content:flex-start; }
+  .mta-home-refresh .corp-page-nav a { font-size:.72rem; }
+  .mta-home-hero { padding:3.5rem 0 2.7rem; }
+  .mta-home-hero-inner { grid-template-columns:1fr; }
+  .mta-home-hero h1 { font-size:clamp(2.15rem,9vw,3.1rem); }
+  .mta-home-brand-panel { min-height:210px; }
+  .mta-home-brand-frame { width:min(100%,350px); min-height:165px; padding:1.5rem; }
+  .mta-home-brand-frame img { max-height:100px; }
+  .mta-home-orbit { width:230px; height:230px; }
+  .mta-home-intro { padding:3rem 0; }
+  .mta-home-intro-grid { grid-template-columns:1fr; gap:1rem; }
+  .mta-home-projects { padding:3.5rem 0; }
+  .mta-home-section-head { align-items:flex-start; flex-direction:column; gap:.7rem; }
+  .mta-home-project-grid { grid-template-columns:1fr; }
+  .mta-home-platforms-inner,.mta-home-contact-inner { align-items:flex-start; flex-direction:column; }
+  .mta-home-contact-inner { padding:1.5rem; }
+}
+@media(max-width:380px) {
+  .mta-home-refresh .corp-header-actions { gap:.3rem; }
+  .mta-home-refresh .control-btn { padding:.45rem .55rem; font-size:.7rem; }
+  .mta-home-signature { gap:.5rem; font-size:.53rem; }
+}
+
+/* Project portfolio: detailed, readable cards with explicit release states */
+.mta-projects-main { padding-bottom:1rem; }
+.mta-projects-hero { padding-top:4.5rem; padding-bottom:2.5rem; max-width:980px; }
+.mta-projects-hero h1 { margin:1rem 0; font-size:clamp(2.1rem,5vw,3.7rem); font-weight:850; line-height:1.45; }
+.mta-projects-hero h1 em { color:var(--accent-blue); font-style:normal; }
+.mta-projects-hero>p { max-width:790px; color:var(--text-secondary); line-height:2.1; font-size:.95rem; }
+.mta-projects-legend { display:flex; flex-wrap:wrap; gap:1.2rem; margin-top:1.6rem; color:var(--text-muted); font-size:.75rem; }
+.mta-projects-legend>span { display:inline-flex; align-items:center; gap:.45rem; }
+.mta-status-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+.mta-status-dot.is-live { background:#10B981; }.mta-status-dot.is-progress { background:#60A5FA; }.mta-status-dot.is-research { background:#A78BFA; }
+.mta-project-detail-list { display:grid; gap:1.1rem; padding-bottom:4rem; }
+.mta-project-detail { display:grid; grid-template-columns:210px minmax(0,1fr); gap:2rem; padding:2rem; border:1px solid var(--border-color); border-radius:22px; background:var(--bg-surface); scroll-margin-top:100px; }
+.mta-project-detail-featured { border-color:rgba(56,189,248,.28); background:linear-gradient(120deg,rgba(37,99,235,.1),var(--bg-surface) 45%); }
+.mta-project-detail-aside { display:flex; flex-direction:column; align-items:flex-start; gap:1rem; }
+.mta-project-mark { display:grid; place-items:center; width:76px; height:76px; border:1px solid rgba(56,189,248,.25); border-radius:21px; background:rgba(56,189,248,.09); color:var(--accent-blue); font:850 1.4rem 'Plus Jakarta Sans',sans-serif; }
+.mta-project-category { color:var(--text-muted); font:750 .6rem 'Plus Jakarta Sans',sans-serif; letter-spacing:.1em; line-height:1.7; }
+.mta-project-state { display:inline-flex; padding:.4rem .7rem; border-radius:99px; font-size:.68rem; font-weight:750; }
+.mta-project-state.is-live { color:#10B981; background:rgba(16,185,129,.1); }
+.mta-project-state.is-progress { color:#60A5FA; background:rgba(96,165,250,.1); }
+.mta-project-state.is-research { color:#A78BFA; background:rgba(167,139,250,.1); }
+.mta-project-number { color:var(--text-muted); font:750 .62rem 'Plus Jakarta Sans',sans-serif; letter-spacing:.12em; }
+.mta-project-detail-body h2 { margin:.35rem 0 .5rem; font-size:1.65rem; font-weight:850; }
+.mta-project-lead { color:var(--accent-blue)!important; font-weight:750; font-size:.96rem!important; margin-bottom:.7rem!important; }
+.mta-project-detail-body>p { color:var(--text-secondary); font-size:.87rem; line-height:2; margin-bottom:1rem; }
+.mta-project-feature-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.7rem; margin:1.25rem 0; }
+.mta-project-feature-grid>div { display:flex; flex-direction:column; gap:.35rem; padding:.9rem 1rem; border:1px solid var(--border-color); border-radius:13px; background:rgba(255,255,255,.018); }
+.mta-project-feature-grid strong { font-size:.78rem; color:var(--text-primary); }
+.mta-project-feature-grid span { color:var(--text-secondary); font-size:.75rem; line-height:1.8; }
+.mta-project-meta { display:flex; flex-wrap:wrap; gap:.55rem; margin:1.1rem 0; }
+.mta-project-meta>span { padding:.38rem .6rem; border-radius:8px; background:var(--bg-card); color:var(--text-muted); font:650 .65rem 'Plus Jakarta Sans',sans-serif; }
+.mta-project-note { padding:.8rem 1rem; border-inline-start:3px solid var(--accent-blue); background:rgba(56,189,248,.055); border-radius:8px; }
+.mta-project-actions { display:flex; flex-wrap:wrap; align-items:center; gap:1rem; margin-top:1.3rem; }
+.mta-project-inline-link { color:var(--accent-blue); text-decoration:none; font-size:.8rem; font-weight:750; }
+.mta-projects-contact { display:flex; align-items:center; justify-content:space-between; gap:2rem; margin-bottom:4rem; padding:2rem; border:1px solid var(--border-color); border-radius:20px; background:var(--bg-surface); }
+.mta-projects-contact h2 { margin:.5rem 0; font-size:1.4rem; }
+.mta-projects-contact p { color:var(--text-secondary); font-size:.85rem; line-height:1.8; }
+@media(max-width:760px) {
+  .mta-project-detail { grid-template-columns:1fr; gap:1.2rem; padding:1.3rem; }
+  .mta-project-detail-aside { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:.55rem .9rem; }
+  .mta-project-mark { grid-row:span 2; width:58px; height:58px; border-radius:16px; }
+  .mta-project-category { align-self:end; }
+  .mta-project-state { justify-self:start; align-self:start; }
+  .mta-project-feature-grid { grid-template-columns:1fr; }
+  .mta-projects-contact { align-items:flex-start; flex-direction:column; padding:1.3rem; }
+}
