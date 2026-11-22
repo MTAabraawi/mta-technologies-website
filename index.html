@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/home-carousel.css"/>
 <link rel="icon" type="image/webp" href="images/mta-logo-square.webp"/>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLS74VD22C"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-PLS74VD22C');</script>
@@ -42,28 +43,73 @@
   </div>
 </header>
 
-<aside class="mta-ad-slot mta-ad-slot-top" data-ad-zone="12478774" aria-label="Advertisement"><span class="mta-ad-label"><span class="ar-only">إعلان</span><span class="en-only">Advertisement</span></span></aside>
-
 <main>
-  <section class="mta-home-hero">
-    <div class="mta-home-hero-glow"></div>
-    <div class="container mta-home-hero-inner">
-      <div class="mta-home-hero-copy">
-        <span class="mta-home-eyebrow"><span class="mta-home-dot"></span><span class="ar-only">شركة تقنية مستقلة · تطوير منتجات رقمية</span><span class="en-only">INDEPENDENT TECHNOLOGY · DIGITAL PRODUCT ENGINEERING</span></span>
-        <h1><span class="ar-only">نحوّل الأفكار إلى<br/><em>منتجات تقنية مفيدة.</em></span><span class="en-only">Turning ideas into<br/><em>useful technology.</em></span></h1>
-        <p><span class="ar-only">في MTA TECHNOLOGIES نصمم ونطوّر تطبيقات وبرمجيات ومنصات رقمية تركز على احتياجات المستخدم، مع توضيح ما أصبح متاحاً وما لا يزال قيد التطوير.</span><span class="en-only">MTA TECHNOLOGIES designs and develops applications, software, and digital platforms around real user needs—with a clear distinction between released products and work in progress.</span></p>
-        <div class="mta-home-actions">
-          <a class="btn btn-primary" href="projects.html"><span class="ar-only">تعرّف على مشاريعنا</span><span class="en-only">Explore our projects</span> ↗</a>
-          <a class="mta-home-secondary" href="about.html"><span class="ar-only">عن الشركة</span><span class="en-only">About MTA</span></a>
+  <section class="mta-home-hero mta-home-cinematic" aria-label="MTA TECHNOLOGIES featured presentation">
+    <div class="mta-home-carousel" data-mta-carousel data-autoplay="8500">
+      <article class="mta-home-slide mta-home-slide-brand" data-carousel-slide aria-hidden="false">
+        <div class="mta-cinema-grid" aria-hidden="true"></div>
+        <div class="mta-cinema-copy">
+          <span class="mta-home-eyebrow"><span class="mta-home-dot"></span><span class="ar-only">شركة تقنية مستقلة · تطوير منتجات رقمية</span><span class="en-only">INDEPENDENT TECHNOLOGY · DIGITAL PRODUCT ENGINEERING</span></span>
+          <h1><span class="ar-only">نبني حلولاً تقنية<br/><em>لمستقبل أذكى.</em></span><span class="en-only">Building technology<br/><em>for a smarter tomorrow.</em></span></h1>
+          <p><span class="ar-only">نصمم ونطوّر تطبيقات وبرمجيات ومنصات رقمية تركز على احتياجات المستخدم وتحوّل الأفكار إلى منتجات عملية.</span><span class="en-only">We design and develop applications, software, and digital platforms that turn ideas into practical products centered on people.</span></p>
+          <div class="mta-home-actions">
+            <a class="btn btn-primary" href="about.html"><span class="ar-only">اكتشف MTA</span><span class="en-only">Discover MTA</span> ↗</a>
+            <a class="mta-home-secondary" href="projects.html"><span class="ar-only">مشاريعنا</span><span class="en-only">Our projects</span></a>
+          </div>
+          <span class="mta-cinema-tagline">BUILDING A SMARTER TOMORROW</span>
         </div>
-        <div class="mta-home-signature"><span>MTA TECHNOLOGIES</span><span>BUILDING A SMARTER TOMORROW</span></div>
-      </div>
-      <div class="mta-home-brand-panel">
-        <div class="mta-home-brand-frame"><span class="mta-home-frame-corner"></span><img src="images/mta-logo-horizontal.webp" alt="MTA TECHNOLOGIES" width="520" height="180"/><span class="mta-home-brand-caption">SOFTWARE · APPLICATIONS · DIGITAL PLATFORMS</span></div>
-        <div class="mta-home-orbit mta-home-orbit-one"></div><div class="mta-home-orbit mta-home-orbit-two"></div>
+        <div class="mta-cinema-emblem" aria-label="MTA TECHNOLOGIES">
+          <span class="mta-cinema-orbit mta-cinema-orbit-a"></span>
+          <span class="mta-cinema-orbit mta-cinema-orbit-b"></span>
+          <span class="mta-cinema-ring"></span>
+          <span class="mta-cinema-ring mta-cinema-ring-inner"></span>
+          <span class="mta-cinema-logo"><img src="images/mta-logo-square.webp" alt="MTA" width="220" height="220" fetchpriority="high"/></span>
+          <span class="mta-cinema-spark mta-cinema-spark-one"></span>
+          <span class="mta-cinema-spark mta-cinema-spark-two"></span>
+        </div>
+      </article>
+
+      <article class="mta-home-slide mta-home-slide-projects" data-carousel-slide aria-hidden="true" hidden>
+        <div class="mta-projects-motion-bg" aria-hidden="true"></div>
+        <div class="mta-slide-heading">
+          <span class="mta-home-kicker">02 / THE MTA ECOSYSTEM</span>
+          <h2><span class="ar-only">أفكار تتحول إلى <em>تجارب رقمية</em></span><span class="en-only">Ideas become <em>digital experiences</em></span></h2>
+          <p><span class="ar-only">نطوّر منتجات متنوعة في التطبيقات والأدوات والمنصات الرقمية.</span><span class="en-only">We create products across apps, tools, and digital platforms.</span></p>
+        </div>
+        <div class="mta-projects-motion-stage" aria-label="MTA projects">
+          <div class="mta-motion-app mta-motion-app-one"><span class="mta-motion-app-icon">NB</span><strong>MTA Net Blocker</strong><small><span class="ar-only">إدارة اتصال التطبيقات</span><span class="en-only">App network control</span></small></div>
+          <div class="mta-motion-app mta-motion-app-two"><span class="mta-motion-app-icon">UL</span><strong>University Library</strong><small><span class="ar-only">منصة أكاديمية</span><span class="en-only">Academic platform</span></small></div>
+          <div class="mta-motion-app mta-motion-app-three"><span class="mta-motion-app-icon">VD</span><strong>Video Downloader</strong><small><span class="ar-only">أدوات وسائط رقمية</span><span class="en-only">Digital media tools</span></small></div>
+          <div class="mta-motion-app mta-motion-app-four"><span class="mta-motion-app-icon">AI</span><strong>AI Video Studio</strong><small><span class="ar-only">بحث في الفيديو الذكي</span><span class="en-only">AI video research</span></small></div>
+          <div class="mta-projects-motion-core"><img src="images/mta-logo-square.webp" alt="" width="90" height="90" loading="lazy"/></div>
+        </div>
+        <a class="mta-slide-cta" href="projects.html"><span class="ar-only">استكشف المشاريع بالتفصيل</span><span class="en-only">Explore all projects</span> ↗</a>
+      </article>
+
+      <article class="mta-home-slide mta-home-slide-ad" data-carousel-slide aria-hidden="true" hidden>
+        <div class="mta-slide-heading">
+          <span class="mta-home-kicker">03 / PARTNER WITH US</span>
+          <h2><span class="ar-only">مساحة إعلانية ضمن عالم MTA</span><span class="en-only">An advertising space in the MTA experience</span></h2>
+          <p><span class="ar-only">تظهر الإعلانات ضمن العرض المتحرك مع الحفاظ على وضوح أنها إعلانات.</span><span class="en-only">Advertisements appear as part of the presentation and remain clearly identified.</span></p>
+        </div>
+        <div class="mta-cinema-ad-frame">
+          <span class="mta-ad-label"><span class="ar-only">إعلان</span><span class="en-only">Advertisement</span></span>
+          <aside class="mta-ad-slot mta-ad-slot-top" data-ad-zone="12478774" aria-label="Advertisement"></aside>
+        </div>
+      </article>
+
+      <div class="mta-carousel-controls" aria-label="Carousel controls">
+        <button class="mta-carousel-arrow" type="button" data-carousel-prev aria-label="Previous slide">‹</button>
+        <div class="mta-carousel-dots">
+          <button type="button" data-carousel-to="0" aria-label="Slide 1" aria-current="true"></button>
+          <button type="button" data-carousel-to="1" aria-label="Slide 2" aria-current="false"></button>
+          <button type="button" data-carousel-to="2" aria-label="Slide 3" aria-current="false"></button>
+        </div>
+        <button class="mta-carousel-arrow" type="button" data-carousel-next aria-label="Next slide">›</button>
+        <button class="mta-carousel-pause" type="button" data-carousel-pause aria-label="Pause slideshow">Ⅱ</button>
       </div>
     </div>
-  </section>
+  </section>>
 
   <section class="mta-home-intro">
     <div class="container mta-home-intro-grid">
@@ -125,6 +171,7 @@
   <div><h3><span class="ar-only">المعلومات</span><span class="en-only">Information</span></h3><a href="privacy-policy.html"><span class="ar-only">الخصوصية</span><span class="en-only">Privacy</span></a><a href="terms.html"><span class="ar-only">الشروط</span><span class="en-only">Terms</span></a><a href="disclaimer.html"><span class="ar-only">إخلاء المسؤولية</span><span class="en-only">Disclaimer</span></a></div>
 </div><div class="corp-footer-bottom"><span>© 2026 MTA TECHNOLOGIES. ALL RIGHTS RESERVED.</span><span>BUILDING A SMARTER TOMORROW</span></div></div></footer>
 <script src="js/main.js"></script>
+<script src="js/home-carousel.js" defer></script>
 <script src="js/adcash.js" defer></script>
 </body>
 </html>
