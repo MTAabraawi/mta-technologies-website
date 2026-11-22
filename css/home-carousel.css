@@ -204,3 +204,9 @@
     overflow:hidden;
   }
 }
+
+@media (max-width: 767px) {
+  .mta-corporate-home .mta-ad-slot-bottom[data-ad-status="skipped-responsive"] {
+    display:none;
+  }
+}
