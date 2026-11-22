@@ -260,6 +260,16 @@
 
 
 /* Ensure homepage project artwork remains visible independently of card animations. */
+.mta-home-refresh .mta-home-featured-product > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.56;
+  max-width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
 .mta-home-refresh .mta-home-featured-product > img,
 .mta-home-refresh .mta-project-art-stage .mta-motion-app > img {
   display: block;
