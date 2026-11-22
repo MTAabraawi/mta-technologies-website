@@ -33,7 +33,7 @@
         zoneId: String(zoneId),
         renderIn: "#" + slot.id
       });
-      slot.setAttribute("data-ad-status", "requested");
+      slot.setAttribute("data-ad-status", slot.querySelector("iframe, ins, [data-ad], img[src]") ? "creative-inserted" : "requested");
       window.dispatchEvent(new CustomEvent("mta:adstatus", {
         detail: { slot: slot.id, zone: String(zoneId), status: "requested" }
       }));
