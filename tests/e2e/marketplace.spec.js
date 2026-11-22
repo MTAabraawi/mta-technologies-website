@@ -463,10 +463,10 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
     projectCards: document.querySelectorAll('.mta-home-slide-projects .mta-motion-app').length,
     carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
   }));
-  expect(layout.headerColumns.trim().split(/\\s+/).length).toBe(3);
+  expect(layout.headerColumns.trim().split(/\s+/).length).toBe(3);
   // Read the actual CSS grid tracks, not animated card bounding boxes:
   // the entrance animation applies 3D transforms that can shift visual left edges.
-  expect(layout.stageColumns.trim().split(/\\s+/).length).toBe(2);
+  expect(layout.stageColumns.trim().split(/\s+/).length).toBe(2);
   expect(layout.projectCards).toBe(4);
   expect(layout.carouselHeight).toBeGreaterThanOrEqual(640);
 });
