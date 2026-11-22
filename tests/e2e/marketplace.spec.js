@@ -438,13 +438,26 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
 
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await page.goto('/index.html', { waitUntil: 'load' });
   await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
+  // Wait for the external stylesheet cascade and desktop grid to be applied;
+  // DOMContentLoaded alone can run before linked CSS has finished loading.
+  await page.waitForFunction(() => {
+    const stage = document.querySelector('.mta-projects-motion-stage');
+    const header = document.querySelector('.corp-header-inner');
+    if (!stage || !header) return false;
+    const stageStyle = getComputedStyle(stage);
+    const headerStyle = getComputedStyle(header);
+    return stageStyle.display === 'grid'
+      && stageStyle.gridTemplateColumns.split(' ').length >= 2
+      && headerStyle.display === 'grid';
+  });
   const layout = await page.evaluate(() => ({
     headerColumns: getComputedStyle(document.querySelector('.corp-header-inner')).gridTemplateColumns,
     stageColumnPositions: Array.from(new Set(
       Array.from(document.querySelector('.mta-projects-motion-stage').children)
+        .filter(card => !card.classList.contains('mta-projects-motion-core'))
         .map(card => Math.round(card.getBoundingClientRect().left))
     )).length,
     carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
