@@ -443,11 +443,14 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
   const layout = await page.evaluate(() => ({
     headerColumns: getComputedStyle(document.querySelector('.corp-header-inner')).gridTemplateColumns,
-    stageColumns: getComputedStyle(document.querySelector('.mta-projects-motion-stage')).gridTemplateColumns,
+    stageColumnPositions: Array.from(new Set(
+      Array.from(document.querySelector('.mta-projects-motion-stage').children)
+        .map(card => Math.round(card.getBoundingClientRect().left))
+    )).length,
     carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
   }));
   expect(layout.headerColumns.split(' ').length).toBe(3);
-  expect(layout.stageColumns.trim().split(' ').length).toBe(2);
+  expect(layout.stageColumnPositions).toBe(2);
   expect(layout.carouselHeight).toBeGreaterThanOrEqual(640);
 });
 test('project portfolio explains each project and distinguishes release status', async ({ page }) => {
