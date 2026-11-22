@@ -225,3 +225,40 @@
     grid-auto-flow: row;
   }
 }
+
+
+/* Corporate portfolio artwork and mobile-first visual rhythm. */
+.mta-project-art-stage{width:min(100%,920px);gap:1rem}
+.mta-project-art-stage .mta-motion-app{display:flex;min-height:0;padding:.75rem;gap:.65rem;text-decoration:none;color:#f8fafc;opacity:1;animation:mta-art-card-enter .7s both;overflow:hidden}
+.mta-project-art-stage .mta-motion-app img{display:block;width:100%;height:clamp(112px,16vw,176px);object-fit:cover;border-radius:12px;border:1px solid rgba(125,211,252,.18);transition:transform .45s ease}
+.mta-project-art-stage .mta-motion-app:hover img{transform:scale(1.035)}
+.mta-project-art-stage .mta-motion-app strong{font-size:.9rem}
+.mta-project-art-stage .mta-motion-app small{font-size:.72rem;color:#9fc2df}
+.mta-project-art-stage .mta-motion-app-one{animation-delay:.08s}
+.mta-project-art-stage .mta-motion-app-two{animation-delay:.18s}
+.mta-project-art-stage .mta-motion-app-three{animation-delay:.28s}
+.mta-project-art-stage .mta-motion-app-four{animation-delay:.38s}
+.mta-project-art-stage .mta-motion-app:hover{border-color:rgba(56,189,248,.6);transform:translateY(-3px)}
+@keyframes mta-art-card-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.mta-home-featured-work .mta-home-section-head{margin-bottom:1.6rem}
+.mta-home-featured-product{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(1.25rem,4vw,3.5rem);padding:clamp(1rem,3vw,2rem);border:1px solid var(--border-color);border-radius:24px;background:linear-gradient(135deg,rgba(14,22,41,.96),rgba(8,20,37,.9))}
+.mta-home-featured-product>img{display:block;width:100%;aspect-ratio:1.56;object-fit:cover;border-radius:16px}
+.mta-home-featured-product h3{margin:.5rem 0;font-size:clamp(1.35rem,3vw,2rem)}
+.mta-home-featured-product p{max-width:520px;color:var(--text-secondary);line-height:1.9;margin-bottom:1rem}
+.mta-home-featured-product .mta-status{display:inline-flex;margin-inline-end:.8rem}
+.mta-home-featured-product .mta-home-card-link{display:inline-flex;margin-top:1rem}
+.mta-home-actions{gap:.5rem}
+@media(max-width:760px){
+ .mta-project-art-stage{grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}
+ .mta-project-art-stage .mta-motion-app{padding:.5rem;border-radius:14px}
+ .mta-project-art-stage .mta-motion-app img{height:105px}
+ .mta-project-art-stage .mta-motion-app strong{font-size:.72rem}
+ .mta-project-art-stage .mta-motion-app small{font-size:.62rem}
+ .mta-home-featured-product{grid-template-columns:1fr;gap:1rem}
+ .mta-home-featured-product>img{aspect-ratio:1.6}
+ .mta-home-featured-product>div{padding:.25rem .2rem .5rem}
+}
+@media(prefers-reduced-motion:reduce){
+ .mta-project-art-stage .mta-motion-app{animation:none!important}
+ .mta-project-art-stage .mta-motion-app img{transition:none}
+}
