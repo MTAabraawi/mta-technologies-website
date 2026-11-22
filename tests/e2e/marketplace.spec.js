@@ -384,18 +384,20 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await page.reload({ waitUntil: 'domcontentloaded' });
   const mobileTopSlot = page.locator('.mta-ad-slot-top');
   const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'skipped-responsive');
+  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual([]);
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
   await page.locator('[data-carousel-to="2"]').click();
   await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
-  const mobileVisibleText = await mobileTopSlot.evaluate(element => element.innerText);
-  expect(mobileVisibleText).not.toContain('aclib.runBanner');
-  expect(mobileVisibleText).not.toContain('zoneId');
-  expect(mobileVisibleText).not.toContain('12478782');
-  await expect(mobileTopSlot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-  await expect(mobileBottomSlot.locator('iframe')).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478782']);
+  for (const slot of [mobileTopSlot, mobileBottomSlot]) {
+    const visibleText = await slot.evaluate(element => element.innerText);
+    expect(visibleText).not.toContain('aclib.runBanner');
+    expect(visibleText).not.toContain('zoneId');
+    expect(visibleText).not.toContain('12478782');
+    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
+    await expect(slot.locator('script')).toHaveCount(0);
+  }
 });
 
 test('corporate homepage has a focused hierarchy and introduces all MTA projects', async ({ page }) => {
@@ -445,7 +447,7 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
     carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
   }));
   expect(layout.headerColumns.split(' ').length).toBe(3);
-  expect(layout.stageColumns.split(' ').length).toBe(2);
+  expect(layout.stageColumns.trim().split(/\\s+/).length).toBe(2);
   expect(layout.carouselHeight).toBeGreaterThanOrEqual(640);
 });
 test('project portfolio explains each project and distinguishes release status', async ({ page }) => {
