@@ -1,5 +1,28 @@
 (function () {
   "use strict";
+  // Adcash In-Page Push: one request per page load.
+  // The Adcash library is already loaded in each page's <head>.
+  var inPagePushZoneId = "12481106";
+  if (!window.__mtaInPagePush12481106Requested && window.aclib &&
+      typeof window.aclib.runInPagePush === "function") {
+    try {
+      window.aclib.runInPagePush({
+        zoneId: inPagePushZoneId,
+        maxAds: 2
+      });
+      window.__mtaInPagePush12481106Requested = true;
+    } catch (error) {
+      window.dispatchEvent(new CustomEvent("mta:adstatus", {
+        detail: {
+          format: "in-page-push",
+          zone: inPagePushZoneId,
+          status: "error",
+          error: String(error && error.message || error)
+        }
+      }));
+    }
+  }
+
   var slots = Array.prototype.slice.call(document.querySelectorAll(".mta-ad-slot[data-ad-zone]"));
   if (!slots.length) return;
 
