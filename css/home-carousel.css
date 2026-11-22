@@ -262,3 +262,11 @@
  .mta-project-art-stage .mta-motion-app{animation:none!important}
  .mta-project-art-stage .mta-motion-app img{transition:none}
 }
+
+
+/* Visible slides animate on entry; autoplay itself is not tied to CSS motion. */
+.mta-home-carousel .mta-home-slide:not([hidden]){animation:mta-slide-arrive .72s cubic-bezier(.2,.75,.25,1) both}
+@keyframes mta-slide-arrive{from{opacity:.35;transform:translateY(12px) scale(.995)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){
+ .mta-home-carousel .mta-home-slide:not([hidden]){animation:none!important}
+}
