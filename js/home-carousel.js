@@ -10,7 +10,7 @@
   var index = 0;
   var timer = null;
   var paused = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var delay = Math.max(5000, Number(root.getAttribute("data-autoplay")) || 8500);
+  var delay = Math.max(1000, Number(root.getAttribute("data-autoplay")) || 4200);
 
   function show(nextIndex) {
     index = (nextIndex + slides.length) % slides.length;
@@ -22,6 +22,7 @@
     dots.forEach(function (dot, i) {
       dot.setAttribute("aria-current", i === index ? "true" : "false");
     });
+    window.dispatchEvent(new CustomEvent("mta:carouselchange", { detail: { index: index } }));
   }
   function stop() {
     if (timer) window.clearInterval(timer);

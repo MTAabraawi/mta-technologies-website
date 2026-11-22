@@ -349,11 +349,11 @@ test('all site pages and store/application routes use the shared Adcash Display 
   }
 });
 
-test('shared Adcash initializer requests both Display zones without exposing code as text', async ({ page }) => {
+test('shared Adcash initializer waits for visible carousel slides and never exposes provider code as text', async ({ page }) => {
   await page.route('**/acscdn.com/script/aclib.js', route => route.fulfill({
     status: 200,
     contentType: 'application/javascript',
-    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); } };"
+    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); var frame = document.createElement('iframe'); frame.title = 'Advertisement'; frame.src = 'about:blank'; document.currentScript.parentElement.appendChild(frame); } };"
   }));
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
@@ -361,33 +361,44 @@ test('shared Adcash initializer requests both Display zones without exposing cod
   const bottomSlot = page.locator('.mta-ad-slot-bottom');
   await expect(topSlot).toHaveCount(1);
   await expect(bottomSlot).toBeVisible();
-  await expect(topSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect(bottomSlot).toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
+  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
+
+  await page.locator('[data-carousel-to="1"]').click();
+  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
   await page.locator('[data-carousel-to="2"]').click();
-  await expect(topSlot).toBeVisible();
+  await expect(topSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
+
   for (const slot of [topSlot, bottomSlot]) {
-    await expect(slot).not.toContainText('aclib.runBanner');
-    await expect(slot).not.toContainText('zoneId');
-    await expect(slot).not.toContainText('12478782');
+    const visibleText = await slot.evaluate(element => Array.from(element.childNodes).filter(node => node.nodeType !== Node.ELEMENT_NODE || !["SCRIPT", "STYLE"].includes(node.tagName)).map(node => node.textContent || "").join(" ").trim());
+    expect(visibleText).not.toContain('aclib.runBanner');
+    expect(visibleText).not.toContain('zoneId');
+    expect(visibleText).not.toContain('12478774');
+    expect(visibleText).not.toContain('12478782');
+    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
   }
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
   const mobileTopSlot = page.locator('.mta-ad-slot-top');
   const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileTopSlot).toHaveCount(1);
-  await expect(mobileBottomSlot).toBeVisible();
-  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'requested');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
   await page.locator('[data-carousel-to="2"]').click();
-  await expect(mobileTopSlot).toBeVisible();
+  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478782']);
   for (const slot of [mobileTopSlot, mobileBottomSlot]) {
-    await expect(slot).not.toContainText('aclib.runBanner');
-    await expect(slot).not.toContainText('12478782');
+    const visibleText = await slot.evaluate(element => element.innerText);
+    expect(visibleText).not.toContain('aclib.runBanner');
+    expect(visibleText).not.toContain('zoneId');
+    expect(visibleText).not.toContain('12478782');
+    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
+    await expect(slot.locator('script')).toHaveCount(0);
   }
 });
-
 
 test('corporate homepage has a focused hierarchy and introduces all MTA projects', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
@@ -410,6 +421,7 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   const carousel = page.locator('[data-mta-carousel]');
   await expect(carousel).toBeVisible();
   await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(3);
+  await expect(carousel).toHaveAttribute('data-autoplay', '4200');
   await expect(carousel.locator('.mta-cinema-logo img')).toHaveAttribute('src', 'images/mta-logo-square.webp');
   await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible();
   await carousel.locator('[data-carousel-next]').click();
@@ -423,6 +435,41 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   await expect(carousel.locator('[data-carousel-pause]')).toHaveAttribute('aria-label', 'Play slideshow');
 });
 
+
+test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/index.html', { waitUntil: 'load' });
+  await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
+  await expect(page.locator('.corp-store-link')).toHaveCount(0);
+  // The project slide is initially hidden; activate it before measuring its grid.
+  await page.locator('[data-carousel-to="1"]').click();
+  const projectSlide = page.locator('.mta-home-slide-projects');
+  await expect(projectSlide).toHaveAttribute('aria-hidden', 'false');
+  await expect(projectSlide).toBeVisible();
+  // Wait for the external stylesheet cascade and visible desktop grid.
+  await page.waitForFunction(() => {
+    const stage = document.querySelector('.mta-home-slide-projects .mta-projects-motion-stage');
+    const header = document.querySelector('.corp-header-inner');
+    if (!stage || !header || !stage.getClientRects().length) return false;
+    const stageStyle = getComputedStyle(stage);
+    const headerStyle = getComputedStyle(header);
+    return stageStyle.display === 'grid'
+      && stageStyle.gridTemplateColumns.split(' ').length >= 2
+      && headerStyle.display === 'grid';
+  });
+  const layout = await page.evaluate(() => ({
+    headerColumns: getComputedStyle(document.querySelector('.corp-header-inner')).gridTemplateColumns,
+    stageColumns: getComputedStyle(document.querySelector('.mta-home-slide-projects .mta-projects-motion-stage')).gridTemplateColumns,
+    projectCards: document.querySelectorAll('.mta-home-slide-projects .mta-motion-app').length,
+    carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
+  }));
+  expect(layout.headerColumns.trim().split(/\s+/).length).toBe(3);
+  // Read the actual CSS grid tracks, not animated card bounding boxes:
+  // the entrance animation applies 3D transforms that can shift visual left edges.
+  expect(layout.stageColumns.trim().split(/\s+/).length).toBe(2);
+  expect(layout.projectCards).toBe(4);
+  expect(layout.carouselHeight).toBeGreaterThanOrEqual(640);
+});
 test('project portfolio explains each project and distinguishes release status', async ({ page }) => {
   await page.goto('/projects.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('main h1')).toHaveCount(1);
