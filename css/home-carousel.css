@@ -70,11 +70,6 @@
  .mta-cinema-ad-frame{padding:.8rem;min-height:220px}
  .mta-carousel-controls{bottom:.8rem}
 }
-@media(prefers-reduced-motion:reduce){
- .mta-home-cinematic *, .mta-home-cinematic *:before, .mta-home-cinematic *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
-}
-
-
 /* 2026-11 desktop refinement: calm hierarchy, generous whitespace, balanced motion. */
 @media (min-width: 761px) {
   .mta-home-refresh .corp-header-inner {
@@ -257,8 +252,4 @@
  .mta-home-featured-product{grid-template-columns:1fr;gap:1rem}
  .mta-home-featured-product>img{aspect-ratio:1.6}
  .mta-home-featured-product>div{padding:.25rem .2rem .5rem}
-}
-@media(prefers-reduced-motion:reduce){
- .mta-project-art-stage .mta-motion-app{animation:none!important}
- .mta-project-art-stage .mta-motion-app img{transition:none}
 }
