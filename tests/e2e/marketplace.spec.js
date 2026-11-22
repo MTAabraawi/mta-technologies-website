@@ -383,17 +383,16 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await page.reload({ waitUntil: 'domcontentloaded' });
   const mobileTopSlot = page.locator('.mta-ad-slot-top');
   const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'skipped-responsive');
   await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual([]);
   await page.locator('[data-carousel-to="2"]').click();
   await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
-  for (const slot of [mobileTopSlot, mobileBottomSlot]) {
-    await expect(slot).not.toContainText('aclib.runBanner');
-    await expect(slot).not.toContainText('zoneId');
-    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-  }
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
+  await expect(mobileTopSlot).not.toContainText('aclib.runBanner');
+  await expect(mobileTopSlot).not.toContainText('zoneId');
+  await expect(mobileTopSlot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
+  await expect(mobileBottomSlot.locator('iframe')).toHaveCount(0);
 });
 
 test('corporate homepage has a focused hierarchy and introduces all MTA projects', async ({ page }) => {
