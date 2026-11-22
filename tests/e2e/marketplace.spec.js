@@ -364,12 +364,22 @@ test('shared Adcash initializer requests both Display zones without exposing cod
   await expect(topSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect(bottomSlot).toHaveAttribute('data-ad-status', 'requested');
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
-  await expect(page.locator('.mta-ad-slot')).not.toContainText('aclib.runBanner');
-  await expect(page.locator('.mta-ad-slot')).not.toContainText('zoneId');
-  await expect(page.locator('.mta-ad-slot')).not.toContainText('12478782');
+  for (const slot of [topSlot, bottomSlot]) {
+    await expect(slot).not.toContainText('aclib.runBanner');
+    await expect(slot).not.toContainText('zoneId');
+    await expect(slot).not.toContainText('12478782');
+  }
   await page.setViewportSize({ width: 390, height: 844 });
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478774', '12478782']);
-  await expect(page.locator('.mta-ad-slot-top')).toBeVisible();
-  await expect(page.locator('.mta-ad-slot-bottom')).toBeVisible();
+  const mobileTopSlot = page.locator('.mta-ad-slot-top');
+  const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
+  await expect(mobileTopSlot).toBeVisible();
+  await expect(mobileBottomSlot).toBeVisible();
+  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'requested');
+  for (const slot of [mobileTopSlot, mobileBottomSlot]) {
+    await expect(slot).not.toContainText('aclib.runBanner');
+    await expect(slot).not.toContainText('12478782');
+  }
 });
