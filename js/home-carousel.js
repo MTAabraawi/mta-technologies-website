@@ -10,7 +10,6 @@
 
   var index = 0;
   var timer = null;
-  var reducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
   var delay = Math.max(2500, Number(root.getAttribute("data-autoplay")) || 5200);
   var touchStart = null;
   var suppressClickUntil = 0;
@@ -33,7 +32,7 @@
   }
   function start() {
     stop();
-    if (reducedMotion || document.hidden || slides.length < 2) return;
+    if (document.hidden || slides.length < 2) return;
     timer = window.setInterval(function () { show(index + 1); }, delay);
   }
   function move(step) {
