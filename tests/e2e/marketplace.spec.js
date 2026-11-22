@@ -447,7 +447,7 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
     carouselHeight: document.querySelector('.mta-home-carousel').getBoundingClientRect().height
   }));
   expect(layout.headerColumns.split(' ').length).toBe(3);
-  expect(layout.stageColumns.trim().split(/\\s+/).length).toBe(2);
+  expect(layout.stageColumns.trim().split(' ').length).toBe(2);
   expect(layout.carouselHeight).toBeGreaterThanOrEqual(640);
 });
 test('project portfolio explains each project and distinguishes release status', async ({ page }) => {
