@@ -396,11 +396,12 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
     expect(visibleText).not.toContain('zoneId');
     expect(visibleText).not.toContain('12478782');
     await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-    await expect(slot.locator('script')).toHaveCount(0);
+    await expect(slot.locator('script')).toHaveCount(1);
+    await expect(slot.locator('script')).toHaveJSProperty('hidden', true);
   }
 });
 
-test('corporate homepage has a focused hierarchy and introduces all MTA projects', async ({ page }) => {
+test('corporate homepage presents company capabilities and a released product', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('main > section')).toHaveCount(5);
   await expect(page.locator('main h1')).toHaveCount(1);
@@ -421,13 +422,17 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   await carousel.locator('[data-carousel-next]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(1)).toBeVisible();
   await expect(carousel.locator('.mta-motion-app')).toHaveCount(4);
-  for (const image of await carousel.locator('.mta-motion-app img').all()) await expect(image).toBeVisible();
+  for (const image of await carousel.locator('.mta-motion-app img').all()) {
+    await expect(image).toBeVisible();
+    await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  }
   await expect(carousel.locator('.mta-motion-app[href*="projects.html"]')).toHaveCount(3);
   await expect(carousel.locator('[data-carousel-pause]')).toHaveCount(0);
   await carousel.locator('[data-carousel-to="2"]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(2)).toBeVisible();
   await expect(carousel.locator('.mta-ad-slot-top')).toBeVisible();
   await expect(carousel.locator('.mta-ad-slot-top')).toHaveAttribute('data-ad-zone', '12478774');
+  await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible({ timeout: 6_000 });
 });
 
 
