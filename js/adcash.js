@@ -10,11 +10,26 @@
     return slot.isConnected && !slot.closest("[hidden]");
   }
 
+  function isMobileViewport() {
+    return window.matchMedia && window.matchMedia("(max-width: 767px)").matches;
+  }
+
+  function shouldSkipSlot(slot) {
+    return document.body.classList.contains("mta-corporate-home") &&
+      slot.classList.contains("mta-ad-slot-bottom") && isMobileViewport();
+  }
+
   function runSlot(slot) {
+    if (shouldSkipSlot(slot)) {
+      slot.setAttribute("data-ad-status", "skipped-responsive");
+      return true;
+    }
     if (!isVisibleSlot(slot)) return false;
     if (slot.getAttribute("data-ad-status") === "requested") return true;
 
-    var zoneId = slot.getAttribute("data-ad-zone");
+    var zoneId = isMobileViewport()
+      ? (slot.getAttribute("data-ad-zone-mobile") || slot.getAttribute("data-ad-zone"))
+      : slot.getAttribute("data-ad-zone");
     if (!zoneId || !window.aclib || typeof window.aclib.runBanner !== "function") {
       return false;
     }
@@ -45,7 +60,7 @@
   function waitForAdcash() {
     initializeVisibleSlots();
     var pending = slots.some(function (slot) {
-      return isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested";
+      return isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested" && slot.getAttribute("data-ad-status") !== "skipped-responsive";
     });
     if (!pending) return;
     attempts += 1;
@@ -53,7 +68,7 @@
       window.setTimeout(waitForAdcash, 250);
     } else {
       slots.forEach(function (slot) {
-        if (isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested") {
+        if (isVisibleSlot(slot) && slot.getAttribute("data-ad-status") !== "requested" && slot.getAttribute("data-ad-status") !== "skipped-responsive") {
           slot.setAttribute("data-ad-status", "library-unavailable");
         }
       });
