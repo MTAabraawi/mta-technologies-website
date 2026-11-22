@@ -353,7 +353,7 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await page.route('**/acscdn.com/script/aclib.js', route => route.fulfill({
     status: 200,
     contentType: 'application/javascript',
-    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); var frame = document.createElement('iframe'); frame.title = 'Advertisement'; frame.src = 'about:blank'; document.currentScript.parentElement.appendChild(frame); } };"
+    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); var frame = document.createElement('iframe'); frame.title = 'Advertisement'; frame.src = 'about:blank'; document.querySelector(options.renderIn).appendChild(frame); } };"
   }));
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
@@ -361,14 +361,14 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   const bottomSlot = page.locator('.mta-ad-slot-bottom');
   await expect(topSlot).toHaveCount(1);
   await expect(bottomSlot).toBeVisible();
-  await expect(bottomSlot).toHaveAttribute('data-ad-status', 'requested');
-  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
+  await expect(bottomSlot).toHaveAttribute('data-ad-status', 'rendered');
+  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'rendered');
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
 
   await page.locator('[data-carousel-to="1"]').click();
   await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
   await page.locator('[data-carousel-to="2"]').click();
-  await expect(topSlot).toHaveAttribute('data-ad-status', 'requested');
+  await expect(topSlot).toHaveAttribute('data-ad-status', 'rendered');
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
 
   for (const slot of [topSlot, bottomSlot]) {
@@ -384,35 +384,30 @@ test('shared Adcash initializer waits for visible carousel slides and never expo
   await page.reload({ waitUntil: 'domcontentloaded' });
   const mobileTopSlot = page.locator('.mta-ad-slot-top');
   const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'requested');
-  await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'requested');
+  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'rendered');
+  await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'rendered');
   await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
   await page.locator('[data-carousel-to="2"]').click();
-  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478782']);
+  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'rendered');
+  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
   for (const slot of [mobileTopSlot, mobileBottomSlot]) {
     const visibleText = await slot.evaluate(element => element.innerText);
     expect(visibleText).not.toContain('aclib.runBanner');
     expect(visibleText).not.toContain('zoneId');
     expect(visibleText).not.toContain('12478782');
     await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-    await expect(slot.locator('script')).toHaveCount(0);
+    await expect(slot.locator('script')).toHaveCount(1);
+    await expect(slot.locator('script')).toHaveJSProperty('hidden', true);
   }
 });
 
-test('corporate homepage has a focused hierarchy and introduces all MTA projects', async ({ page }) => {
+test('corporate homepage presents company capabilities and a released product', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('main > section')).toHaveCount(5);
   await expect(page.locator('main h1')).toHaveCount(1);
-  await expect(page.locator('.mta-home-project-card')).toHaveCount(4);
-  for (const name of [
-    'MTA Net Blocker',
-    'MTA Video Downloader',
-    'MTA University Library Collector',
-    'MTA AI Video Studio'
-  ]) {
-    await expect(page.locator('.mta-home-project-card').filter({ hasText: name })).toHaveCount(1);
-  }
+  await expect(page.locator('.mta-home-capability-card')).toHaveCount(4);
+  await expect(page.locator('.mta-home-proof')).toContainText('MTA Net Blocker');
+  await expect(page.locator('.mta-home-project-card')).toHaveCount(0);
   await expect(page.locator('.mta-home-contact')).toBeVisible();
 });
 
@@ -427,12 +422,17 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   await carousel.locator('[data-carousel-next]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(1)).toBeVisible();
   await expect(carousel.locator('.mta-motion-app')).toHaveCount(4);
+  for (const image of await carousel.locator('.mta-motion-app img').all()) {
+    await expect(image).toBeVisible();
+    await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  }
+  await expect(carousel.locator('.mta-motion-app[href*="projects.html"]')).toHaveCount(3);
+  await expect(carousel.locator('[data-carousel-pause]')).toHaveCount(0);
   await carousel.locator('[data-carousel-to="2"]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(2)).toBeVisible();
   await expect(carousel.locator('.mta-ad-slot-top')).toBeVisible();
   await expect(carousel.locator('.mta-ad-slot-top')).toHaveAttribute('data-ad-zone', '12478774');
-  await carousel.locator('[data-carousel-pause]').click();
-  await expect(carousel.locator('[data-carousel-pause]')).toHaveAttribute('aria-label', 'Play slideshow');
+  await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible({ timeout: 6_000 });
 });
 
 

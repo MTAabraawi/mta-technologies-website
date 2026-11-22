@@ -44,7 +44,7 @@
 
 <main>
   <section class="mta-home-hero mta-home-cinematic" aria-label="MTA TECHNOLOGIES featured presentation">
-    <div class="mta-home-carousel" data-mta-carousel data-autoplay="4200">
+    <div class="mta-home-carousel" data-mta-carousel data-autoplay="4200" tabindex="0" role="region" aria-roledescription="carousel">
       <article class="mta-home-slide mta-home-slide-brand" data-carousel-slide aria-hidden="false">
         <div class="mta-cinema-grid" aria-hidden="true"></div>
         <div class="mta-cinema-copy">
@@ -75,12 +75,23 @@
           <h2><span class="ar-only">أفكار تتحول إلى <em>تجارب رقمية</em></span><span class="en-only">Ideas become <em>digital experiences</em></span></h2>
           <p><span class="ar-only">نطوّر منتجات متنوعة في التطبيقات والأدوات والمنصات الرقمية.</span><span class="en-only">We create products across apps, tools, and digital platforms.</span></p>
         </div>
-        <div class="mta-projects-motion-stage" aria-label="MTA projects" style="grid-template-columns:repeat(2,minmax(0,1fr))">
-          <div class="mta-motion-app mta-motion-app-one"><span class="mta-motion-app-icon">NB</span><strong>MTA Net Blocker</strong><small><span class="ar-only">إدارة اتصال التطبيقات</span><span class="en-only">App network control</span></small></div>
-          <div class="mta-motion-app mta-motion-app-two"><span class="mta-motion-app-icon">UL</span><strong>University Library</strong><small><span class="ar-only">منصة أكاديمية</span><span class="en-only">Academic platform</span></small></div>
-          <div class="mta-motion-app mta-motion-app-three"><span class="mta-motion-app-icon">VD</span><strong>Video Downloader</strong><small><span class="ar-only">أدوات وسائط رقمية</span><span class="en-only">Digital media tools</span></small></div>
-          <div class="mta-motion-app mta-motion-app-four"><span class="mta-motion-app-icon">AI</span><strong>AI Video Studio</strong><small><span class="ar-only">بحث في الفيديو الذكي</span><span class="en-only">AI video research</span></small></div>
-          <div class="mta-projects-motion-core"><img src="images/mta-logo-square.webp" alt="" width="90" height="90" loading="lazy"/></div>
+        <div class="mta-projects-motion-stage" aria-label="MTA project showcase">
+          <a class="mta-motion-app mta-motion-app-one" href="app-mta-net-blocker.html">
+            <span class="mta-motion-app-art"><img src="images/apps/mta-net-blocker.svg" alt="MTA Net Blocker app artwork" loading="lazy"/></span>
+            <strong>MTA Net Blocker</strong><small><span class="ar-only">متاح · إدارة اتصال التطبيقات</span><span class="en-only">Released · App network control</span></small>
+          </a>
+          <a class="mta-motion-app mta-motion-app-two" href="projects.html#mta-university-library-collector">
+            <span class="mta-motion-app-art"><img src="images/projects/university-library.svg" alt="Academic library concept artwork" loading="lazy"/></span>
+            <strong>MTA University Library</strong><small><span class="ar-only">قيد التطوير · تقنية تعليمية</span><span class="en-only">In development · Education technology</span></small>
+          </a>
+          <a class="mta-motion-app mta-motion-app-three" href="projects.html#mta-video-downloader">
+            <span class="mta-motion-app-art"><img src="images/projects/video-tools.svg" alt="Digital media tools concept artwork" loading="lazy"/></span>
+            <strong>MTA Video Downloader</strong><small><span class="ar-only">قيد التطوير · أدوات وسائط</span><span class="en-only">In development · Media tools</span></small>
+          </a>
+          <a class="mta-motion-app mta-motion-app-four" href="projects.html#mta-ai-video-studio">
+            <span class="mta-motion-app-art"><img src="images/projects/ai-studio.svg" alt="AI video research concept artwork" loading="lazy"/></span>
+            <strong>MTA AI Video Studio</strong><small><span class="ar-only">بحث واستكشاف · ذكاء اصطناعي</span><span class="en-only">Research · Applied AI</span></small>
+          </a>
         </div>
         <a class="mta-slide-cta" href="projects.html"><span class="ar-only">استكشف المشاريع بالتفصيل</span><span class="en-only">Explore all projects</span> ↗</a>
       </article>
@@ -89,11 +100,11 @@
         <div class="mta-slide-heading">
           <span class="mta-home-kicker">03 / PARTNER WITH US</span>
           <h2><span class="ar-only">مساحة إعلانية ضمن عالم MTA</span><span class="en-only">An advertising space in the MTA experience</span></h2>
-          <p><span class="ar-only">تظهر الإعلانات ضمن العرض المتحرك مع الحفاظ على وضوح أنها إعلانات.</span><span class="en-only">Advertisements appear as part of the presentation and remain clearly identified.</span></p>
+          <p><span class="ar-only">مساحة إعلانية مخصصة لشركائنا، وتُعرض فقط عند توفر إعلان من الشبكة.</span><span class="en-only">A dedicated partner placement, shown when an eligible campaign is available.</span></p>
         </div>
         <div class="mta-cinema-ad-frame">
           <span class="mta-ad-label"><span class="ar-only">إعلان</span><span class="en-only">Advertisement</span></span>
-          <aside class="mta-ad-slot mta-ad-slot-top" data-ad-zone="12478774" data-ad-zone-mobile="12478782" aria-label="Advertisement"></aside>
+          <aside class="mta-ad-slot mta-ad-slot-top" data-ad-zone="12478774" aria-label="Advertisement"></aside>
         </div>
       </article>
 
@@ -105,7 +116,6 @@
           <button type="button" data-carousel-to="2" aria-label="Slide 3" aria-current="false"></button>
         </div>
         <button class="mta-carousel-arrow" type="button" data-carousel-next aria-label="Next slide">›</button>
-        <button class="mta-carousel-pause" type="button" data-carousel-pause aria-label="Pause slideshow">Ⅱ</button>
       </div>
     </div>
   </section>
@@ -117,38 +127,18 @@
     </div>
   </section>
 
-  <section class="mta-home-projects">
+  <section class="mta-home-capabilities">
     <div class="container">
-      <div class="mta-home-section-head"><div><span class="mta-home-kicker">02 / SELECTED WORK</span><h2><span class="ar-only">مشاريعنا ومنتجاتنا</span><span class="en-only">Projects & Products</span></h2><p><span class="ar-only">تعرّف على وظيفة كل مشروع وحالته الحالية قبل الانتقال إلى تفاصيله.</span><span class="en-only">Understand what each project is for and its current status before exploring its details.</span></p></div><a class="mta-home-text-link" href="projects.html"><span class="ar-only">جميع المشاريع</span><span class="en-only">All projects</span> ↗</a></div>
-      <div class="mta-home-project-grid">
-        <article class="mta-home-project-card mta-home-project-featured">
-          <div class="mta-home-project-top"><span class="mta-home-project-icon">NB</span><span class="mta-status mta-status-live"><span class="ar-only">متاح</span><span class="en-only">Released</span></span></div>
-          <span class="mta-home-project-type">ANDROID · NETWORK CONTROL</span><h3>MTA Net Blocker</h3>
-          <p><span class="ar-only">تطبيق أندرويد لإدارة وصول التطبيقات المثبتة إلى الإنترنت. يتيح حظر الاتصال أو السماح به لكل تطبيق، مع التحكم في اتصال Wi-Fi وبيانات الهاتف عبر خدمة VPN محلية على الجهاز.</span><span class="en-only">An Android app for managing internet access by installed app. Block or allow connections over Wi-Fi and mobile data through an on-device local VPN service.</span></p>
-          <a href="app-mta-net-blocker.html" class="mta-home-card-link"><span class="ar-only">شرح المنتج وروابط التنزيل</span><span class="en-only">Product details & downloads</span> ↗</a>
-        </article>
-        <article class="mta-home-project-card">
-          <div class="mta-home-project-top"><span class="mta-home-project-icon">VD</span><span class="mta-status mta-status-progress"><span class="ar-only">قيد التطوير</span><span class="en-only">In development</span></span></div>
-          <span class="mta-home-project-type">MEDIA · DOWNLOAD WORKFLOWS</span><h3>MTA Video Downloader</h3>
-          <p><span class="ar-only">مشروع أداة لتنظيم عملية تنزيل الوسائط من المصادر المدعومة، مع التركيز على وضوح المصدر وخيارات الحفظ. لا توجد نسخة عامة معلنة حالياً.</span><span class="en-only">A project exploring a straightforward workflow for saving media from supported sources, with clear source handling and download options. No public release is announced yet.</span></p>
-          <a href="projects.html#mta-video-downloader" class="mta-home-card-link"><span class="ar-only">تفاصيل المشروع</span><span class="en-only">Project details</span> ↗</a>
-        </article>
-        <article class="mta-home-project-card">
-          <div class="mta-home-project-top"><span class="mta-home-project-icon">UL</span><span class="mta-status mta-status-progress"><span class="ar-only">قيد التطوير</span><span class="en-only">In development</span></span></div>
-          <span class="mta-home-project-type">EDUCATION · DIGITAL LIBRARY</span><h3>MTA University Library Collector</h3>
-          <p><span class="ar-only">منصة أكاديمية لتنظيم بيانات الجامعات والكليات والأقسام والخطط والمقررات، وربطها بالمراجع والملفات التعليمية المتاحة بصورة مشروعة. ما زال العمل جارياً على استكمال المحتوى والوظائف.</span><span class="en-only">An academic platform for organizing universities, faculties, departments, study plans, and courses, with links to lawfully available learning resources. Content and features remain under development.</span></p>
-          <a href="projects.html#mta-university-library-collector" class="mta-home-card-link"><span class="ar-only">تفاصيل المشروع</span><span class="en-only">Project details</span> ↗</a>
-        </article>
-        <article class="mta-home-project-card">
-          <div class="mta-home-project-top"><span class="mta-home-project-icon">AI</span><span class="mta-status mta-status-research"><span class="ar-only">بحث واستكشاف</span><span class="en-only">Research</span></span></div>
-          <span class="mta-home-project-type">GENERATIVE MEDIA · R&amp;D</span><h3>MTA AI Video Studio</h3>
-          <p><span class="ar-only">مسار بحثي لاستكشاف إنشاء الفيديو وتحريره بمساعدة الذكاء الاصطناعي، ودراسة اتساق المشاهد والحركة بين الإطارات. ليس منتجاً عاماً متاحاً للتنزيل حالياً.</span><span class="en-only">A research track exploring AI-assisted video creation and editing, including scene and motion consistency across frames. It is not currently a public downloadable product.</span></p>
-          <a href="projects.html#mta-ai-video-studio" class="mta-home-card-link"><span class="ar-only">تفاصيل المشروع</span><span class="en-only">Project details</span> ↗</a>
-        </article>
+      <div class="mta-home-section-head"><div><span class="mta-home-kicker">02 / WHAT WE ENGINEER</span><h2><span class="ar-only">هندسة تقنية تصنع فرقاً</span><span class="en-only">Engineering with purpose</span></h2><p><span class="ar-only">نركز على بناء حلول رقمية عملية، من هندسة تطبيقات أندرويد إلى المنصات والأنظمة الذكية.</span><span class="en-only">We focus on practical digital solutions, from Android engineering to platforms and intelligent systems.</span></p></div><a class="mta-home-text-link" href="innovation.html"><span class="ar-only">مجالاتنا التقنية</span><span class="en-only">Our technology focus</span> ↗</a></div>
+      <div class="mta-home-capability-grid">
+        <article class="mta-home-capability-card"><span class="mta-capability-index">01</span><div class="mta-capability-symbol">⌘</div><h3><span class="ar-only">هندسة البرمجيات</span><span class="en-only">Software Engineering</span></h3><p><span class="ar-only">تصميم وبناء تطبيقات وأدوات رقمية قابلة للاستخدام والتطوير.</span><span class="en-only">Designing and building usable, maintainable digital applications and tools.</span></p></article>
+        <article class="mta-home-capability-card"><span class="mta-capability-index">02</span><div class="mta-capability-symbol">◈</div><h3><span class="ar-only">أنظمة أندرويد</span><span class="en-only">Android Systems</span></h3><p><span class="ar-only">تطبيقات أندرويد متخصصة تضع التحكم والخصوصية وتجربة المستخدم في المقدمة.</span><span class="en-only">Focused Android applications built around control, privacy, and user experience.</span></p></article>
+        <article class="mta-home-capability-card"><span class="mta-capability-index">03</span><div class="mta-capability-symbol">▤</div><h3><span class="ar-only">المنصات المعرفية</span><span class="en-only">Knowledge Platforms</span></h3><p><span class="ar-only">تنظيم البيانات والمحتوى التعليمي وتحويله إلى تجارب رقمية مفيدة.</span><span class="en-only">Organizing data and learning resources into useful digital experiences.</span></p></article>
+        <article class="mta-home-capability-card"><span class="mta-capability-index">04</span><div class="mta-capability-symbol">✳</div><h3><span class="ar-only">البحث والتقنيات الذكية</span><span class="en-only">Applied Research & AI</span></h3><p><span class="ar-only">استكشاف تقنيات الذكاء الاصطناعي والوسائط وبناء نماذج أولية مدروسة.</span><span class="en-only">Exploring AI and media technologies through carefully scoped prototypes.</span></p></article>
       </div>
+      <div class="mta-home-proof"><span class="mta-proof-label"><span class="ar-only">منتج متاح</span><span class="en-only">Available product</span></span><img src="images/apps/mta-net-blocker.svg" alt="" loading="lazy"/><div><strong>MTA Net Blocker</strong><p><span class="ar-only">منتج أندرويد منشور لإدارة اتصال التطبيقات عبر VPN محلي.</span><span class="en-only">A released Android product for managing app connectivity through a local VPN.</span></p></div><a href="app-mta-net-blocker.html"><span class="ar-only">اكتشف المنتج</span><span class="en-only">Explore product</span> ↗</a></div>
     </div>
   </section>
-
   <section class="mta-home-platforms">
     <div class="container mta-home-platforms-inner">
       <div><span class="mta-home-kicker">03 / APP DISCOVERY</span><h2><span class="ar-only">اكتشف التطبيقات من مصادرها</span><span class="en-only">Discover apps from their sources</span></h2><p><span class="ar-only">يوفر MTA App Marketplace دليلاً منظماً لمتاجر ومصادر التطبيقات عبر منصات متعددة. تختلف درجة توفر البيانات والتكامل من مصدر إلى آخر، وتُعرض حالة كل مصدر داخل الدليل.</span><span class="en-only">MTA App Marketplace organizes app stores and sources across multiple platforms. Data availability and integration vary by source, and each source's status is shown in the directory.</span></p></div>

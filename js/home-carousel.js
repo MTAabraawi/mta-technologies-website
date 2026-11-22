@@ -6,13 +6,13 @@
   var dots = Array.prototype.slice.call(root.querySelectorAll("[data-carousel-to]"));
   var previous = root.querySelector("[data-carousel-prev]");
   var next = root.querySelector("[data-carousel-next]");
-  var pause = root.querySelector("[data-carousel-pause]");
   var index = 0;
   var timer = null;
-  var paused = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var delay = Math.max(1000, Number(root.getAttribute("data-autoplay")) || 4200);
+  var delay = Math.max(2500, Number(root.getAttribute("data-autoplay")) || 4200);
+  var pointerStart = null;
 
   function show(nextIndex) {
+    if (!slides.length) return;
     index = (nextIndex + slides.length) % slides.length;
     slides.forEach(function (slide, i) {
       var active = i === index;
@@ -30,10 +30,13 @@
   }
   function start() {
     stop();
-    if (paused || document.hidden) return;
+    if (document.hidden || slides.length < 2) return;
     timer = window.setInterval(function () { show(index + 1); }, delay);
   }
-  function move(step) { show(index + step); start(); }
+  function move(step) {
+    show(index + step);
+    start();
+  }
   if (previous) previous.addEventListener("click", function () { move(-1); });
   if (next) next.addEventListener("click", function () { move(1); });
   dots.forEach(function (dot) {
@@ -42,19 +45,29 @@
       start();
     });
   });
-  if (pause) pause.addEventListener("click", function () {
-    paused = !paused;
-    pause.textContent = paused ? "▶" : "Ⅱ";
-    pause.setAttribute("aria-label", paused ? "Play slideshow" : "Pause slideshow");
-    if (paused) stop(); else start();
+
+  // Native touch scrolling remains vertical; horizontal gestures switch slides.
+  root.addEventListener("pointerdown", function (event) {
+    if (event.pointerType === "mouse" || event.target.closest("a,button")) return;
+    pointerStart = { x: event.clientX, y: event.clientY };
+  }, { passive: true });
+  root.addEventListener("pointerup", function (event) {
+    if (!pointerStart) return;
+    var dx = event.clientX - pointerStart.x;
+    var dy = event.clientY - pointerStart.y;
+    pointerStart = null;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+      move(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+  root.addEventListener("pointercancel", function () { pointerStart = null; });
+  root.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowRight") { event.preventDefault(); move(1); }
+    if (event.key === "ArrowLeft") { event.preventDefault(); move(-1); }
   });
-  root.addEventListener("mouseenter", stop);
-  root.addEventListener("mouseleave", start);
-  root.addEventListener("focusin", stop);
-  root.addEventListener("focusout", function (event) {
-    if (!root.contains(event.relatedTarget)) start();
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) stop(); else start();
   });
-  document.addEventListener("visibilitychange", start);
   window.addEventListener("mta:languagechange", function () { show(index); });
   show(0);
   start();
