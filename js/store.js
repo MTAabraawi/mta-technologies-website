@@ -115,7 +115,7 @@ else{
  if(profile){const texts=lang()?profile.en:profile.ar;if(editorialIntro)editorialIntro.textContent=texts[0];if(editorialWhat)editorialWhat.textContent=texts[1];if(editorialVerify)editorialVerify.textContent=texts[2];if(editorialAvailability)editorialAvailability.textContent=lang()?(store.name+" availability, pricing and regional access can vary across "+store.platforms.join(", ")+". Check the publisher listing for current regional and device requirements."):( "قد يختلف توفر "+store.name+" وأسعاره والوصول إليه بحسب "+store.platforms.join(" و")+" والمنطقة والجهاز. راجع صفحة الناشر للتأكد من المتطلبات الحالية.");}
  const storeSchema=document.createElement("script");storeSchema.type="application/ld+json";storeSchema.id="store-profile-schema";storeSchema.textContent=JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":store.name+" catalogue","description":store.desc,"url":location.href,"inLanguage":["ar","en"],"about":{"@type":"Thing","name":store.name+" app catalogue"}});document.head.append(storeSchema);
  const logoUrl="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.host)+"&sz=128",logoFallback="https://icons.duckduckgo.com/ip3/"+encodeURIComponent(store.host)+".ico";
- logo.src=logoUrl;logo.alt=store.name+" logo";logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.webp"}};
+ logo.src=logoUrl;logo.setAttribute("alt",copy("شعار "+store.name,"Logo of "+store.name));logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.webp"}};
  official.href=store.url;
  $("store-platforms").replaceChildren(...store.platforms.map(p=>{const s=document.createElement("span");s.textContent=p;return s}));
  const connected=!!store.source;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
@@ -141,7 +141,7 @@ let indexedTotal=0;
 function makeCard(app){
  const card=document.createElement("article");card.className="store-app-card";card.dataset.category=String(app.category||"Other").split(",")[0].trim();card.dataset.platform=String(app.platform||"").toLowerCase();card.dataset.appKey=appIdentity(app);
  const top=document.createElement("div");top.className="store-app-top";
- const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.alt=(app.name||"App")+" icon";
+ const icon=document.createElement("img");icon.className="store-app-icon";icon.loading="lazy";icon.decoding="async";icon.setAttribute("alt",copy("أيقونة "+(app.name||"التطبيق"),"Icon for "+(app.name||"application")));
  let metadata=app.metadata_json&&typeof app.metadata_json==="object"?app.metadata_json:{};
  if(typeof app.metadata_json==="string"){try{metadata=JSON.parse(app.metadata_json)}catch{metadata={}}}
  const pageUrl=safe(metadata.homepage||metadata.website||metadata.homepage_url||metadata.project_url||metadata.publisher_url||metadata.publisher_website||metadata.publisherWebsite||app.app_url||"");let host="";try{host=pageUrl?new URL(pageUrl).hostname.replace(/^www\./,""):""}catch{}
