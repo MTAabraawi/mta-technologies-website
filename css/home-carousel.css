@@ -120,8 +120,8 @@
   .mta-slide-heading { max-width:700px; margin-bottom:2.2rem; }
   .mta-slide-heading h2 { font-size:clamp(2.15rem,3.1vw,3rem); }
   .mta-slide-heading p { margin-inline:auto; max-width:570px; }
-  .mta-projects-motion-stage {
-    grid-template-columns:repeat(2,minmax(0,1fr));
+  .mta-home-refresh .mta-projects-motion-stage {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     gap:1rem 1.2rem;
     width:min(100%,820px);
     margin:0 auto 1.1rem;
