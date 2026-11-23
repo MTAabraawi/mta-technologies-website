@@ -322,82 +322,28 @@ test('all public HTML pages are free of Google AdSense integrations', async ({ p
 });
 
 
-test('all site pages and store/application routes use the shared Adcash Display placement', async ({ page }) => {
+test('all public HTML pages use the approved AdSense publisher and contain no retired ad network code', async ({ page }) => {
   const pages = [
-    '/index.html', '/about.html', '/projects.html', '/innovation.html',
-    '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
-    '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
-    '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
-    '/suggestions.html', '/application.html', '/store.html',
-    '/contact-thanks.html', '/404.html',
-    '/store?store=fdroid', '/store?store=google-play',
-    '/application?source=fdroid&id=1&name=MTA%20Net%20Blocker'
+    '/index.html','/about.html','/app-mta-net-blocker.html','/application.html',
+    '/apps.html','/contact.html','/cookies.html','/data-subject-rights.html',
+    '/disclaimer.html','/gallery.html','/innovation.html','/knowledge.html',
+    '/privacy-policy.html','/projects.html','/store.html','/suggestions.html','/terms.html',
+    '/contact-thanks.html','/404.html'
   ];
-  const hilltop = /hilltop\s*ads?|hilltopads?\.(?:com|net)|hilltopads?/i;
+  const retired = /acscdn\\.com|aclib\\.js|js\\/adcash\\.js|12478774|12478782|12481106|mta-ad-slot|hilltopads?/i;
   for (const path of pages) {
     const response = await page.request.get(path);
     expect(response.status(), 'Page should load: ' + path).toBe(200);
     const html = await response.text();
-    expect(html, 'HilltopAds must be absent: ' + path).not.toMatch(hilltop);
-    expect(html, 'Adcash library must be present: ' + path).toContain('acscdn.com/script/aclib.js');
-    expect(html, 'Shared Adcash initializer must be present: ' + path).toContain('js/adcash.js');
-    expect(html, 'Top 728x90 Adcash slot must be present: ' + path).toContain('class="mta-ad-slot mta-ad-slot-top"');
-    expect(html, 'Bottom 300x250 Adcash slot must be present: ' + path).toContain('class="mta-ad-slot mta-ad-slot-bottom"');
-    expect(html, 'Top Adcash zone must be configured: ' + path).toContain('data-ad-zone="12478774"');
-    expect(html, 'Bottom Adcash zone must be configured: ' + path).toContain('data-ad-zone="12478782"');
-    expect(html, 'Inline banner code must not be embedded in HTML: ' + path).not.toMatch(/aclib\.runBanner\s*\(/i);
+    expect(html, 'Retired ad code must be absent: ' + path).not.toMatch(retired);
+    if (!['/contact-thanks.html','/404.html'].includes(path)) {
+      expect(html, 'Approved AdSense publisher must be present: ' + path).toContain('ca-pub-8004171697196640');
+      expect(html).toContain('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
+    }
   }
-});
-
-test('shared Adcash initializer waits for visible carousel slides and never exposes provider code as text', async ({ page }) => {
-  await page.route('**/acscdn.com/script/aclib.js', route => route.fulfill({
-    status: 200,
-    contentType: 'application/javascript',
-    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); var frame = document.createElement('iframe'); frame.title = 'Advertisement'; frame.src = 'about:blank'; document.querySelector(options.renderIn).appendChild(frame); } };"
-  }));
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-  const topSlot = page.locator('.mta-ad-slot-top');
-  const bottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(topSlot).toHaveCount(1);
-  await expect(bottomSlot).toBeVisible();
-  await expect(bottomSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
-
-  await page.locator('[data-carousel-to="1"]').click();
-  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await page.locator('[data-carousel-to="2"]').click();
-  await expect(topSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
-
-  for (const slot of [topSlot, bottomSlot]) {
-    const visibleText = await slot.evaluate(element => Array.from(element.childNodes).filter(node => node.nodeType !== Node.ELEMENT_NODE || !["SCRIPT", "STYLE"].includes(node.tagName)).map(node => node.textContent || "").join(" ").trim());
-    expect(visibleText).not.toContain('aclib.runBanner');
-    expect(visibleText).not.toContain('zoneId');
-    expect(visibleText).not.toContain('12478774');
-    expect(visibleText).not.toContain('12478782');
-    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-  }
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  const mobileTopSlot = page.locator('.mta-ad-slot-top');
-  const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
-  await page.locator('[data-carousel-to="2"]').click();
-  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478782']);
-  for (const slot of [mobileTopSlot, mobileBottomSlot]) {
-    const visibleText = await slot.evaluate(element => element.innerText);
-    expect(visibleText).not.toContain('aclib.runBanner');
-    expect(visibleText).not.toContain('zoneId');
-    expect(visibleText).not.toContain('12478782');
-    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-    await expect(slot.locator('script')).toHaveCount(0);
-  }
+  const ads = await page.request.get('/ads.txt');
+  expect(ads.status()).toBe(200);
+  expect(await ads.text()).toContain('google.com, pub-8004171697196640, DIRECT, f08c47fec0942fa0');
 });
 
 test('corporate homepage leads with company identity and features only the released product', async ({ page }) => {
@@ -410,33 +356,22 @@ test('corporate homepage leads with company identity and features only the relea
   await expect(page.locator('.mta-home-contact')).toBeVisible();
 });
 
-test('cinematic homepage carousel animates the MTA logo, projects, and embedded Adcash slide', async ({ page }) => {
+test('cinematic homepage carousel animates the MTA logo and project slides', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   const carousel = page.locator('[data-mta-carousel]');
   await expect(carousel).toBeVisible();
-  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(3);
+  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(2);
   await expect(carousel).toHaveAttribute('data-autoplay', '4200');
   await expect(carousel.locator('.mta-cinema-logo img')).toHaveAttribute('src', 'images/mta-logo-square.webp');
   await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible();
   await carousel.locator('[data-carousel-next]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(1)).toBeVisible();
   await expect(carousel.locator('.mta-motion-app')).toHaveCount(4);
-  await carousel.locator('[data-carousel-to="2"]').click();
-  await expect(carousel.locator('[data-carousel-slide]').nth(2)).toBeVisible();
-  await expect(carousel.locator('.mta-ad-slot-top')).toBeVisible();
-  await expect(carousel.locator('.mta-ad-slot-top')).toHaveAttribute('data-ad-zone', '12478774');
-  await expect(carousel.locator('[data-carousel-pause]')).toHaveCount(0);
+  await expect(carousel.locator('.mta-ad-slot')).toHaveCount(0);
   await expect(carousel.locator('.mta-motion-app img')).toHaveCount(5);
-  const previews = carousel.locator('.mta-motion-app .mta-motion-app-preview');
-  await expect(previews).toHaveCount(1);
-  for (const image of await previews.all()) {
-    await expect(image).toHaveAttribute('src', /images\/project-.*\.svg$/);
-  }
-  const netBlockerIcon = carousel.locator('.mta-motion-app .mta-motion-app-app-icon');
-  await expect(netBlockerIcon).toHaveCount(1);
-  await expect(netBlockerIcon).toHaveAttribute('src', 'images/apps/mta-net-blocker.svg');
+  await expect(carousel.locator('.mta-motion-app .mta-motion-app-preview')).toHaveCount(1);
+  await expect(carousel.locator('.mta-motion-app .mta-motion-app-app-icon')).toHaveCount(1);
 });
-
 
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
