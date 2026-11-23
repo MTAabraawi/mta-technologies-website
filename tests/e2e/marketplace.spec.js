@@ -622,7 +622,7 @@ test('Open VSX has a dedicated internal store profile and preserves registry con
   const response = await page.goto('/store?store=open-vsx');
   expect(response.status()).toBe(200);
   await expect(page.locator('#store-title')).toHaveText('Open VSX Registry');
-  await expect(page.locator('#store-editorial-what')).toContainText('إضافات محررات VS Code');
+  await expect(page.locator('#store-editorial-what')).toContainText('تصفح الإضافات');
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
 });
 
