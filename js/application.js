@@ -7,7 +7,7 @@ function fact(label,value){if(value==null||String(value).trim()==="")return;cons
 function renderSourceMetadata(app){
  const m=normalizedMetadata(app),root=$("application-source-metadata"),facts=$("application-extra-facts"),lists=$("application-metadata-lists"),shots=$("application-screenshots");
  facts.replaceChildren();lists.replaceChildren();shots.replaceChildren();
- const value=(v)=>Array.isArray(v)?v.filter(x=>x!=null&&String(x).trim()).join(", "):v&&typeof v==="object"?(v.final!=null?[v.final,v.currency].filter(Boolean).join(" "):JSON.stringify(v)):v;
+ const value=(v)=>Array.isArray(v)?v.filter(x=>x!=null&&String(x).trim()).join(", "):v&&typeof v==="object"?(v.final!=null?[v.final,v.currency].filter(Boolean).join(" "):JSON.stringify(v)):typeof v==="number"?v.toLocaleString("en-US"):v;
  const fields=[
   ["versionString","الإصدار","Version"],["versionCode","رمز الإصدار","Version code"],
   ["price","السعر","Price"],["apkSize","حجم ملف التطبيق","App / IPA size"],
