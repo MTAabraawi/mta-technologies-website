@@ -454,6 +454,8 @@ test('homepage carousel advances automatically and supports touch swipe', async 
 });
 test('public content pages expose unique titles, descriptions, canonical URLs and valid JSON-LD', async ({ page }) => {
   const paths = ['/','/about.html','/projects.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
+  const titles = new Set();
+  const canonicals = new Set();
   for (const path of paths) {
     const response = await page.request.get(path);
     expect(response.status(), path).toBe(200);
@@ -462,9 +464,14 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
     const description = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
     const canonical = html.match(/<link\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i)?.[1] || '';
     expect(title.length, path + ' title').toBeGreaterThan(12);
+    expect(titles.has(title), path + ' duplicate title').toBe(false);
+    titles.add(title);
     expect(description.length, path + ' description').toBeGreaterThan(60);
     expect(canonical, path + ' canonical').toMatch(/^https:\/\//);
+    expect(canonicals.has(canonical), path + ' duplicate canonical').toBe(false);
+    canonicals.add(canonical);
     const blocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+    expect(blocks.length, path + ' JSON-LD').toBeGreaterThan(0);
     for (const block of blocks) expect(() => JSON.parse(block[1])).not.toThrow();
   }
 });
