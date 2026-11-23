@@ -32,7 +32,16 @@
     "arch-linux": ["Arch Linux Packages", "حزم وتطبيقات Arch Linux", "Arch Linux packages and apps"],
     "debian-packages": ["Debian Packages", "برامج وحزم Debian", "Debian software packages"],
     "steam": ["Steam", "نتائج بحث من متجر Steam", "Steam storefront search results"],
-    "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"]
+    "mta-curated-web": ["MTA Web Apps", "تطبيقات الويب المختارة", "Curated web applications"],
+    "open-vsx": ["Open VSX Registry", "إضافات المحررات المتوافقة مع VS Code", "Extensions for VS Code-compatible editors"],
+    "fedora-packages": ["Fedora Packages", "حزم Fedora Linux", "Fedora Linux packages"],
+    "firefox-addons": ["Firefox Add-ons", "إضافات متصفح Firefox", "Firefox browser extensions"],
+    "wordpress-plugins": ["WordPress Plugin Directory", "إضافات WordPress", "WordPress plugins"],
+    "homebrew-formulae": ["Homebrew Formulae", "أدوات ومكتبات Homebrew", "Homebrew tools and libraries"],
+    "scoop": ["Scoop Buckets", "برامج Windows عبر Scoop", "Windows software via Scoop"],
+    "alpine-linux": ["Alpine Linux Packages", "حزم Alpine Linux", "Alpine Linux packages"],
+    "jetbrains-marketplace": ["JetBrains Marketplace", "إضافات بيئات JetBrains", "Plugins for JetBrains IDEs"],
+    "gnome-extensions": ["GNOME Extensions", "إضافات سطح مكتب GNOME", "GNOME desktop extensions"]
   };
   const isEnglish = () => document.documentElement.lang === "en";
   const text = (ar, en) => isEnglish() ? en : ar;
@@ -44,7 +53,7 @@
   };
   const platformName = value => ({
     android: "Android", ios: "iOS", windows: "Windows",
-    macos: "macOS", linux: "Linux", web: "Web"
+    macos: "macOS", linux: "Linux", web: "Web", "ide-plugins": "IDE Extensions"
   }[String(value || "").toLowerCase()] || String(value || "Other"));
   const categoryName = value => {
     const raw = String(value || "Other").split(",")[0].trim().toLowerCase();
