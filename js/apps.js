@@ -36,6 +36,7 @@
   };
   const isEnglish = () => document.documentElement.lang === "en";
   const text = (ar, en) => isEnglish() ? en : ar;
+  const firstText = values => { for (const value of values) if (typeof value === "string" && value.trim()) return value.trim(); return ""; };
   const safeHttpsUrl = value => {
     try {
       const url = new URL(String(value || ""));
@@ -45,9 +46,9 @@
   const platformName = value => ({
     android: "Android", ios: "iOS", windows: "Windows",
     macos: "macOS", linux: "Linux", web: "Web"
-  }[String(value || "").toLowerCase()] || String(value || text("غير محدد", "Unspecified")));
+  }[firstText([value]).toLowerCase()] || firstText([value]) || text("غير محدد", "Unspecified"));
   const categoryName = value => {
-    const raw = String(value || "").split(",")[0].trim().toLowerCase();
+    const raw = firstText([value]).split(",")[0].trim().toLowerCase();
     const map = {
       games: "Games", game: "Games", security: "Security",
       productivity: "Productivity", education: "Education", office: "Office",
@@ -69,13 +70,14 @@
     card.className = "app-card";
     card.dataset.dynamicApp = "true";
     const platforms = Array.isArray(app.platforms)
-      ? app.platforms.map(platformName)
-      : String(app.platform || text("غير محدد", "Unspecified")).split(/\s*,\s*/).filter(Boolean).map(platformName);
-    const description = isEnglish()
-      ? (app.description_en || app.summary || app.description || text("لم يقدم المصدر وصفاً لهذا التطبيق.", "No description provided by source."))
-      : (app.description_ar || app.summary || app.description || text("لم يقدم المصدر وصفاً لهذا التطبيق.", "No description provided by source."));
-    const name = String(app.app_name || app.name || "Application");
-    const dev = String(app.developer_name || app.developer || text("المطور غير محدد في المصدر", "Developer not specified by source"));
+      ? app.platforms.map(platformName).filter(Boolean)
+      : String(firstText([app.platform]) || text("غير محدد", "Unspecified")).split(/\s*,\s*/).filter(Boolean).map(platformName);
+    const descriptionValues = isEnglish()
+      ? [app.description_en, app.summary, app.description]
+      : [app.description_ar, app.summary, app.description];
+    const description = firstText(descriptionValues) || text("لم يقدم المصدر وصفاً لهذا التطبيق.", "No description provided by source.");
+    const name = firstText([app.app_name, app.name]) || "Application";
+    const dev = firstText([app.developer_name, app.developer]) || text("المطور غير محدد في المصدر", "Developer not specified by source");
     const cat = categoryName(app.category);
     const categorySelect = document.getElementById("category-filter");
     if (categorySelect && cat && ![...categorySelect.options].some(option => option.value === cat)) {
