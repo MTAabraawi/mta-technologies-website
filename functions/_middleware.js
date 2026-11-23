@@ -1,7 +1,7 @@
 // Keep production GA4 data clean: only the canonical public host may load the GA bootstrap.
 // Cloudflare Pages applies this middleware to static pages and Pages Function responses.
 const PRODUCTION_HOST = "www.mtahqq.dpdns.org";
-const GA_BOOTSTRAP = /<script\\b(?=[^>]*\\bsrc=["']https:\\/\\/www\\.googletagmanager\\.com\\/gtag\\/js\\?id=G-PLS74VD22C["'])[^>]*>\\s*<\\/script>\\s*<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi;
+const GA_BOOTSTRAP = /<script\b(?=[^>]*\bsrc=["']https:\/\/www\.googletagmanager\.com\/gtag\/js\?id=G-PLS74VD22C["'])[^>]*>\s*<\/script>\s*<script\b[^>]*>[\s\S]*?<\/script>/gi;
 
 export async function onRequest({ request, next }) {
   const response = await next();
