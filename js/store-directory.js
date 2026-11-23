@@ -4,26 +4,33 @@ if(!root)return;
 const api=String(window.MTA_MARKETPLACE_API||window.location.origin||"").replace(/\/$/,"");
 const en=()=>document.documentElement.lang==="en",w=(ar,eng)=>en()?eng:ar;
 
-/* Last successfully verified catalogue counts. Used only when live stats cannot be reached. */
+/* Last verified GitHub catalogue snapshot: 2026-11-22 16:02 UTC.
+   Used only when live stats cannot be reached; never presented as live data. */
+const lastKnownUpdatedAt="2026-11-22T16:02:28Z";
 const lastKnownSources={
- "fdroid":4996,
- "izzyondroid":1405,
- "apple-itunes":1453,
- "apple-macos":1193,
- "winget-run-community":191,
- "bluejetty":0,
- "openuse":0,
- "chocolatey":0,
- "flathub":1000,
- "snap-store":413,
- "arch-linux":608,
- "debian-packages":10,
- "alpine-linux":29202,
+ "alpine-linux":28537,
+ "apple-itunes":3296,
+ "apple-macos":2737,
+ "arch-linux":1430,
+ "bluejetty":200049,
+ "chocolatey":98,
+ "debian-packages":25,
+ "fdroid":5001,
+ "fedora-packages":83426,
+ "firefox-addons":3190,
+ "flathub":3430,
+ "gnome-extensions":153,
+ "homebrew-cask":7848,
+ "homebrew-formulae":8739,
+ "izzyondroid":1400,
  "jetbrains-marketplace":285,
- "homebrew-formulae":8732,
- "homebrew-cask":7839,
- "steam":82,
- "mta-curated-web":7
+ "mta-curated-web":7,
+ "openuse":976,
+ "scoop":5269,
+ "snap-store":722,
+ "steam":172,
+ "winget-run-community":974,
+ "wordpress-plugins":4590
 };
 const lastKnownTotal=Object.values(lastKnownSources).reduce((sum,n)=>sum+n,0);
 
@@ -64,7 +71,7 @@ function arrange(sources,stale){
       ?w("آخر عدد متحقق: "+count.toLocaleString(),"Last verified: "+count.toLocaleString())
       :(key==="steam"?w("نتائج جزئية · "+count.toLocaleString()+" سجل","Partial results · "+count.toLocaleString()+" records"):count.toLocaleString()+" "+w("تطبيق مفهرس","indexed apps"));
      badge.dataset.count=String(count);
-     badge.title=stale?w("تعذر الاتصال المباشر؛ هذا آخر عدد تحققنا منه.","Live verification is temporarily unavailable; showing the last verified count."):"";
+     badge.title=stale?w("تعذر الاتصال المباشر؛ آخر لقطة مؤكدة: 22 نوفمبر 2026.","Live verification is unavailable; last verified snapshot: 22 Nov 2026."):"";
     } else if(badge) badge.removeAttribute("data-count");
     card.dataset.catalogueState="connected";live.push({card,count});
    } else {
@@ -98,7 +105,7 @@ function summary(data,stale){
  let note=document.querySelector(".catalogue-icon-note");
  if(stale){
   if(!note){note=document.createElement("p");note.className="catalogue-icon-note";box.after(note);}
-  note.textContent=w("تعذر التحقق المباشر مؤقتاً؛ نعرض المتاجر التي سبق التحقق من وجود تطبيقات لها وآخر أعدادها المعروفة.","Live verification is temporarily unavailable. Showing stores previously verified to contain apps and their last known counts.");
+  note.textContent=w("تعذر التحقق المباشر مؤقتاً؛ الأعداد المعروضة من لقطة 22 نوفمبر 2026 وليست أعداداً مباشرة.","Live verification is temporarily unavailable. Counts are from the 22 Nov 2026 snapshot, not live totals.");
  }else if(note)note.remove();
 }
 function apply(data,stale){
