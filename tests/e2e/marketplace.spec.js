@@ -199,7 +199,7 @@ test('stale catalogue fallback keeps every recently verified source visible with
     'openuse': '976'
   };
   for (const [source, count] of Object.entries(expected)) {
-    const card = page.locator('.store-connected-group .store-picker-card[data-store-key="' + source + '"]');
+    const card = page.locator('.store-connected-group .store-picker-card').filter({ has: page.locator('[data-source-count="' + source + '"]') });
     await expect(card, source + ' should remain connected during a stats outage').toHaveAttribute('data-catalogue-state', 'connected');
     await expect(card.locator('[data-source-count]')).toHaveAttribute('data-count', count);
   }
