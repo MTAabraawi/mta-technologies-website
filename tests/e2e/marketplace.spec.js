@@ -430,7 +430,7 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   const previews = carousel.locator('.mta-motion-app .mta-motion-app-preview');
   await expect(previews).toHaveCount(4);
   for (const image of await previews.all()) {
-    await expect(image).toHaveAttribute('src', /images\\/project-.*\\.svg$/);
+    await expect(image).toHaveAttribute('src', /images\/project-.*\.svg$/);
   }
   const netBlockerIcon = carousel.locator('.mta-motion-app .mta-motion-app-app-icon');
   await expect(netBlockerIcon).toHaveCount(1);
