@@ -447,7 +447,7 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
     expect(response.status(), path).toBe(200);
     const html = await response.text();
     const title = html.match(/<title[^>]*>(.*?)<\/title>/i)?.[1]?.trim() || '';
-    const description = html.match(/<meta\s+name=["']description["']\\s+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
+    const description = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
     const canonical = html.match(/<link\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i)?.[1] || '';
     expect(title.length, path + ' title').toBeGreaterThan(12);
     expect(description.length, path + ' description').toBeGreaterThan(60);
