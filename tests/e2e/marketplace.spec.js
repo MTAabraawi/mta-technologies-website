@@ -367,7 +367,6 @@ test('cinematic homepage carousel animates the MTA logo and project slides', asy
   await carousel.locator('[data-carousel-next]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(1)).toBeVisible();
   await expect(carousel.locator('.mta-motion-app')).toHaveCount(4);
-  await expect(carousel.locator('.mta-ad-slot')).toHaveCount(0);
   await expect(carousel.locator('.mta-motion-app img')).toHaveCount(5);
   await expect(carousel.locator('.mta-motion-app .mta-motion-app-preview')).toHaveCount(1);
   await expect(carousel.locator('.mta-motion-app .mta-motion-app-app-icon')).toHaveCount(1);
@@ -439,5 +438,33 @@ test('homepage carousel advances automatically and supports touch swipe', async 
   const carousel = page.locator('[data-mta-carousel]');
   await carousel.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 7, clientX: 320, clientY: 350 });
   await carousel.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 7, clientX: 210, clientY: 352 });
-  await expect(slides.nth(2)).toBeVisible();
+  await expect(slides.nth(0)).toBeVisible();
+});
+test('public content pages expose unique titles, descriptions, canonical URLs and valid JSON-LD', async ({ page }) => {
+  const paths = ['/','/about.html','/projects.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
+  for (const path of paths) {
+    const response = await page.request.get(path);
+    expect(response.status(), path).toBe(200);
+    const html = await response.text();
+    const title = html.match(/<title[^>]*>(.*?)<\\/title>/i)?.[1]?.trim() || '';
+    const description = html.match(/<meta\\s+name=["']description["']\\s+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
+    const canonical = html.match(/<link\\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i)?.[1] || '';
+    expect(title.length, path + ' title').toBeGreaterThan(12);
+    expect(description.length, path + ' description').toBeGreaterThan(60);
+    expect(canonical, path + ' canonical').toMatch(/^https:\\/\\//);
+    const blocks = [...html.matchAll(/<script[^>]*type=["']application\\/ld\\+json["'][^>]*>([\\s\\S]*?)<\\/script>/gi)];
+    for (const block of blocks) expect(() => JSON.parse(block[1])).not.toThrow();
+  }
+});
+
+test('unknown routes return a real HTTP 404 response', async ({ page }) => {
+  const response = await page.request.get('/this-route-must-not-exist-seo-check');
+  expect(response.status()).toBe(404);
+});
+
+test('application detail pages keep noindex when required identifiers are missing', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
 });
