@@ -95,7 +95,21 @@
     top.className = "app-card-top";
     const icon = document.createElement("div");
     icon.className = "app-icon app-icon-image";
-    const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
+    const metadata = (() => {
+      try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); }
+      catch { return {}; }
+    })();
+    const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
+    const iconCollection = Array.isArray(metadata.icons) ? metadata.icons :
+      (metadata.icons && typeof metadata.icons === "object" ? Object.values(metadata.icons) : []);
+    const iconUrl = [
+      app.icon_url, app.icon_path, metadata.icon_url, metadata.iconUrl,
+      metadata.appIconUrl, metadata.app_icon_url,
+      typeof metadata.icon === "string" ? metadata.icon : "",
+      iconObject.url, iconObject.path, metadata.artworkUrl512, metadata.artworkUrl100,
+      ...iconCollection.map(item => typeof item === "string" ? item :
+        (item && typeof item === "object" ? (item.url || item.path || "") : ""))
+    ].map(safeHttpsUrl).find(Boolean) || "";
     const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
     const fallbackIcon = () => {
       const mark = document.createElement("span");
@@ -141,7 +155,6 @@
     const desc = document.createElement("p");
     desc.textContent = description;
     card.append(desc);
-    const metadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
     const sizeBytes = Number(metadata.size_bytes || app.size_bytes || 0);
     if (Number.isFinite(sizeBytes) && sizeBytes > 0) {
       const size = document.createElement("small");
