@@ -63,7 +63,7 @@ No manual ad-slot IDs are configured. Ad delivery remains subject to Google's si
 ## Ownership, licensing and due diligence
 
 - MTA does not claim ownership of third-party applications, store names, logos, publisher descriptions or upstream catalogue records.
-- Each source repository's code is governed by its own published licence. Public access or a public repository must not be represented as exclusive IP unless the applicable licence and ownership evidence support that claim.
+- Do not assume a public repository is MIT-licensed merely because it is public; inspect the LICENSE file and notices for each repository. If copies have already been released under MIT or another permissive licence, the rights already granted for those copies remain in force and cannot be sold as exclusive to one buyer.\n- For an asset-transfer review, separate the domain, brand, original MTA content, indexing data, source connectors and operating documentation from open-source code and third-party catalogue records.
 - Catalogue metadata and source links remain subject to upstream source terms. Transfer or commercial reuse rights must be reviewed source by source.
 - Domain, brand assets, original MTA-authored content, hosting configuration, repository data and operational workflows are distinct assets. Their ownership and transferability should be documented separately.
 - GitHub, Cloudflare, analytics and advertising accounts do not automatically transfer to a buyer; provider rules and authorized account handover apply.
