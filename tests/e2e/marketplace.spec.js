@@ -636,6 +636,7 @@ test('browser hydration preserves noindex for thin application metadata and does
   await page.goto('/application?source=fdroid&store=fdroid&id=2&name=Fixture%20Application%200001', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#application-name')).toHaveText('Fixture Application 0001');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
+  await expect(page.locator('#application-software-schema')).toHaveCount(0);
   await expect(page.locator('#application-icon')).toBeHidden();
   await expect(page.locator('#application-icon-fallback')).toBeVisible();
 });
