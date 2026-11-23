@@ -21,7 +21,7 @@ on:
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
   push:
-    branches: [main, feature/global-store-catalog-expansion]
+    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening]
     paths:
       - '*.html'
       - 'css/style.css'
