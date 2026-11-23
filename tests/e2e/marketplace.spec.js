@@ -630,3 +630,23 @@ test('application detail pages keep noindex when required identifiers are missin
   const html = await response.text();
   expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
 });
+
+
+test('browser hydration preserves noindex for thin application metadata and does not invent an icon', async ({ page }) => {
+  await page.goto('/application?source=fdroid&store=fdroid&id=2&name=Fixture%20Application%200001', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#application-name')).toHaveText('Fixture Application 0001');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
+  await expect(page.locator('#application-icon')).toBeHidden();
+  await expect(page.locator('#application-icon-fallback')).toBeVisible();
+});
+
+test('store cards and profile icons use publisher-provided assets rather than guessed domain favicons', async ({ page }) => {
+  const response = await page.request.get('/js/store.js');
+  expect(response.status()).toBe(200);
+  const script = await response.text();
+  expect(script).not.toContain('google.com/s2/favicons');
+  expect(script).not.toContain('icons.duckduckgo.com/ip3');
+  expect(script).not.toContain('favicon.ico');
+  expect(script).not.toContain('metadata.thumbnail');
+  expect(script).toContain('metadata.appIconUrl');
+});
