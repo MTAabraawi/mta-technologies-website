@@ -670,3 +670,15 @@ test('server-rendered store cards read publisher icon metadata and use an honest
   const metadataIcon = page.locator('.store-app-card').nth(2).locator('.store-app-icon');
   await expect(metadataIcon).toHaveAttribute('src', 'https://example.org/publisher-icon.png');
 });
+
+
+test('homepage catalogue cards do not invent icons or developer identities when source fields are absent', async ({ page }) => {
+  const response = await page.request.get('/js/apps.js');
+  expect(response.status()).toBe(200);
+  const script = await response.text();
+  expect(script).not.toContain('google.com/s2/favicons');
+  expect(script).not.toContain('Independent developer');
+  expect(script).toContain('metadata.appIconUrl');
+  expect(script).toContain('Developer not specified by source');
+  expect(script).toContain('No description provided by source');
+});
