@@ -51,10 +51,16 @@ function makeCard(app, storeKey, store) {
     "&name=" + encodeURIComponent(name);
   const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); } catch { return {}; } })();
   const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
-  const icon = safeHttps(app.icon_url || metadata.icon_url || metadata.iconUrl ||
-    metadata.appIconUrl || metadata.app_icon_url ||
-    (typeof metadata.icon === "string" ? metadata.icon : "") || iconObject.url || iconObject.path ||
-    metadata.artworkUrl512 || metadata.artworkUrl100);
+  const iconCollection = Array.isArray(metadata.icons) ? metadata.icons :
+    (metadata.icons && typeof metadata.icons === "object" ? Object.values(metadata.icons) : []);
+  const iconCandidates = [
+    app.icon_url, metadata.icon_url, metadata.iconUrl, metadata.appIconUrl, metadata.app_icon_url,
+    typeof metadata.icon === "string" ? metadata.icon : "", iconObject.url, iconObject.path,
+    metadata.artworkUrl512, metadata.artworkUrl100,
+    ...iconCollection.map(item => typeof item === "string" ? item :
+      (item && typeof item === "object" ? (item.url || item.path || "") : ""))
+  ].map(safeHttps).filter(Boolean);
+  const icon = [...new Set(iconCandidates)][0] || "";
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "APP";
   const original = safeHttps(app.source_url || app.app_url) || store.url || "#";
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
