@@ -342,7 +342,7 @@ test('all public HTML pages use the approved AdSense publisher and contain no re
     '/privacy-policy.html','/projects.html','/store.html','/suggestions.html','/terms.html',
     '/contact-thanks.html','/404.html'
   ];
-  const retired = /acscdn\\.com|aclib\\.js|js\\/adcash\\.js|12478774|12478782|12481106|mta-ad-slot|hilltopads?/i;
+  const retired = /acscdn[.]com|aclib[.]js|js[/]adcash[.]js|12478774|12478782|12481106|mta-ad-slot|hilltopads?/i;
   for (const path of pages) {
     const response = await page.request.get(path);
     expect(response.status(), 'Page should load: ' + path).toBe(200);
