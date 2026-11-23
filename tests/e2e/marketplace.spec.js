@@ -582,3 +582,15 @@ test('application detail pages keep noindex when required identifiers are missin
   const html = await response.text();
   expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
 });
+
+
+test('sitemap includes only store profiles with indexed catalogue sources', async ({ page }) => {
+  const response = await page.request.get('/sitemap-pages.xml');
+  expect(response.status()).toBe(200);
+  const xml = await response.text();
+  for (const key of ["fedora-packages","jetbrains-marketplace","gnome-extensions","firefox-addons","wordpress-plugins","homebrew-formulae","scoop","alpine-linux","fdroid","izzyondroid","apple-app-store","mac-app-store","winget","chocolatey","bluejetty-app-index","openuse","flathub","snap-store","arch-linux","debian-packages","homebrew","steam","mta-web-apps"]) {
+    expect(xml).toContain('https://www.mtahqq.dpdns.org/store?store=' + key);
+  }
+  expect(xml).not.toContain('store?store=google-play');
+  expect(xml).toContain('<urlset');
+});
