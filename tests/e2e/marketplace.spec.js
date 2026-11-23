@@ -583,6 +583,15 @@ test('application SSR refuses a name-only match when the source ID is wrong', as
   expect(html).not.toContain('id="application-ssr-schema"');
 });
 
+test('application profiles with insufficient source descriptions remain noindex and omit SoftwareApplication schema', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=2&name=Fixture%20Application%200001');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toContain('id="application-ssr-schema"');
+  expect(html).toContain('لم يوفر مصدر البيانات وصفاً كافياً');
+});
+
 test('application detail pages keep noindex when required identifiers are missing', async ({ page }) => {
   const response = await page.request.get('/application?source=fdroid');
   expect(response.status()).toBe(200);

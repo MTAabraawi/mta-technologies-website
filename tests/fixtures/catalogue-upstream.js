@@ -7,7 +7,7 @@ const rows = Array.from({ length: total }, (_, i) => ({
   platform: 'android',
   name: i === 0 ? 'MTA Net Blocker' : 'Fixture Application ' + String(i).padStart(4, '0'),
   developer: i === 0 ? 'MTA TECHNOLOGIES' : 'Fixture Publisher',
-  summary: 'Deterministic catalogue fixture for proxy integration tests',
+  summary: i === 1 ? '' : 'Deterministic catalogue fixture for proxy integration tests',
   description: '',
   category: i % 2 === 0 ? 'utilities' : 'productivity',
   license: null,

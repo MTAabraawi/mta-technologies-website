@@ -81,12 +81,14 @@ export async function onRequest(context) {
     const app = rows.find(row => String(row.external_id || row.id || "") === id);
     if (!app) throw new Error("Application not found");
     const title = String(app.name || name);
-    const summary = String(app.summary || app.description || "Application details and source information from the MTA directory.").slice(0, 500);
-    const description = String(app.description || app.summary || "Review the original publisher listing for current application details.").slice(0, 5000);
+    const sourceDescription = [app.summary, app.description].find(value => typeof value === "string" && value.trim().length >= 40) || "";
+    const hasSubstantiveContent = Boolean(sourceDescription);
+    const summary = String(sourceDescription || "لم يوفر مصدر البيانات وصفاً كافياً لهذا التطبيق بعد. راجع صفحة المصدر الأصلية للتحقق من التفاصيل.").slice(0, 500);
+    const description = String(app.description || app.summary || "لا تتوفر تفاصيل وصفية كافية للفهرسة حالياً. راجع صفحة المصدر الأصلية للحصول على المعلومات المحدثة.").slice(0, 5000);
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
     html = meta(html, "description", summary);
-    html = meta(html, "robots", "index,follow");
+    html = meta(html, "robots", hasSubstantiveContent ? "index,follow" : "noindex,follow");
     html = canonical(html, canonicalUrl);
     html = setIdText(html, "application-name", title);
     html = setIdText(html, "application-breadcrumb", title);
@@ -119,7 +121,8 @@ export async function onRequest(context) {
       html = html.replace('<span id="application-icon-fallback" class="store-app-icon-fallback">MTA</span>',
         '<span id="application-icon-fallback" class="store-app-icon-fallback">' + esc(initials) + '</span>');
     }
-    const schema = {
+    if (hasSubstantiveContent) {
+      const schema = {
       "@context":"https://schema.org","@type":"SoftwareApplication",
       "name":title,"description":summary,"url":canonicalUrl,
       "operatingSystem":String(app.platform || "Unspecified"),
@@ -129,7 +132,8 @@ export async function onRequest(context) {
       "sameAs":sourceUrl || undefined
     };
     const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
-    html = html.replace("</head>", json + "</head>");
+      html = html.replace("</head>", json + "</head>");
+    }
   } catch (error) {
     console.error("MTA application SSR failed:", error);
     html = meta(html, "robots", "noindex,follow");
