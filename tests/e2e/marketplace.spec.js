@@ -590,7 +590,7 @@ test('sitemap includes only store profiles with indexed catalogue sources', asyn
   const response = await page.request.get('/sitemap-pages.xml');
   expect(response.status()).toBe(200);
   const xml = await response.text();
-  for (const key of ["fedora-packages","jetbrains-marketplace","gnome-extensions","firefox-addons","wordpress-plugins","homebrew-formulae","scoop","alpine-linux","fdroid","izzyondroid","apple-app-store","mac-app-store","winget","chocolatey","bluejetty-app-index","openuse","flathub","snap-store","arch-linux","debian-packages","homebrew","steam","mta-web-apps"]) {
+  for (const key of ["fedora-packages","jetbrains-marketplace","gnome-extensions","firefox-addons","wordpress-plugins","homebrew-formulae","scoop","alpine-linux","fdroid","izzyondroid","apple-app-store","mac-app-store","winget","chocolatey","bluejetty-app-index","openuse","flathub","snap-store","arch-linux","debian-packages","homebrew","steam","mta-web-apps", "open-vsx"]) {
     expect(xml).toContain('https://www.mtahqq.dpdns.org/store?store=' + key);
   }
   expect(xml).not.toContain('store?store=google-play');
