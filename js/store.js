@@ -148,7 +148,7 @@ function makeCard(app){
  if(typeof app.metadata_json==="string"){try{metadata=JSON.parse(app.metadata_json)}catch{metadata={}}}
  const iconObject=metadata.icon&&typeof metadata.icon==="object"?metadata.icon:{};
  const iconCollection=Array.isArray(metadata.icons)?metadata.icons:(metadata.icons&&typeof metadata.icons==="object"?Object.values(metadata.icons):[]);
- const metadataIcons=[metadata.icon_url,metadata.iconUrl,typeof metadata.icon==="string"?metadata.icon:"",iconObject.url,iconObject.path,metadata.logo,metadata.image,metadata.image_url,metadata.artworkUrl512,metadata.artworkUrl100,metadata.thumbnail,...iconCollection];
+ const metadataIcons=[metadata.icon_url,metadata.iconUrl,metadata.appIconUrl,metadata.app_icon_url,typeof metadata.icon==="string"?metadata.icon:"",iconObject.url,iconObject.path,metadata.artworkUrl512,metadata.artworkUrl100,...iconCollection];
  const iconUrl=safe(app.icon_url||"");
  const candidates=[iconUrl,...metadataIcons.map(value=>safe(typeof value==="string"?value:(value&&typeof value==="object"?(value.url||value.path||""):"")))].filter((v,i,a)=>v&&a.indexOf(v)===i);
 let iconIndex=0;
