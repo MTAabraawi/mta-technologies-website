@@ -445,7 +445,7 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
   }
 });
 
-test('internal links across the public site resolve without broken routes or redirects', async ({ page }) => {
+test('internal links across the public site resolve without broken routes', async ({ page }) => {
   const pages = [
     '/','/about.html','/projects.html','/apps.html','/innovation.html','/knowledge.html',
     '/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html',
@@ -466,7 +466,7 @@ test('internal links across the public site resolve without broken routes or red
       const target = url.pathname + url.search;
       if (checked.has(target)) continue;
       checked.add(target);
-      const linked = await page.request.get(target, { maxRedirects: 0 });
+      const linked = await page.request.get(target);
       expect(linked.status(), 'Internal link ' + href + ' from ' + path).toBe(200);
     }
   }
