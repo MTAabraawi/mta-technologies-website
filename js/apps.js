@@ -110,7 +110,6 @@
       ...iconCollection.map(item => typeof item === "string" ? item :
         (item && typeof item === "object" ? (item.url || item.path || "") : ""))
     ].map(safeHttpsUrl).find(Boolean) || "";
-    const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
     const fallbackIcon = () => {
       const mark = document.createElement("span");
       mark.className = "app-icon-fallback";
