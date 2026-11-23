@@ -992,33 +992,6 @@ body{letter-spacing:normal;text-rendering:optimizeLegibility}
 .home-catalogue-overview{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:2rem;align-items:center;margin-top:4rem;margin-bottom:2rem;padding:2rem;border:1px solid var(--border-color);border-radius:24px;background:radial-gradient(ellipse at 90% 15%,var(--accent-glow),transparent 50%),var(--bg-surface)}.home-catalogue-copy h2{font-size:clamp(1.5rem,3vw,2.25rem);line-height:1.5;margin:.35rem 0 .7rem}.home-catalogue-copy p{color:var(--text-secondary);line-height:2;font-size:.9rem;margin-bottom:1.2rem}.home-catalogue-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem}.home-catalogue-stats>div{display:flex;flex-direction:column;gap:.35rem;padding:1rem .8rem;border:1px solid var(--border-color);border-radius:15px;background:var(--bg-card);min-width:0}.home-catalogue-stats strong{font-size:clamp(1.25rem,3vw,2rem);font-variant-numeric:tabular-nums;color:var(--text-primary);overflow-wrap:anywhere}.home-catalogue-stats span{color:var(--text-secondary);font-size:.72rem;line-height:1.7}.home-catalogue-stats>p{grid-column:1/-1;color:var(--text-muted);font-size:.72rem;line-height:1.7;margin-top:.25rem}@media(max-width:760px){.home-catalogue-overview{grid-template-columns:1fr;padding:1.2rem;gap:1.2rem}.home-catalogue-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
  
-/* Adcash responsive Display placements: 728x90 desktop and 300x250 compact screens */
-.mta-ad-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 728px;
-  min-height: 118px;
-  margin: 2rem auto;
-  padding: 0;
-  box-sizing: border-box;
-  text-align: center;
-}
-.mta-ad-label {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.68rem;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-}
-.mta-ad-slot > script {
-  display: block;
-}
-
-
 /* 2026-11-16: mobile viewport hardening across the corporate site */
 html,
 body {
@@ -1224,28 +1197,6 @@ textarea {
 .corp-footer-bottom {
   color: #AAB9CC;
 }
-.mta-ad-slot {
-  width: min(100%, 728px);
-  min-height: 118px;
-}
-@media (max-width: 680px) {
-  .corp-logo img,
-  .brand-logo-img {
-    width: min(40vw, 150px);
-    height: 42px;
-  }
-  .corp-footer-brand img {
-    width: min(70vw, 190px);
-    height: 48px;
-  }
-  .corp-core img {
-    height: 70px;
-  }
-  .mta-ad-slot {
-    min-height: 260px;
-  }
-}
-
 /* Legacy corporate pages: keep the full navigation usable on phones without a hamburger */
 @media (max-width: 768px) {
   header .nav-bar {
@@ -1298,57 +1249,13 @@ textarea {
 }
 
 
-/* Keep the 300x250 Adcash placement within narrow viewports. */
-@media (max-width: 767px) {
-  .mta-ad-slot {
-    width: min(100%, 300px);
-    min-height: 278px;
-  }
-}
-
-
-/* Adcash: retain both configured banner formats on every viewport. */
-.mta-ad-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  margin: 2rem auto;
-  padding: 0;
-  text-align: center;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.mta-ad-slot-top {
-  width: min(100%, 728px);
-  min-height: 118px;
-}
-.mta-ad-slot-bottom {
-  width: min(100%, 300px);
-  min-height: 278px;
-}
-.mta-ad-slot .mta-ad-label {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.68rem;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
-}
-.mta-ad-slot > script {
-  display: block;
-}
-@media (max-width: 767px) {
-  .mta-ad-slot-top {
-    width: 100%;
-    min-height: 118px;
-  }
-  .mta-ad-slot-bottom {
-    width: min(100%, 300px);
-    min-height: 278px;
-  }
-}
+/* MTA marketplace carousel slide */
+.mta-marketplace-slide-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem;width:min(100%,700px);margin:1.5rem auto}
+.mta-marketplace-slide-card{display:flex;flex-direction:column;justify-content:center;gap:.45rem;min-height:112px;padding:1rem;border:1px solid var(--border-color);border-radius:18px;background:var(--bg-card);color:var(--text-primary);text-decoration:none;box-shadow:0 12px 28px rgba(0,0,0,.14);transition:transform .2s ease,border-color .2s ease}
+.mta-marketplace-slide-card:hover{transform:translateY(-3px);border-color:var(--accent-blue)}
+.mta-marketplace-slide-card strong{font-size:1rem;font-weight:800}
+.mta-marketplace-slide-card span{color:var(--text-secondary);font-size:.76rem;line-height:1.6}
+@media(max-width:640px){.mta-marketplace-slide-preview{grid-template-columns:1fr;gap:.55rem;margin:1rem auto}.mta-marketplace-slide-card{min-height:76px;padding:.8rem 1rem}}
 
 /* 2026 corporate homepage refresh: calmer hierarchy and fewer competing sections */
 .mta-home-refresh { background:var(--bg-primary); }

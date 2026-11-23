@@ -2,7 +2,7 @@
 **BUILDING A SMARTER TOMORROW**  
 **البريد الرسمي المعتمد: mtatechnologies0@gmail.com**
 
-الموقع الرسمي الكامل لشركة **MTA TECHNOLOGIES**، مبني كـ **Static Website** فائق السرعة وخالٍ تماماً من التبعيات المعقدة أو الخوادم، وجاهز للرفع الفوري على **Cloudflare Pages** و **GitHub Pages**.
+الموقع الرسمي لشركة **MTA TECHNOLOGIES**، بواجهة ثنائية اللغة على **Cloudflare Pages**. يتضمن الموقع صفحات ثابتة، وCloudflare Pages Functions لعرض صفحات المتاجر والتطبيقات من الخادم، ومحرك فهرسة عبر Worker وكتالوج بيانات محفوظ في GitHub.
 
 ---
 
@@ -10,7 +10,7 @@
 
 - `index.html` : الصفحة الرئيسية مع الشعار الرسمي، الرسالة، وملخص المشاريع والمجالات.
 - `about.html` : نبذة عن الشركة ورؤيتها ورسالتها.
-- `projects.html` : المشاريع والمنتجات الرسمية (MTA Net Blocker, MTA AI Video Studio, MTA Video Downloader, MTA University Library Collector).
+- `projects.html` : المشاريع والمنتجات مع توضيح حالة الإصدار لكل مشروع.\n- `apps.html` و`store.html` و`application.html` : دليل المتاجر وصفحات التطبيقات الديناميكية.\n- `platform-overview.html` : شرح بنية دليل التطبيقات ومصادر البيانات وحدود التغطية والحقوق.
 - `innovation.html` : مجالات العمل والابتكار التقني السبعة.
 - `knowledge.html` : مركز المعرفة والمقالات الهندسية الأصلية.
 - `gallery.html` : معرض الهوية البصرية والواجهات مع عارض تكبير تفاعلي (Lightbox).
@@ -25,7 +25,7 @@
 - `images/` : ملفات الشعارات الرسمية المتجهة (SVG) بدقة فائقة.
 - `favicon.svg` : أيقونة المتصفح الرسمية.
 - `robots.txt` : تعليمات محركات البحث.
-- `sitemap.xml` : خريطة أرشفة الموقع.
+- `sitemap-index.xml` و`sitemap-pages.xml` و`sitemap-stores.xml` : خرائط صفحات الموقع والمتاجر.\n- `ads.txt` : تصريح ناشر Google AdSense.\n- `functions/` : العرض الخادمي لصفحات المتاجر والتطبيقات.\n- `tests/e2e/` : اختبارات Playwright ببيانات تجريبية معزولة.
 
 ---
 

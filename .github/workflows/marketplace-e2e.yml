@@ -3,7 +3,7 @@ name: MTA Marketplace E2E
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main, feature/global-store-catalog-expansion, audit/seo-content-adsense-marketplace]
+    branches: [main, feature/global-store-catalog-expansion]
     paths:
       - '*.html'
       - 'css/style.css'
@@ -26,7 +26,7 @@ on:
       - 'robots.txt'
       - '.github/workflows/marketplace-e2e.yml'
   push:
-    branches: [main, feature/global-store-catalog-expansion]
+    branches: [main, feature/global-store-catalog-expansion, audit/seo-content-adsense-marketplace]
     paths:
       - '*.html'
       - 'css/style.css'
@@ -39,6 +39,14 @@ on:
       - 'tests/fixtures/**'
       - 'playwright.config.js'
       - 'package.json'
+      - 'js/store.js'
+      - 'js/store-directory.js'
+      - 'store.html'
+      - 'ads.txt'
+      - 'data/**'
+      - 'sitemap*.xml'
+      - 'robots.txt'
+      - 'README.md'
       - '.github/workflows/marketplace-e2e.yml'
 
 permissions:
