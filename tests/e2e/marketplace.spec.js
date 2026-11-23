@@ -74,6 +74,8 @@ test('F-Droid opens an internal branded catalogue and displays server-rendered a
   // must be usable without a redundant browser-side request.
   await expect(page.locator('.store-app-card')).toHaveCount(12, { timeout: 60_000 });
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
+  await expect(page.locator(".store-app-card").first()).toContainText("1.0.1");
+  await expect(page.locator(".store-app-card").first()).toContainText("12,345");
   expect(errors).toEqual([]);
 });
 

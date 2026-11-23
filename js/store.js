@@ -173,6 +173,7 @@ function makeCard(app){
   const summaryToggle=document.createElement("summary");summaryToggle.textContent=copy("قراءة التفاصيل","Read full description");
   const body=document.createElement("p");body.textContent=fullDescription;details.append(summaryToggle,body);
  }
+ const sourceFacts=[[metadata.version||metadata.versionString,copy("الإصدار","Version")],[metadata.averageRating??metadata.rating,copy("التقييم","Rating")],[metadata.downloadCount??metadata.estimatedDownloads??metadata.active_installs,copy("التنزيلات","Downloads")],[metadata.last_updated||metadata.lastUpdated||metadata.updatedAt,copy("آخر تحديث","Last updated")]].filter(([value])=>value!=null&&String(value).trim()!=="");sourceFacts.forEach(([value,label])=>{const span=document.createElement("span");span.className="store-app-fact";span.textContent=label+": "+(typeof value==="number"?value.toLocaleString():String(value));tags.append(span)});
  const categorySelect=$("store-category-filter"),category=card.dataset.category;
  if(category&&categorySelect&&!Array.from(categorySelect.options).some(o=>o.value===category)){
   const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option);

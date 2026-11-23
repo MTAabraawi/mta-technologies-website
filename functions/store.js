@@ -64,6 +64,8 @@ function makeCard(app, storeKey, store) {
   const original = safeHttps(app.source_url || app.app_url) || store.url || "#";
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
   const meta = [app.developer, platform, app.category].filter(Boolean).join(" · ");
+  const sourceFacts = [["الإصدار", metadata.version || metadata.versionString], ["التقييم", metadata.averageRating ?? metadata.rating], ["التنزيلات", metadata.downloadCount ?? metadata.estimatedDownloads ?? metadata.active_installs], ["آخر تحديث", metadata.last_updated || metadata.lastUpdated || metadata.updatedAt]].filter(([, value]) => value != null && String(value).trim() !== "");
+  const sourceFactsHtml = sourceFacts.map(([label, value]) => '<span class="store-app-fact"><strong>' + escapeHtml(label) + ':</strong> ' + escapeHtml(typeof value === "number" ? value.toLocaleString("en-US") : value) + '</span>').join("");
   const summary = app.summary || app.description || "لا يتوفر وصف مختصر في بيانات المصدر.";
   const category = String(app.category || "Other").split(",")[0].trim();
   return '<article class="store-app-card" data-category="' + escapeHtml(category) + '" data-platform="' + escapeHtml(String(app.platform || "").toLowerCase()) + '">' +
@@ -75,7 +77,7 @@ function makeCard(app, storeKey, store) {
     '<h3><a href="' + escapeHtml(detail) + '">' + escapeHtml(name) + '</a></h3>' +
     '<p class="store-app-meta">' + escapeHtml(meta) + '</p>' +
     '<p class="store-app-summary">' + escapeHtml(summary) + '</p>' +
-    '<div class="store-app-tags">' + [platform, app.license].filter(Boolean).map(value => '<span>' + escapeHtml(value) + '</span>').join("") + '</div>' +
+    '<div class="store-app-tags">' + [platform, app.license].filter(Boolean).map(value => '<span>' + escapeHtml(value) + '</span>').join("") + sourceFactsHtml + '</div>' +
     '<a class="store-app-detail-link" href="' + escapeHtml(detail) + '">تفاصيل التطبيق داخل MTA</a>' +
     '<a class="store-app-link" href="' + escapeHtml(original) + '" target="_blank" rel="noopener noreferrer">عرض التطبيق في مصدره الأصلي ↗</a>' +
   '</article>';
