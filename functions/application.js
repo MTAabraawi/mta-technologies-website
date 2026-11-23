@@ -52,6 +52,22 @@ function setIdText(html, id, value) {
 function setIdHtml(html, id, value) {
   return replaceInner(html, id, value);
 }
+async function fetchJsonWithRetry(url) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await fetch(url, { headers: { accept: "application/json" }, cf: { cacheTtl: 0 } });
+      if (response.ok) return await response.json();
+      lastError = new Error("Application API HTTP " + response.status);
+      if (response.status < 500 && response.status !== 429) throw lastError;
+    } catch (error) {
+      lastError = error;
+      if (attempt === 2 || (error && /^Application API HTTP 4/.test(error.message || "") && !/429/.test(error.message || ""))) throw error;
+    }
+    if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)));
+  }
+  throw lastError || new Error("Application API unavailable");
+}
 export async function onRequest(context) {
   const response = await context.next();
   const url = new URL(context.request.url);
@@ -68,17 +84,15 @@ export async function onRequest(context) {
   const canonicalUrl = canonicalOrigin + "/application" + (canonicalParams.size ? "?" + canonicalParams.toString() : "");
   const engine = (context.env && context.env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
   try {
-    if (!source || !id || !name) throw new Error("Missing app reference");
+    if (!source || !id) throw new Error("Missing app source or exact identifier");
     const api = new URL("/api/v1/apps", engine);
     api.searchParams.set("source", source);
     api.searchParams.set("external_id", id);
-    const upstream = await fetch(api, { headers: { accept: "application/json" }, cf: { cacheTtl: 0 } });
-    if (!upstream.ok) throw new Error("Application API HTTP " + upstream.status);
-    const rows = await upstream.json();
+    const rows = await fetchJsonWithRetry(api);
     if (!Array.isArray(rows)) throw new Error("Invalid application response");
     const app = rows.find(row => String(row.external_id || row.id || "") === id);
     if (!app) throw new Error("Application not found");
-    const title = String(app.name || name);
+    const title = String(app.name || name || "Application");
     const summary = String(app.summary || app.description || "Application details and source information from the MTA directory.").slice(0, 500);
     const description = String(app.description || app.summary || "Review the original publisher listing for current application details.").slice(0, 5000);
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
@@ -91,8 +105,8 @@ export async function onRequest(context) {
     html = setIdText(html, "application-byline", [app.developer, app.platform, app.category].filter(Boolean).join(" · "));
     html = setIdText(html, "application-summary", summary);
     html = setIdText(html, "application-description", description);
-    html = setIdText(html, "application-platform-guidance", "تحقق من متطلبات النظام والتوافق وهوية الناشر والترخيص والأذونات قبل تثبيت التطبيق. قد تختلف الإتاحة حسب البلد والجهاز.");
-    html = setIdText(html, "application-data-quality", "تعرض هذه الصفحة الحقول التي وفرها مصدر البيانات فقط. الحقول غير المتاحة لا تُعرض كحقائق مؤكدة؛ راجع صفحة الناشر للتحقق من أحدث المعلومات.");
+    html = setIdHtml(html, "application-platform-guidance", '<span class="ar-only">تحقق من متطلبات النظام والتوافق وهوية الناشر والترخيص والأذونات قبل تثبيت التطبيق. قد تختلف الإتاحة حسب البلد والجهاز.</span><span class="en-only">Check system requirements, compatibility, publisher identity, licence and permissions before installing. Availability may vary by country and device.</span>');
+    html = setIdHtml(html, "application-data-quality", '<span class="ar-only">تعرض هذه الصفحة الحقول التي وفرها مصدر البيانات فقط. الحقول غير المتاحة لا تُعرض كحقائق مؤكدة؛ راجع صفحة الناشر للتحقق من أحدث المعلومات.</span><span class="en-only">This page shows only fields supplied by the data source. Missing fields are not presented as facts; check the publisher listing for the latest information.</span>');
     html = setIdText(html, "application-store-link", STORE_NAMES[store] || store);
     const sourceUrl = safe(app.source_url || app.app_url);
     if (sourceUrl) {
@@ -103,8 +117,8 @@ export async function onRequest(context) {
     html = html.replace('<a id="application-store-link" href="apps.html">', '<a id="application-store-link" href="' + esc(storeHref) + '">');
     html = html.replace('<a id="application-back-link" class="btn btn-outline" href="apps.html">', '<a id="application-back-link" class="btn btn-outline" href="' + esc(storeHref) + '">');
     const metadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
-    const facts = [["المطور",app.developer],["المنصة",app.platform],["التصنيف",app.category],["الترخيص",app.license],["الإصدار",metadata.version || metadata.versionString],["معرّف الحزمة",metadata.package_name || metadata.bundle_id],["الحد الأدنى لإصدار Android",metadata.minSdkVersion],["الحجم بالبايت",metadata.size_bytes],["آخر تحديث للسجل",app.updated_at],["مصدر البيانات",app.source || source],["معرّف المصدر",app.external_id || app.id]].filter(pair => pair[1] != null && String(pair[1]).trim() !== "");
-    html = setIdHtml(html, "application-facts", facts.map(pair => "<dt>"+esc(pair[0])+"</dt><dd>"+esc(pair[1])+"</dd>").join(""));
+    const facts = [["المطور","Developer",app.developer],["المنصة","Platform",app.platform],["التصنيف","Category",app.category],["الترخيص","Licence",app.license],["الإصدار","Version",metadata.version || metadata.versionString],["معرّف الحزمة","Package identifier",metadata.package_name || metadata.bundle_id],["الحد الأدنى لإصدار Android","Minimum Android version",metadata.minSdkVersion],["الحجم بالبايت","Size (bytes)",metadata.size_bytes],["آخر تحديث للسجل","Catalogue record updated",app.updated_at],["مصدر البيانات","Data source",app.source || source],["معرّف المصدر","Source identifier",app.external_id || app.id]].filter(pair => pair[2] != null && String(pair[2]).trim() !== "");
+    html = setIdHtml(html, "application-facts", facts.map(pair => '<dt><span class="ar-only">'+esc(pair[0])+'</span><span class="en-only">'+esc(pair[1])+'</span></dt><dd>'+esc(pair[2])+'</dd>').join(""));
     const icon = safe(app.icon_url);
     if (icon) {
       html = html.replace('<img id="application-icon" alt="" hidden>',
@@ -124,7 +138,8 @@ export async function onRequest(context) {
       "softwareVersion":metadata.version || metadata.versionString || undefined,
       "dateModified":app.updated_at || undefined,
       "image":icon || undefined,
-      "sameAs":sourceUrl || undefined
+      "sameAs":sourceUrl || undefined,
+      "inLanguage":["ar","en"]
     };
     const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
     html = html.replace("</head>", json + "</head>");

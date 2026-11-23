@@ -594,3 +594,13 @@ test('sitemap includes only store profiles with indexed catalogue sources', asyn
   expect(xml).not.toContain('store?store=google-play');
   expect(xml).toContain('<urlset');
 });
+
+
+test('application detail can resolve by exact source ID without a display-name query parameter', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&id=2');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('Fixture Application 0001');
+  expect(html).toContain('id="application-ssr-schema"');
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+});
