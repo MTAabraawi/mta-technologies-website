@@ -23,7 +23,7 @@ on:
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
   push:
-    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening]
+    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23]
     paths:
       - '*.html'
       - 'css/style.css'
