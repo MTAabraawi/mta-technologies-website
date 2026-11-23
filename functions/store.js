@@ -79,6 +79,31 @@ function makeCard(app, storeKey, store) {
     '<a class="store-app-link" href="' + escapeHtml(original) + '" target="_blank" rel="noopener noreferrer">عرض التطبيق في مصدره الأصلي ↗</a>' +
   '</article>';
 }
+const STORE_EDITORIAL = {
+  "fdroid": ["فهرس F-Droid يركز على تطبيقات Android الحرة ومفتوحة المصدر. راجع بيانات الحزمة والترخيص وروابط المشروع قبل الانتقال إلى المستودع.", "قد تتضمن السجلات معلومات الإصدار ومتطلبات النظام، لكن التوفر والتوافق يعتمدان على الجهاز وسياسة المستودع.", "تحقق من توقيع الحزمة والترخيص وصفحة المصدر الأصلية. لا يستضيف MTA ملفات APK ولا يعيد توزيعها."],
+  "izzyondroid": ["يعرض هذا القسم حزم Android من مستودع IzzyOnDroid المستقل، ونفصل بياناته عن F-Droid حتى يبقى مصدر كل تطبيق واضحاً.", "قد تختلف سياسة قبول الحزم ومواعيد التحديث؛ ووجود الحزمة هنا لا يعني أنها موجودة في متاجر أخرى.", "راجع صفحة الحزمة والتوقيع وروابط المشروع والترخيص وتاريخ التحديث قبل التثبيت."],
+  "apple-itunes": ["تستند النتائج إلى واجهة البحث العامة لدى Apple، وهي وسيلة لاكتشاف التطبيقات وليست نسخة كاملة من App Store.", "قد تختلف النتائج والأسعار والتوفر باختلاف بلد المتجر، وبعض الحقول لا تتوفر لكل سجل.", "افتح صفحة App Store الأصلية للتحقق من المطور والتوافق والاشتراكات وعمليات الشراء."],
+  "apple-macos": ["هذا الفهرس مخصص لتطبيقات macOS التي تظهر في واجهة بحث Apple، وهو منفصل عن نتائج iPhone وiPad.", "تعتمد الملاءمة على إصدار macOS وطراز الجهاز ومعمارية المعالج، وقد لا تعكس النتائج كل التطبيقات المتاحة.", "راجع صفحة Mac App Store الأصلية للتحقق من متطلبات النظام والسعر والمطور."],
+  "bluejetty": ["Blue Jetty مصدر تجميعي انتقائي لبيانات تطبيقات الهاتف، وليس نسخة كاملة من Google Play أو Apple App Store.", "قد تحتوي السجلات على روابط متاجر ومعلومات ناشر وملاحظات مصدرية؛ نعرض الحقول التي وفرها المصدر فقط.", "قارن السجل مع صفحة المتجر الرسمية، وراجع هوية المطور والتوافق والأذونات قبل التثبيت."],
+  "openuse": ["يجمع OpenUse بيانات عن برمجيات حرة ومفتوحة المصدر عبر أنظمة متعددة ويربط السجلات بصفحات المشاريع الأصلية.", "إدراج مشروع لا يعني أن MTA يطوره أو يوزع ملفاته؛ تختلف طريقة التثبيت والترخيص ومتطلبات التشغيل.", "افحص المستودع الرسمي والترخيص ونشاط الصيانة ونظام التشغيل المدعوم قبل اعتماد البرنامج."],
+  "steam": ["تأتي النتائج من بحث محدود في واجهة Steam العامة، ولا تمثل كامل مكتبة الألعاب أو كل منتجات المتجر.", "قد تتغير الأسعار والتوفر واللغات ومتطلبات التشغيل بحسب البلد والحساب ونظام التشغيل.", "افتح صفحة Steam للتحقق من متطلبات النظام والتقييمات والسعر وسياسة المحتوى قبل الشراء."]
+};
+function injectEditorial(html, key) {
+  const profile = STORE_EDITORIAL[key];
+  if (!profile) return html;
+  const ids = ["store-editorial-what", "store-editorial-verify", "store-editorial-availability"];
+  for (let i = 0; i < ids.length; i++) {
+    const marker = 'id="' + ids[i] + '"';
+    const markerAt = html.indexOf(marker);
+    const openEnd = html.indexOf(">", markerAt);
+    const closeStart = html.indexOf("</p>", openEnd);
+    if (markerAt < 0 || openEnd < 0 || closeStart < 0) continue;
+    const text = '<span class="ar-only">' + escapeHtml(profile[i]) + '</span>';
+    html = html.slice(0, openEnd + 1) + text + html.slice(closeStart);
+  }
+  return html;
+}
+
 function setMeta(html, name, content) {
   const escaped = escapeHtml(content);
   const re = new RegExp("<meta\\s+name=[\"']" + name + "[\"'][^>]*>", "i");
@@ -90,6 +115,23 @@ function setCanonical(html, canonical) {
   const re = /<link\s+rel=["']canonical["'][^>]*>/i;
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
 }
+async function fetchJsonWithRetry(url) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const response = await fetch(url, { headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false } });
+      if (response.ok) return await response.json();
+      lastError = new Error("Catalogue HTTP " + response.status);
+      if (response.status < 500 && response.status !== 429) throw lastError;
+    } catch (error) {
+      lastError = error;
+      if (attempt === 2 || (error && /^Catalogue HTTP 4/.test(error.message || "") && !/429/.test(error.message || ""))) throw error;
+    }
+    if (attempt < 2) await new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)));
+  }
+  throw lastError || new Error("Catalogue request failed");
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
@@ -106,11 +148,7 @@ export async function onRequest(context) {
   } else {
     const engineOrigin = (env && env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
     try {
-      const statsResponse = await fetch(new URL("/api/v1/catalog-stats", engineOrigin), {
-        headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
-      });
-      if (!statsResponse.ok) throw new Error("Catalogue stats HTTP " + statsResponse.status);
-      const stats = await statsResponse.json();
+      const stats = await fetchJsonWithRetry(new URL("/api/v1/catalog-stats", engineOrigin));
       const count = Number((stats.sources || {})[store.source] || 0);
       if (count <= 0) {
         html = setMeta(html, "robots", "noindex,follow");
@@ -121,14 +159,9 @@ export async function onRequest(context) {
         appsUrl.searchParams.set("source", store.source);
         appsUrl.searchParams.set("limit", "12");
         appsUrl.searchParams.set("offset", "0");
-        const appsResponse = await fetch(appsUrl, {
-          headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
-        });
-        if (!appsResponse.ok) throw new Error("Catalogue apps HTTP " + appsResponse.status);
-        const apps = await appsResponse.json();
+        const apps = await fetchJsonWithRetry(appsUrl);
         if (!Array.isArray(apps) || !apps.length) throw new Error("No server-renderable catalogue rows");
-        const description = store.description + " تصفح " + count.toLocaleString("en-US") +
-          " سجلاً مفهرساً، وابحث حسب الاسم والمنصة والتصنيف. MTA يعرض بيانات المصدر وروابط الناشر الأصلية ولا يستضيف ملفات التثبيت.";
+        const description = (store.description + " تصفح " + count.toLocaleString("en-US") + " سجلاً مفهرساً من المصدر. تحقق من صفحة الناشر الأصلية قبل التثبيت؛ MTA لا يستضيف ملفات البرامج.").slice(0, 320);
         const title = store.name + " | دليل التطبيقات | MTA TECHNOLOGIES";
         html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
         html = setMeta(html, "description", description);
@@ -138,6 +171,7 @@ export async function onRequest(context) {
         html = html.replace('<span id="breadcrumb-store">Store</span>', '<span id="breadcrumb-store">' + escapeHtml(store.name) + '</span>');
         html = html.replace('<p id="store-subtitle"></p>', '<p id="store-subtitle">' + escapeHtml(store.platforms.join(" · ")) + '</p>');
         html = html.replace('<p id="store-description"></p>', '<p id="store-description">' + escapeHtml(store.description) + '</p>');
+        html = injectEditorial(html, storeKey);
         html = html.replace('<span class="store-status" id="store-status">Checking integration</span>', '<span class="store-status is-connected" id="store-status">متصل · ' + count.toLocaleString("en-US") + ' سجل مفهرس</span>');
         html = html.replace('<p id="store-results-note"><span class="ar-only">نحمّل بيانات التطبيقات المتاحة من المصدر.</span><span class="en-only">Loading available application metadata.</span></p>',
           '<p id="store-results-note">يعرض هذا القسم عينة أولية من ' + count.toLocaleString("en-US") + ' سجلاً مفهرساً من مصدر ' + escapeHtml(store.name) + '. تُحمّل بقية النتائج على دفعات.</p>');

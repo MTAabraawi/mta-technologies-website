@@ -64,9 +64,7 @@ export async function onRequest(context) {
   const canonicalOrigin = (context.env && context.env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
   const canonicalParams = new URLSearchParams();
   if (source) canonicalParams.set("source", source);
-  if (store) canonicalParams.set("store", store);
   if (id) canonicalParams.set("id", id);
-  if (name) canonicalParams.set("name", name);
   const canonicalUrl = canonicalOrigin + "/application" + (canonicalParams.size ? "?" + canonicalParams.toString() : "");
   const engine = (context.env && context.env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
   try {
@@ -104,10 +102,8 @@ export async function onRequest(context) {
     const storeHref = "store?store=" + encodeURIComponent(store);
     html = html.replace('<a id="application-store-link" href="apps.html">', '<a id="application-store-link" href="' + esc(storeHref) + '">');
     html = html.replace('<a id="application-back-link" class="btn btn-outline" href="apps.html">', '<a id="application-back-link" class="btn btn-outline" href="' + esc(storeHref) + '">');
-    const facts = [
-      ["المطور",app.developer],["المنصة",app.platform],["التصنيف",app.category],
-      ["الترخيص",app.license],["مصدر البيانات",app.source || source],["معرّف المصدر",app.external_id || app.id]
-    ].filter(pair => pair[1] != null && String(pair[1]).trim() !== "");
+    const metadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
+    const facts = [["المطور",app.developer],["المنصة",app.platform],["التصنيف",app.category],["الترخيص",app.license],["الإصدار",metadata.version || metadata.versionString],["معرّف الحزمة",metadata.package_name || metadata.bundle_id],["الحد الأدنى لإصدار Android",metadata.minSdkVersion],["الحجم بالبايت",metadata.size_bytes],["آخر تحديث للسجل",app.updated_at],["مصدر البيانات",app.source || source],["معرّف المصدر",app.external_id || app.id]].filter(pair => pair[1] != null && String(pair[1]).trim() !== "");
     html = setIdHtml(html, "application-facts", facts.map(pair => "<dt>"+esc(pair[0])+"</dt><dd>"+esc(pair[1])+"</dd>").join(""));
     const icon = safe(app.icon_url);
     if (icon) {
@@ -125,6 +121,8 @@ export async function onRequest(context) {
       "operatingSystem":String(app.platform || "Unspecified"),
       "applicationCategory":String(app.category || "Software"),
       "publisher":app.developer ? {"@type":"Organization","name":String(app.developer)} : undefined,
+      "softwareVersion":metadata.version || metadata.versionString || undefined,
+      "dateModified":app.updated_at || undefined,
       "image":icon || undefined,
       "sameAs":sourceUrl || undefined
     };

@@ -564,7 +564,7 @@ test('application browser profile renders source metadata and preserves normaliz
   await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
   await expect(page.locator('#application-source-metadata')).toBeVisible();
   await expect(page.locator('#application-extra-facts')).toContainText('1.0.1');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/application\?source=fdroid&store=fdroid&id=1&name=/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://www.mtahqq.dpdns.org/application?source=fdroid&id=1');
   await expect(page.locator('link[rel="canonical"]')).not.toHaveAttribute('href', /utm_campaign/);
 });
 
