@@ -28,6 +28,38 @@ test('local test guard recognizes analytics and advertising hosts', async () => 
   expect(trackingAndAdHosts.test('www.mtahqq.dpdns.org')).toBe(false);
 });
 
+
+test('local and preview HTML suppresses production GA4 without changing AdSense markup', async ({ page }) => {
+  const response = await page.request.get('/apps.html');
+  expect(response.ok()).toBeTruthy();
+  const html = await response.text();
+  expect(html).not.toContain('googletagmanager.com/gtag/js');
+  expect(html).not.toContain('G-PLS74VD22C');
+  expect(html).toContain('ca-pub-8004171697196640');
+});
+
+test('visitor suggestion confirmation emits one generate_lead event only after submission', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__mtaAnalyticsEvents = [];
+    window.gtag = (...args) => window.__mtaAnalyticsEvents.push(args);
+  });
+  await page.goto('/suggestions.html');
+  await page.locator('#visitor-suggestion-form').dispatchEvent('submit');
+  const pending = await page.evaluate(() => sessionStorage.getItem('mta:lead-pending'));
+  expect(Number(pending)).toBeGreaterThan(0);
+
+  await page.goto('/contact-thanks.html');
+  const confirmation = await page.evaluate(() => ({
+    events: window.__mtaAnalyticsEvents,
+    pending: sessionStorage.getItem('mta:lead-pending')
+  }));
+  expect(confirmation.events).toEqual([['event', 'generate_lead', { method: 'visitor_suggestion_form' }]]);
+  expect(confirmation.pending).toBeNull();
+
+  await page.reload();
+  expect(await page.evaluate(() => window.__mtaAnalyticsEvents)).toEqual([]);
+});
+
 test('marketplace API is served from the same origin', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
@@ -536,12 +568,12 @@ test('404 page is excluded from indexing and does not declare a canonical entity
   expect(html).not.toContain('application/ld+json');
 });
 
-test('data rights page includes the configured GA4 measurement tag', async ({ page }) => {
+test('data rights page suppresses GA4 on local preview hosts', async ({ page }) => {
   const response = await page.goto('/data-subject-rights.html');
   expect(response.status()).toBe(200);
   const html = await response.text();
-  expect(html).toContain('G-PLS74VD22C');
-  expect(html).toContain('googletagmanager.com/gtag/js');
+  expect(html).not.toContain('G-PLS74VD22C');
+  expect(html).not.toContain('googletagmanager.com/gtag/js');
 });
 
 test('base store route stays noindex until a specific connected store is selected', async ({ page }) => {
