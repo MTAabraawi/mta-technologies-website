@@ -462,7 +462,7 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
     const html = await response.text();
     const title = html.match(/<title[^>]*>(.*?)<\/title>/i)?.[1]?.trim() || '';
     const description = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
-    const canonical = html.match(/<link\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i)?.[1] || '';
+    const canonical = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i)?.[1] || '';
     expect(title.length, path + ' title').toBeGreaterThan(12);
     expect(titles.has(title), path + ' duplicate title').toBe(false);
     titles.add(title);
@@ -479,6 +479,25 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
 test('unknown routes return a real HTTP 404 response', async ({ page }) => {
   const response = await page.request.get('/this-route-must-not-exist-seo-check');
   expect(response.status()).toBe(404);
+});
+
+test('application detail SSR matches exact source IDs and normalizes canonical query parameters', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=1&name=MTA%20Net%20Blocker&utm_source=automated-test');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('MTA Net Blocker');
+  expect(html).toContain('id="application-ssr-schema"');
+  expect(html).toContain('SoftwareApplication');
+  expect(html).not.toContain('utm_source');
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+});
+
+test('application SSR refuses a name-only match when the source ID is wrong', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=does-not-exist&name=MTA%20Net%20Blocker');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toContain('id="application-ssr-schema"');
 });
 
 test('application detail pages keep noindex when required identifiers are missing', async ({ page }) => {
