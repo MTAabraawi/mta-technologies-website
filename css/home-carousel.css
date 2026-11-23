@@ -54,7 +54,7 @@
 @keyframes mta-grid-drift{to{background-position:46px 46px}}
 @keyframes mta-copy-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes mta-app-arrive{0%,8%{opacity:0;transform:translateY(22px) rotateY(-10deg) scale(.94)}18%,75%{opacity:1;transform:translateY(0) rotateY(0) scale(1)}90%,100%{opacity:0;transform:translateY(-14px) rotateY(8deg) scale(.96)}}
-@keyframes mta-ad-glow{0%,100%{box-shadow:0 22px 65px rgba(0,0,0,.3)}50%{box-shadow:0 22px 65px rgba(0,0,0,.3),0 0 35px rgba(56,189,248,.13)}}
+50%{box-shadow:0 22px 65px rgba(0,0,0,.3),0 0 35px rgba(56,189,248,.13)}}
 @media(max-width:760px){
  .mta-home-carousel,.mta-home-slide{min-height:650px}
  .mta-home-slide-brand{grid-template-columns:1fr;grid-template-rows:auto 220px;gap:1.4rem;padding:3rem 1.2rem 5rem;text-align:center}
