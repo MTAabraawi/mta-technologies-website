@@ -369,7 +369,7 @@ test('global theme tokens provide readable contrast on dark and light themes', a
 
 test('applications without original artwork still receive a visible icon fallback', async ({ page }) => {
   // Force every image request to fail so the test exercises the complete
-  // original-icon -> publisher-favicon -> monogram fallback chain.
+  // publisher-provided icon -> neutral monogram fallback chain.
   await page.route('**/*', route => {
     if (route.request().resourceType() === 'image') return route.abort();
     return route.continue();
