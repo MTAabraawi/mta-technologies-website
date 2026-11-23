@@ -15,6 +15,9 @@ function esc(value) {
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
   }[ch]));
 }
+function stripAdSense(html) {
+  return html.replace(/<script\b[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, "");
+}
 function safe(value) {
   try { const u = new URL(value); return u.protocol === "https:" ? u.href : ""; }
   catch { return ""; }
@@ -130,6 +133,7 @@ export async function onRequest(context) {
       html = html.replace('<span id="application-icon-fallback" class="store-app-icon-fallback">MTA</span>',
         '<span id="application-icon-fallback" class="store-app-icon-fallback">' + esc(initials) + '</span>');
     }
+    if (!usefulDescription) html = stripAdSense(html);
     if (usefulDescription) {
       const schema = {
       "@context":"https://schema.org","@type":"SoftwareApplication",
@@ -150,6 +154,7 @@ export async function onRequest(context) {
     console.error("MTA application SSR failed:", error);
     html = meta(html, "robots", "noindex,follow");
     html = canonical(html, canonicalUrl);
+    html = stripAdSense(html);
   }
   const headers = new Headers(response.headers);
   headers.delete("content-length"); headers.delete("etag");

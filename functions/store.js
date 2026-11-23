@@ -128,6 +128,10 @@ function injectEditorial(html, key) {
   return html;
 }
 
+function stripAdSense(html) {
+  return html.replace(/<script\b[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, "");
+}
+
 function setMeta(html, name, content) {
   const escaped = escapeHtml(content);
   const re = new RegExp("<meta\\s+name=[\"']" + name + "[\"'][^>]*>", "i");
@@ -169,6 +173,7 @@ export async function onRequest(context) {
   if (!store) {
     html = setMeta(html, "robots", "noindex,follow");
     html = setCanonical(html, canonical);
+    html = stripAdSense(html);
   } else {
     const engineOrigin = (env && env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
     try {
@@ -177,6 +182,7 @@ export async function onRequest(context) {
       if (count <= 0) {
         html = setMeta(html, "robots", "noindex,follow");
         html = setCanonical(html, canonical);
+        html = stripAdSense(html);
         html = html.replace('<h1 id="store-title">Store catalogue</h1>', '<h1 id="store-title">' + escapeHtml(store.name) + '</h1>');
       } else {
         const appsUrl = new URL("/api/v1/apps", engineOrigin);
@@ -222,6 +228,7 @@ export async function onRequest(context) {
       console.error("MTA store server rendering failed:", error);
       html = setMeta(html, "robots", "noindex,follow");
       html = setCanonical(html, canonical);
+      html = stripAdSense(html);
       html = html.replace('<h1 id="store-title">Store catalogue</h1>', '<h1 id="store-title">' + escapeHtml(store.name) + '</h1>');
       html = html.replace('<p id="store-description"></p>', '<p id="store-description">' + escapeHtml(store.description) + '</p>');
     }

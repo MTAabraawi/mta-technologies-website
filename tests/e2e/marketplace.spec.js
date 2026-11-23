@@ -576,6 +576,7 @@ test('application SSR refuses a name-only match when the source ID is wrong', as
   const html = await response.text();
   expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
   expect(html).not.toContain('id="application-ssr-schema"');
+  expect(html).not.toContain("adsbygoogle.js");
 });
 
 test('application detail pages keep noindex when required identifiers are missing', async ({ page }) => {
@@ -623,4 +624,13 @@ test('Open VSX has a dedicated internal store profile and preserves registry con
   await expect(page.locator('#store-title')).toHaveText('Open VSX Registry');
   await expect(page.locator('#store-editorial-what')).toContainText('إضافات محررات VS Code');
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
+});
+
+
+test('empty store profiles remain noindex and do not load AdSense', async ({ page }) => {
+  const response = await page.request.get('/store?store=google-play');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toContain("adsbygoogle.js");
 });
