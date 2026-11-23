@@ -650,3 +650,12 @@ test('store cards and profile icons use publisher-provided assets rather than gu
   expect(script).not.toContain('metadata.thumbnail');
   expect(script).toContain('metadata.appIconUrl');
 });
+
+
+test('application SSR uses explicitly labelled icon metadata when the direct icon field is absent', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=3&name=Fixture%20Application%200002');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('src="https://example.org/publisher-icon.png"');
+  expect(html).toContain('Fixture Application 0002 icon');
+});
