@@ -466,8 +466,17 @@ test('internal links across the public site resolve without broken routes', asyn
       const target = url.pathname + url.search;
       if (checked.has(target)) continue;
       checked.add(target);
-      const linked = await page.request.get(target);
-      expect(linked.status(), 'Internal link ' + href + ' from ' + path).toBe(200);
+      const linked = await page.request.get(target, { maxRedirects: 0 });
+      if ([301, 302, 307, 308].includes(linked.status())) {
+        const location = linked.headers()['location'];
+        expect(location, 'Redirect must declare a destination: ' + target).toBeTruthy();
+        const destination = new URL(location, base.origin + target);
+        expect(destination.origin, 'Internal link must not redirect off-site: ' + target).toBe(base.origin);
+        const finalResponse = await page.request.get(destination.pathname + destination.search, { maxRedirects: 0 });
+        expect(finalResponse.status(), 'Redirect destination for ' + target).toBe(200);
+      } else {
+        expect(linked.status(), 'Internal link ' + href + ' from ' + path).toBe(200);
+      }
     }
   }
   expect(checked.size).toBeGreaterThan(20);
