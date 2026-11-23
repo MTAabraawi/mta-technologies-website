@@ -69,9 +69,7 @@ export async function onRequest(context) {
     if (!source || !id || !name) throw new Error("Missing app reference");
     const api = new URL("/api/v1/apps", engine);
     api.searchParams.set("source", source);
-    api.searchParams.set("q", name);
-    api.searchParams.set("limit", "100");
-    api.searchParams.set("offset", "0");
+    api.searchParams.set("external_id", id);
     const upstream = await fetch(api, { headers: { accept: "application/json" }, cf: { cacheTtl: 0 } });
     if (!upstream.ok) throw new Error("Application API HTTP " + upstream.status);
     const rows = await upstream.json();
