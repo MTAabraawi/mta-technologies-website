@@ -683,3 +683,19 @@ test('homepage catalogue cards do not invent icons or developer identities when 
   expect(script).toContain('Developer not specified by source');
   expect(script).toContain('No description provided by source');
 });
+
+
+test('curated catalogue records retain bilingual descriptions and every local icon asset exists', async ({ page }) => {
+  const response = await page.request.get('/data/curated-apps.json');
+  expect(response.status()).toBe(200);
+  const apps = await response.json();
+  expect(apps.length).toBeGreaterThan(0);
+  for (const app of apps) {
+    expect(String(app.description_ar || '').trim().length).toBeGreaterThan(20);
+    expect(String(app.description_en || '').trim().length).toBeGreaterThan(20);
+    expect(String(app.icon_path || '')).toMatch(/^images\/apps\/[A-Za-z0-9._/-]+$/);
+    const icon = await page.request.get('/' + app.icon_path);
+    expect(icon.status(), app.icon_path).toBe(200);
+    expect(icon.headers()['content-type'] || '').toContain('image/svg+xml');
+  }
+});
