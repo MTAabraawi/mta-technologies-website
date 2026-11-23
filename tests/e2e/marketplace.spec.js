@@ -699,3 +699,50 @@ test('curated catalogue records retain bilingual descriptions and every local ic
     expect(icon.headers()['content-type'] || '').toContain('image/svg+xml');
   }
 });
+
+const editorialSlugs = [
+  'android-app-permissions-guide',
+  'safe-apk-download-verification',
+  'choose-ai-tools-evaluate',
+  'verify-website-trustworthiness',
+  'detect-ai-generated-media',
+  'password-managers-passkeys',
+  'browser-privacy-tracking',
+  'ai-agents-security-governance'
+];
+
+test('editorial library is featured on the homepage and lists bilingual articles', async ({ page }) => {
+  await page.goto('/articles.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.editorial-card')).toHaveCount(8);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('.editorial-card .en-only').first()).toBeAttached();
+  for (const slug of editorialSlugs) {
+    const link = page.locator(`.editorial-card a[href="articles/${slug}"]`);
+    await expect(link).toHaveCount(1);
+  }
+  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('a[href="articles.html"]').first()).toBeVisible();
+});
+
+test('each editorial article has Arabic and English editions, canonical metadata, and cited sources', async ({ page, request }) => {
+  for (const slug of editorialSlugs) {
+    const response = await request.get(`/articles/${slug}.html`);
+    expect(response.ok(), slug).toBeTruthy();
+    const html = await response.text();
+    expect(html, slug).toContain('<article class="article-language" lang="ar"');
+    expect(html, slug).toContain('<article class="article-language" lang="en"');
+    expect(html, slug).toContain('application/ld+json');
+    expect(html, slug).toContain('rel="canonical"');
+    expect(html, slug).toContain('article-sources');
+    expect(html, slug).toContain('datePublished');
+  }
+});
+
+test('editorial article URLs are present in the XML sitemap', async ({ request }) => {
+  const response = await request.get('/sitemap-pages.xml');
+  expect(response.ok()).toBeTruthy();
+  const xml = await response.text();
+  for (const slug of editorialSlugs) {
+    expect(xml).toContain(`https://www.mtahqq.dpdns.org/articles/${slug}`);
+  }
+});
