@@ -142,12 +142,12 @@ export async function onRequest(context) {
       const schema = {
       "@context":"https://schema.org","@type":"SoftwareApplication",
       "name":title,"description":summary,"url":canonicalUrl,
-      "operatingSystem":String(app.platform || "Unspecified"),
-      "applicationCategory":String(app.category || "Software"),
       "publisher":app.developer ? {"@type":"Organization","name":String(app.developer)} : undefined,
       "image":icon || undefined,
       "sameAs":sourceUrl || undefined
     };
+      if (app.platform) schema.operatingSystem = String(app.platform);
+      if (app.category) schema.applicationCategory = String(app.category);
     const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
       html = html.replace("</head>", json + "</head>");
     }
