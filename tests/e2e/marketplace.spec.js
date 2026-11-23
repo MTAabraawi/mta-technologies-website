@@ -179,7 +179,8 @@ test('new external store cards provide useful bilingual descriptions without cla
     const card = page.locator('[data-store-key="' + key + '"]');
     await expect(card).toBeVisible();
     await expect(card.locator('.store-card-description')).toBeVisible();
-    await expect(card.locator('.store-card-state')).toContainText('استكشف كتالوج المتجر داخل MTA');
+    await expect(card).toHaveAttribute('data-catalogue-state', 'coming-soon');
+    await expect(card.locator('.store-card-state')).toContainText('نعمل على توفيرها قريباً');
   }
 });
 
