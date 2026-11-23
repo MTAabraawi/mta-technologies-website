@@ -508,6 +508,29 @@ test('internal links across the public site resolve without broken routes', asyn
   expect(checked.size).toBeGreaterThan(20);
 });
 
+test('404 page is excluded from indexing and does not declare a canonical entity URL', async ({ page }) => {
+  const response = await page.goto('/missing-seo-audit-route');
+  expect(response.status()).toBe(404);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toMatch(/<link[^>]+rel=["']canonical["']/i);
+  expect(html).not.toContain('application/ld+json');
+});
+
+test('data rights page includes the configured GA4 measurement tag', async ({ page }) => {
+  const response = await page.goto('/data-subject-rights.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('G-PLS74VD22C');
+  expect(html).toContain('googletagmanager.com/gtag/js');
+});
+
+test('base store route stays noindex until a specific connected store is selected', async ({ page }) => {
+  const response = await page.goto('/store');
+  expect(response.status()).toBe(200);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
+});
+
 test('unknown routes return a real HTTP 404 response', async ({ page }) => {
   const response = await page.request.get('/this-route-must-not-exist-seo-check');
   expect(response.status()).toBe(404);
