@@ -4,7 +4,7 @@ const STORE_NAMES = {
   "mac-app-store":"Mac App Store","winget":"WinGet","chocolatey":"Chocolatey","bluejetty-app-index":"Blue Jetty App Index","openuse":"OpenUse","flathub":"Flathub",
   "snap-store":"Snap Store","arch-linux":"Arch Linux Packages",
   "debian-packages":"Debian Packages","homebrew":"Homebrew Cask",
-  "steam":"Steam","mta-web-apps":"MTA Web Apps"
+  "steam":"Steam","mta-web-apps":"MTA Web Apps","open-vsx":"Open VSX Registry"
 };
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -58,7 +58,10 @@ export async function onRequest(context) {
   const id = url.searchParams.get("id") || "";
   const name = url.searchParams.get("name") || "";
   const canonicalOrigin = (context.env && context.env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
-  const canonicalUrl = canonicalOrigin + url.pathname + url.search;
+  const canonicalParams = new URLSearchParams();
+  if (source) canonicalParams.set("source", source);
+  if (id) canonicalParams.set("id", id);
+  const canonicalUrl = canonicalOrigin + url.pathname + (canonicalParams.size ? "?" + canonicalParams.toString() : "");
   const engine = (context.env && context.env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
   try {
     if (!source || !id || !name) throw new Error("Missing app reference");
@@ -75,12 +78,15 @@ export async function onRequest(context) {
       rows.find(row => String(row.name || "").toLocaleLowerCase() === name.toLocaleLowerCase());
     if (!app) throw new Error("Application not found");
     const title = String(app.name || name);
-    const summary = String(app.summary || app.description || "Application details and source information from the MTA directory.").slice(0, 500);
-    const description = String(app.description || app.summary || "Review the original publisher listing for current application details.").slice(0, 5000);
+    const rawDescription = String(app.description || app.summary || "").trim();
+    const summary = (rawDescription || "Application details and source information from the MTA directory.").slice(0, 500);
+    const description = (rawDescription || "Review the original publisher listing for current application details.").slice(0, 5000);
+    const sourceUrl = safe(app.source_url || app.app_url);
+    const indexable = rawDescription.length >= 80 || Boolean(app.developer && app.platform && app.category && sourceUrl);
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
     html = meta(html, "description", summary);
-    html = meta(html, "robots", "index,follow");
+    html = meta(html, "robots", indexable ? "index,follow" : "noindex,follow");
     html = canonical(html, canonicalUrl);
     html = setIdText(html, "application-name", title);
     html = setIdText(html, "application-breadcrumb", title);
@@ -90,7 +96,6 @@ export async function onRequest(context) {
     html = setIdText(html, "application-platform-guidance", "تحقق من متطلبات النظام والتوافق وهوية الناشر والترخيص والأذونات قبل تثبيت التطبيق. قد تختلف الإتاحة حسب البلد والجهاز.");
     html = setIdText(html, "application-data-quality", "تعرض هذه الصفحة الحقول التي وفرها مصدر البيانات فقط. الحقول غير المتاحة لا تُعرض كحقائق مؤكدة؛ راجع صفحة الناشر للتحقق من أحدث المعلومات.");
     html = setIdText(html, "application-store-link", STORE_NAMES[store] || store);
-    const sourceUrl = safe(app.source_url || app.app_url);
     if (sourceUrl) {
       html = html.replace('<a id="application-source-link" class="btn btn-primary" href="#" target="_blank" rel="noopener noreferrer" hidden>',
         '<a id="application-source-link" class="btn btn-primary" href="' + esc(sourceUrl) + '" target="_blank" rel="noopener noreferrer">');

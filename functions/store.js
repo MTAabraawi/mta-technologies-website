@@ -3,6 +3,7 @@ const CONNECTED_STORES = {
   "fedora-packages": { name: "Fedora Packages", source: "fedora-packages", platforms: ["Linux", "Fedora"], description: "فهرس حزم Fedora الرسمي، مع أسماء الحزم وروابط صفحات التفاصيل الأصلية." },
 
   "jetbrains-marketplace": { name: "JetBrains Marketplace", source: "jetbrains-marketplace", platforms: ["IntelliJ IDEA", "PyCharm", "WebStorm", "IDE plugins"], description: "كتالوج إضافات JetBrains مع بيانات الناشر والتنزيلات والتقييمات وروابط صفحات الإضافات الأصلية." },
+  "open-vsx": { name: "Open VSX Registry", source: "open-vsx", platforms: ["VS Code-compatible editors", "VSCodium", "Eclipse Theia"], description: "فهرس مفتوح لإضافات محررات متوافقة مع VS Code، مع بيانات الناشر والإصدار والتنزيلات والتقييمات والترخيص عندما يوفرها السجل.", url: "https://open-vsx.org/" },
   "gnome-extensions": { name: "GNOME Extensions", source: "gnome-extensions", platforms: ["Linux", "GNOME Shell"], description: "كتالوج إضافات GNOME Shell من دليل GNOME الرسمي، مع التوافق والإصدارات والتنزيلات عند توفرها." },
 
   "google-play": { name: "Google Play", source: "google-play", platforms: ["Android"], description: "دليل بيانات تطبيقات Google Play عند تفعيل موصل AppBrain بمفتاح API صالح. روابط التنزيل تبقى إلى Google Play الأصلي." },
@@ -40,6 +41,10 @@ function safeHttps(value) {
 }
 function replaceOnce(html, pattern, replacement) {
   return html.replace(pattern, replacement);
+}
+function setIdText(html, id, value) {
+  const re = new RegExp('(<(p|span|div)\\b[^>]*id="' + id + '"[^>]*>)[\\s\\S]*?(</\\2>)', "i");
+  return html.replace(re, (_match, opening, _tag, closing) => opening + escapeHtml(value) + closing);
 }
 function makeCard(app, storeKey, store) {
   const name = String(app.name || "Application");
@@ -100,6 +105,19 @@ export async function onRequest(context) {
   let html = await response.text();
   const canonicalOrigin = (env && env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
   const canonical = canonicalOrigin + url.pathname + "?store=" + encodeURIComponent(storeKey);
+  if (store) {
+    const description = store.description + " تصفح البيانات التي يوفرها المصدر، وتحقق من صفحة الناشر الأصلية قبل التثبيت أو الشراء.";
+    html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + escapeHtml(store.name + " | دليل التطبيقات | MTA TECHNOLOGIES") + "</title>");
+    html = setMeta(html, "description", description);
+    html = setIdText(html, "store-title", store.name);
+    html = setIdText(html, "breadcrumb-store", store.name);
+    html = setIdText(html, "store-subtitle", store.platforms.join(" · "));
+    html = setIdText(html, "store-description", store.description);
+    html = setIdText(html, "store-editorial-intro", "توضح هذه الصفحة نطاق " + store.name + " والمنصات التي يغطيها: " + store.platforms.join("، ") + ". " + store.description);
+    html = setIdText(html, "store-editorial-what", "قد تتضمن السجلات الاسم والوصف والمطور والتصنيف والإصدار والترخيص والأيقونة عندما يوفرها المصدر. لا نفترض اكتمال أي حقل غير موجود.");
+    html = setIdText(html, "store-editorial-verify", "راجع اسم الناشر ورابط صفحة المصدر ومتطلبات النظام والتوافق والترخيص قبل التثبيت. يعرض MTA البيانات الوصفية ولا يستضيف ملفات التثبيت.");
+    html = setIdText(html, "store-editorial-availability", "قد تختلف الإتاحة والأسعار والتحديثات بحسب البلد والجهاز والحساب. تبقى المعلومات النهائية لدى " + store.name + " والناشر الأصلي.");
+  }
   if (!store) {
     html = setMeta(html, "robots", "noindex,follow");
     html = setCanonical(html, canonical);
