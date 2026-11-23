@@ -27,8 +27,9 @@ const openVsxRows = [
     app_url: 'https://github.com/microsoft/vscode-python',
     icon_url: 'https://open-vsx.org/extension/ms-python/python/latest/file/icon',
     metadata_json: {
-      namespace: 'ms-python', extension_name: 'python', versionString: '2026.4.0',
-      estimatedDownloads: 123456, rating: 4.5, ratingCount: 16,
+      namespace: 'ms-python', extension_name: 'python', version: '2026.4.0',
+      download_count: 123456, average_rating: 4.5, review_count: 16,
+      published_at: '2026-11-01T00:00:00Z', verified_publisher: true,
       license: 'MIT', registry: 'Open VSX'
     }
   },
