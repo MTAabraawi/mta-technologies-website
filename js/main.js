@@ -53,30 +53,3 @@
     if (modal) modal.style.display = 'none';
   };
 })();
-
-
-// Add an accessible title to ad-network iframes injected after page load.
-(function labelAdvertisementFrames() {
-  function labelFrames(root) {
-    const scope = root && root.querySelectorAll ? root : document;
-    scope.querySelectorAll('.mta-ad-slot iframe:not([title])').forEach(function(frame) {
-      frame.setAttribute('title', 'Advertisement');
-    });
-  }
-  labelFrames(document);
-  if ('MutationObserver' in window && document.documentElement) {
-    const observer = new MutationObserver(function(records) {
-      records.forEach(function(record) {
-        record.addedNodes.forEach(function(node) {
-          if (node.nodeType === 1) {
-            if (node.matches && node.matches('.mta-ad-slot iframe:not([title])')) {
-              node.setAttribute('title', 'Advertisement');
-            }
-            labelFrames(node);
-          }
-        });
-      });
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-  }
-})();
