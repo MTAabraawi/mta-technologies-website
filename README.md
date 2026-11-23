@@ -1,71 +1,72 @@
-# MTA TECHNOLOGIES - Official Corporate Website
+# MTA TECHNOLOGIES — Corporate Website and App Directory
+
 **BUILDING A SMARTER TOMORROW**  
-**البريد الرسمي المعتمد: mtatechnologies0@gmail.com**
+Official contact: mtatechnologies0@gmail.com
 
-الموقع الرسمي لشركة **MTA TECHNOLOGIES**، بواجهة ثنائية اللغة على **Cloudflare Pages**. يتضمن الموقع صفحات ثابتة، وCloudflare Pages Functions لعرض صفحات المتاجر والتطبيقات من الخادم، ومحرك فهرسة عبر Worker وكتالوج بيانات محفوظ في GitHub.
+The MTA website combines a bilingual corporate site with a multi-source software directory. The full marketplace experience runs on Cloudflare Pages and uses Pages Functions, an applications-engine Worker API, and GitHub-backed catalogue snapshots.
 
----
+## Main site areas
 
-## 📁 محتويات الحزمة البرمجية (File Structure)
+- index.html, about.html, projects.html, innovation.html, knowledge.html, gallery.html, and contact.html: corporate pages and product portfolio.
+- apps.html: directory of supported software stores and catalogues.
+- store.html and functions/store.js: source-specific catalogue pages with server-rendered first-page results, source descriptions, filters and pagination.
+- application.html and functions/application.js: dynamic application profiles with source attribution, publisher metadata, compatibility guidance and data-quality notes.
+- app-mta-net-blocker.html: first-party product information for MTA Net Blocker.
+- platform-overview.html: platform architecture, catalogue methodology, coverage limits and rights transparency.
+- js/ and css/: bilingual interface, directory interactions and responsive design.
+- sitemap-index.xml, sitemap-pages.xml, sitemap-stores.xml, and robots.txt: crawl and indexing configuration.
+- ads.txt: Google AdSense publisher declaration.
 
-- `index.html` : الصفحة الرئيسية مع الشعار الرسمي، الرسالة، وملخص المشاريع والمجالات.
-- `about.html` : نبذة عن الشركة ورؤيتها ورسالتها.
-- `projects.html` : المشاريع والمنتجات مع توضيح حالة الإصدار لكل مشروع.\n- `apps.html` و`store.html` و`application.html` : دليل المتاجر وصفحات التطبيقات الديناميكية.\n- `platform-overview.html` : شرح بنية دليل التطبيقات ومصادر البيانات وحدود التغطية والحقوق.
-- `innovation.html` : مجالات العمل والابتكار التقني السبعة.
-- `knowledge.html` : مركز المعرفة والمقالات الهندسية الأصلية.
-- `gallery.html` : معرض الهوية البصرية والواجهات مع عارض تكبير تفاعلي (Lightbox).
-- `contact.html` : صفحة التواصل والبريد المعتمد `mtatechnologies0@gmail.com`.
-- `404.html` : صفحة الخطأ 404 المخصصة لشبكات الاستضافة السحابية.
-- `privacy-policy.html` : سياسة الخصوصية الشاملة وملفات تعريف الارتباط.
-- `terms.html` : شروط الاستخدام وحقوق الملكية الفكرية.
-- `disclaimer.html` : إخلاء المسؤولية القانونية وحالة النماذج الأولية.
-- `cookies.html` : سياسة ملفات تعريف الارتباط والتخزين المحلي.
-- `css/style.css` : نظام التصميم المتكامل (Dark/Light mode + دعم RTL/LTR التلقائي).
-- `js/main.js` : منطق التبديل اللحظي بين العربية والإنجليزية، وتغيير النمط، وتكبير الصور.
-- `images/` : ملفات الشعارات الرسمية المتجهة (SVG) بدقة فائقة.
-- `favicon.svg` : أيقونة المتصفح الرسمية.
-- `robots.txt` : تعليمات محركات البحث.
-- `sitemap-index.xml` و`sitemap-pages.xml` و`sitemap-stores.xml` : خرائط صفحات الموقع والمتاجر.\n- `ads.txt` : تصريح ناشر Google AdSense.\n- `functions/` : العرض الخادمي لصفحات المتاجر والتطبيقات.\n- `tests/e2e/` : اختبارات Playwright ببيانات تجريبية معزولة.
+## Marketplace architecture
 
----
+1. Public catalogue sources are accessed through independent source connectors.
+2. Source records are normalized while retaining their source key, external ID and original listing URL.
+3. Catalogue snapshots and search/browse indexes are stored in the GitHub-backed data repository.
+4. The applications engine exposes catalogue statistics, search and pagination through its Worker API.
+5. Cloudflare Pages Functions render store and application pages with useful HTML before browser JavaScript loads.
 
-## 🌐 دعم اللغتين (Arabic RTL & English LTR)
+MTA presents catalogue metadata and links to original publisher listings. It does not host or redistribute third-party installer binaries. Coverage depends on each source's public interface, terms, regional availability and pagination limits; a listed store is not necessarily indexed in full.
 
-الموقع مجهز بنظام ترجمة لحظي ثنائي اللغة:
-- **العربية (RTL)** كخيار أساسي افتراضي.
-- **الإنجليزية (LTR)** بضغطة زر واحدة على `EN / عربي` في شريط التنقل.
-- يتم حفظ خيار المستخدم تلقائياً في المتصفح عبر `localStorage` لمنع التبديل عند تصفح الصفحات الأخرى.
+## Local browser tests
 
----
+The Playwright suite uses a deterministic local upstream fixture. It must not send automated pageviews to the production site or make real advertising requests.
 
-## ⚡ طرق النشر والاستضافة السريعة
+Install dependencies with npm install --no-audit --no-fund and install Chromium with npx playwright install chromium. Start the fixture using node tests/fixtures/catalogue-upstream.js.
 
-### 1. الاستعراض المحلي الفوري
-- قم بفك ضغط ملف `mta-technologies-website.zip`.
-- افتح ملف `index.html` بالنقر المزدوج في أي متصفح ويب.
-- الموقع يعمل محلياً 100% دون الحاجة إلى تشغيل خادم محلي!
+In a second terminal, start Pages Functions with the fixture as the engine origin:
 
-### 2. النشر على Cloudflare Pages (الأسرع والأفضل عالمياً)
-1. سجل الدخول إلى [لوحة تحكم Cloudflare](https://dash.cloudflare.com/).
-2. توجه إلى **Workers & Pages** ثم اضغط **Create application** ثم اختر تبويب **Pages**.
-3. اختر خيار **Direct Upload** (الرفع المباشر).
-4. حدد اسم المشروع (مثلاً: `mta-technologies`).
-5. اسحب وأفلت مجلد `static-site` المستخرج بالكامل واضغط **Deploy site**.
-6. سيعمل موقعك فوراً مع شهادة أمان SSL عالمية وسرعة تحميل فائقة على شبكة الحافة (Edge CDN).
+    npx wrangler pages dev . --ip 127.0.0.1 --port 8788 --binding 'MTA_APPLICATIONS_ENGINE_ORIGIN=http://127.0.0.1:8789'
 
-### 3. النشر على GitHub Pages
-1. أنشئ مستودعاً جديداً على GitHub باسم `mta-technologies`.
-2. ارفع كافة الملفات الموجودة داخل المجلد إلى الفرع `main`.
-3. اذهب إلى **Settings > Pages**.
-4. تحت **Build and deployment**، اختر **Deploy from a branch** وحدد الفرع `main` والمجلد `/ (root)`.
-5. اضغط **Save**، وسيكون الموقع نشطاً خلال ثوانٍ.
+Then run:
 
----
+    MTA_BASE_URL=http://127.0.0.1:8788 npm run test:e2e
 
-## إعداد Google AdSense
+The CI workflow performs the same local fixture-based verification. It does not run a scheduled production catalogue probe. Test totals are run-specific; report a count only with its workflow run, commit SHA and suite version.
 
-يستخدم الموقع معرّف ناشر Google AdSense `ca-pub-8004171697196640` مع إعداد Auto ads في الصفحات العامة. يتضمن ملف `ads.txt` تصريح الناشر المطابق. لا تُضاف معرّفات وحدات إعلانية يدوية إلا بعد توفير `data-ad-slot` صالح من حساب AdSense. ظهور الإعلانات يظل مشروطاً بموافقة Google وأهلية الموقع وإعدادات الحساب.
+## Hosting
 
----
+Cloudflare Pages is required for the complete marketplace because it runs the functions/ routes. Connect the repository to the Pages project, use the repository root as the build output directory, and set:
 
-جميع الحقوق محفوظة © 2026 شركة MTA TECHNOLOGIES.
+- MTA_APPLICATIONS_ENGINE_ORIGIN: the deployed applications-engine Worker URL.
+- MTA_SITE_ORIGIN: optional canonical origin override; defaults to the official website origin in the Functions.
+
+Static HTML can be previewed separately, but GitHub Pages does not execute Cloudflare Pages Functions and therefore cannot provide the full dynamic marketplace.
+
+## Google AdSense
+
+The public pages use the publisher ID ca-pub-8004171697196640 with the Auto ads loader. The root ads.txt file declares:
+
+    google.com, pub-8004171697196640, DIRECT, f08c47fec0942fa0
+
+No manual ad-slot IDs are configured. Ad delivery remains subject to Google's site approval, account eligibility, consent requirements and policy checks; the presence of the script does not guarantee that ads will be served.
+
+## Ownership, licensing and due diligence
+
+- MTA does not claim ownership of third-party applications, store names, logos, publisher descriptions or upstream catalogue records.
+- Each source repository's code is governed by its own published licence. Public access or a public repository must not be represented as exclusive IP unless the applicable licence and ownership evidence support that claim.
+- Catalogue metadata and source links remain subject to upstream source terms. Transfer or commercial reuse rights must be reviewed source by source.
+- Domain, brand assets, original MTA-authored content, hosting configuration, repository data and operational workflows are distinct assets. Their ownership and transferability should be documented separately.
+- GitHub, Cloudflare, analytics and advertising accounts do not automatically transfer to a buyer; provider rules and authorized account handover apply.
+- Traffic, revenue, integration coverage and test counts must be supported by dated, reproducible evidence. Do not present estimates or a single CI run as guarantees.
+
+This repository describes the website and app directory only. It does not promise exclusive rights over third-party software or upstream catalogue content.

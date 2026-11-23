@@ -500,3 +500,17 @@ test('indexable static pages have a title, useful description, canonical and pri
   expect(await appPage.text()).toContain('"@type":"SoftwareApplication"');
 });
 
+
+
+test('Open VSX application details preserve publisher, licence, version and source identity', async ({ page }) => {
+  await page.goto('/store?store=open-vsx', { waitUntil: 'domcontentloaded' });
+  const card = page.locator('.store-app-card').filter({ hasText: 'Python' }).first();
+  await expect(card).toBeVisible();
+  await card.locator('.store-app-detail-link').click();
+  await expect(page.locator('#application-name')).toHaveText('Python');
+  await expect(page.locator('#application-facts')).toContainText('Microsoft');
+  await expect(page.locator('#application-facts')).toContainText('MIT');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/application\?source=open-vsx&id=ms-python\.python$/);
+  await expect(page.locator('#application-extra-facts')).toContainText('2026.4.0');
+});

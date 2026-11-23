@@ -12,7 +12,6 @@ on:
       - 'js/apps.js'
       - 'js/store.js'
       - 'js/store-directory.js'
-      - 'js/store.js'
       - 'css/apps.css'
       - 'marketplace-config.js'
       - 'functions/**'
