@@ -117,7 +117,7 @@ export async function onRequest(context) {
     const storeHref = "store?store=" + encodeURIComponent(store);
     html = html.replace('<a id="application-store-link" href="apps.html">', '<a id="application-store-link" href="' + esc(storeHref) + '">');
     html = html.replace('<a id="application-back-link" class="btn btn-outline" href="apps.html">', '<a id="application-back-link" class="btn btn-outline" href="' + esc(storeHref) + '">');
-    const metadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
+    const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {}); } catch { return {}; } })();
     const facts = [["المطور","Developer",app.developer],["المنصة","Platform",app.platform],["التصنيف","Category",app.category],["الترخيص","Licence",app.license],["الإصدار","Version",metadata.version || metadata.versionString],["معرّف الحزمة","Package identifier",metadata.package_name || metadata.bundle_id],["الحد الأدنى لإصدار Android","Minimum Android version",metadata.minSdkVersion],["الحجم بالبايت","Size (bytes)",metadata.size_bytes],["آخر تحديث للسجل","Catalogue record updated",app.updated_at],["مصدر البيانات","Data source",app.source || source],["معرّف المصدر","Source identifier",app.external_id || app.id]].filter(pair => pair[2] != null && String(pair[2]).trim() !== "");
     html = setIdHtml(html, "application-facts", facts.map(pair => '<dt><span class="ar-only">'+esc(pair[0])+'</span><span class="en-only">'+esc(pair[1])+'</span></dt><dd>'+esc(pair[2])+'</dd>').join(""));
     const icon = safe(app.icon_url);
