@@ -181,6 +181,32 @@ test('connected store cards show live indexed counts from catalogue statistics',
   }
 });
 
+test('stale catalogue fallback keeps every recently verified source visible with dated counts', async ({ page }) => {
+  await page.route('**/api/v1/catalog-stats', route => route.fulfill({
+    status: 503,
+    contentType: 'application/json',
+    body: JSON.stringify({ error: 'temporary upstream outage' })
+  }));
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+
+  const expected = {
+    'fedora-packages': '83426',
+    'firefox-addons': '3190',
+    'wordpress-plugins': '4590',
+    'scoop': '5269',
+    'gnome-extensions': '153',
+    'bluejetty': '200049',
+    'openuse': '976'
+  };
+  for (const [source, count] of Object.entries(expected)) {
+    const card = page.locator('.store-connected-group .store-picker-card[data-store-key="' + source + '"]');
+    await expect(card, source + ' should remain connected during a stats outage').toHaveAttribute('data-catalogue-state', 'connected');
+    await expect(card.locator('[data-source-count]')).toHaveAttribute('data-count', count);
+  }
+  await expect(page.locator('.catalogue-icon-note')).toContainText('22 نوفمبر 2026');
+  await expect(page.locator('#catalog-stats')).toContainText('362,354');
+});
+
 test('public catalogue can be paginated without duplicate source identities', async ({ page }) => {
   test.setTimeout(240_000);
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
