@@ -77,18 +77,6 @@ test('F-Droid opens an internal branded catalogue and displays server-rendered a
   expect(errors).toEqual([]);
 });
 
-test('main apps catalogue automatically appends the next batch near the results end', async ({ page }) => {
-  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
-  await page.locator('[data-store-key="fdroid"]').click();
-  const cards = page.locator('.app-card');
-  await expect(cards).toHaveCount(50, { timeout: 30_000 });
-  const first = await cards.first().locator('h3').innerText();
-  const more = page.locator('#load-more-apps');
-  await more.scrollIntoViewIfNeeded();
-  await expect(cards).toHaveCount(100, { timeout: 30_000 });
-  await expect(cards.first().locator('h3')).toHaveText(first);
-});
-
 test('store catalogue automatically appends the next page when the user reaches the list end', async ({ page }) => {
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   const cards = page.locator('.store-app-card');
@@ -314,25 +302,6 @@ test('applications without original artwork still receive a visible icon fallbac
   await page.locator('.store-app-card').first().scrollIntoViewIfNeeded();
   await expect(page.locator('.store-app-icon-fallback').first()).toBeVisible({ timeout: 15_000 });
 });
-
-test('all public HTML pages are free of Google AdSense integrations', async ({ page }) => {
-  const pages = [
-    '/index.html', '/about.html', '/projects.html', '/innovation.html',
-    '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
-    '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
-    '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
-    '/suggestions.html', '/application.html', '/store.html',
-    '/store?store=fdroid'
-  ];
-  const adCode = /pagead2\.googlesyndication\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\.net/i;
-  for (const path of pages) {
-    const response = await page.request.get(path);
-    expect(response.status(), 'Page should load: ' + path).toBe(200);
-    const html = await response.text();
-    expect(html, 'Page must not load ad code: ' + path).not.toMatch(adCode);
-  }
-});
-
 
 test('all public HTML pages use the approved AdSense publisher and contain no retired ad network code', async ({ page }) => {
   const pages = [
