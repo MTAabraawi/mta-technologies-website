@@ -153,7 +153,8 @@ test('new open catalogues and Chocolatey open dedicated in-site catalogue pages'
   for (const [key, title] of [
     ['bluejetty-app-index', 'Blue Jetty App Index'],
     ['openuse', 'OpenUse Software Catalog'],
-    ['chocolatey', 'Chocolatey']
+    ['chocolatey', 'Chocolatey'],
+    ['open-vsx', 'Open VSX Registry']
   ]) {
     await page.locator('[data-store-key="' + key + '"]').click();
     await expect(page.locator('#store-title')).toHaveText(title);
@@ -218,10 +219,16 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(54);
+  await expect(page.locator('.store-picker-card')).toHaveCount(55);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
+  const sitemapIndex = await page.request.get('/sitemap-index.xml', { maxRedirects: 0 });
+  expect(sitemapIndex.status()).toBe(200);
+  expect(await sitemapIndex.text()).toContain('/sitemap-stores.xml');
+  const storeSitemap = await page.request.get('/sitemap-stores.xml', { maxRedirects: 0 });
+  expect(storeSitemap.status()).toBe(200);
+  expect(await storeSitemap.text()).toContain('/store?store=open-vsx');
   const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
   expect(sitemap.status()).toBe(200);
   expect(sitemap.headers()['content-type']).toContain('xml');
@@ -278,6 +285,7 @@ test('catalogue cards open dedicated in-site application profiles before the ori
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
   await expect(page.locator('#application-source-link')).toHaveAttribute('href', 'https://example.org/apps/1');
   await expect(page.locator('#application-description')).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/application\?source=fdroid&id=1$/);
 });
 
 test('global theme tokens provide readable contrast on dark and light themes', async ({ page }) => {
@@ -304,6 +312,7 @@ test('applications without original artwork still receive a visible icon fallbac
 
 test('AdSense publisher setup is present on public pages and ads.txt is valid', async ({ page }) => {
   const pagesWithAds = [
+    '/platform-overview.html',
     '/index.html', '/about.html', '/projects.html', '/innovation.html',
     '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
     '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
@@ -331,7 +340,7 @@ test('AdSense publisher setup is present on public pages and ads.txt is valid', 
 
 test('all HTML pages are free of retired advertising code and identifiers', async ({ page }) => {
   const pages = [
-    '/index.html', '/about.html', '/projects.html', '/innovation.html',
+    '/platform-overview.html', '/index.html', '/about.html', '/projects.html', '/innovation.html',
     '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
     '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
     '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
@@ -452,3 +461,42 @@ test('homepage carousel advances automatically and supports touch swipe', async 
   await carousel.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 7, clientX: 210, clientY: 352 });
   await expect(slides.nth(2)).toBeVisible();
 });
+
+test('platform overview provides substantive bilingual ownership and data-source guidance', async ({ page }) => {
+  await page.goto('/platform-overview.html', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('h1')).toContainText('منصة لاكتشاف البرامج');
+  await expect(page.locator('main')).toContainText('حقوق الملكية');
+  await expect(page.locator('main')).toContainText('upstream terms');
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
+});
+
+test('a missing route returns a real HTTP 404 response', async ({ page }) => {
+  const response = await page.request.get('/__mta_route_that_does_not_exist__', { maxRedirects: 0 });
+  expect(response.status()).toBe(404);
+});
+
+test('indexable static pages have a title, useful description, canonical and primary heading', async ({ page }) => {
+  const paths = [
+    '/index.html','/about.html','/projects.html','/innovation.html','/knowledge.html',
+    '/gallery.html','/contact.html','/apps.html','/app-mta-net-blocker.html',
+    '/platform-overview.html','/privacy-policy.html','/terms.html','/disclaimer.html',
+    '/cookies.html','/data-subject-rights.html','/suggestions.html'
+  ];
+  for (const path of paths) {
+    const response = await page.request.get(path);
+    expect(response.status(), path).toBe(200);
+    const html = await response.text();
+    expect(html.match(/<title>[^<]{8,}<\/title>/i), 'Title missing: ' + path).not.toBeNull();
+    const description = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i);
+    expect(description && description[1].length, 'Description missing: ' + path).toBeGreaterThan(70);
+    const canonical = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+    expect(canonical && canonical[1], 'Canonical missing: ' + path).toBeTruthy();
+    expect(canonical[1]).toMatch(/^https:\/\/www\.mtahqq\.dpdns\.org\//);
+    expect(html.match(/<h1\b/i), 'H1 missing: ' + path).not.toBeNull();
+  }
+  const projectPage = await page.request.get('/projects.html');
+  expect(await projectPage.text()).toContain('"@type":"CollectionPage"');
+  const appPage = await page.request.get('/app-mta-net-blocker.html');
+  expect(await appPage.text()).toContain('"@type":"SoftwareApplication"');
+});
+
