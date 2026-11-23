@@ -1,17 +1,10 @@
 name: Optimize brand images
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/optimize-brand-assets.yml'
-      - 'scripts/optimize-brand-assets.mjs'
-      - 'images/mta-logo-horizontal.png'
-      - 'images/mta-logo-square.png'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: optimize-brand-images
@@ -38,15 +31,15 @@ jobs:
       - name: Generate modern logo formats and update references
         run: node scripts/optimize-brand-assets.mjs
 
-      - name: Commit optimized assets
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add images/mta-logo-horizontal.webp images/mta-logo-horizontal.avif images/mta-logo-square.webp images/mta-logo-square.avif
-          git add -u
-          if git diff --cached --quiet; then
-            echo "No optimized image changes to commit."
-          else
-            git commit -m "Optimize brand logos as WebP and AVIF"
-            git push origin HEAD:main
-          fi
+      - name: Save generated patch
+        run: git diff --binary > /tmp/brand-assets-optimization.patch
+
+      - name: Upload optimized assets and patch
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimized-brand-assets
+          path: |
+            images/*.webp
+            images/*.avif
+            /tmp/brand-assets-optimization.patch
+          if-no-files-found: warn

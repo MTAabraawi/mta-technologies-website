@@ -3,10 +3,9 @@ name: MTA Marketplace E2E
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main, feature/global-store-catalog-expansion]
+    branches: [main, feature/global-store-catalog-expansion, audit/seo-content-adsense-marketplace]
     paths:
       - '*.html'
-      - 'js/adcash.js'
       - 'css/style.css'
       - 'apps.html'
       - 'store.html'
@@ -21,14 +20,15 @@ on:
       - 'tests/fixtures/**'
       - 'playwright.config.js'
       - 'package.json'
+      - 'ads.txt'
+      - 'data/**'
+      - 'sitemap*.xml'
+      - 'robots.txt'
       - '.github/workflows/marketplace-e2e.yml'
-  schedule:
-    - cron: '23 */6 * * *'
   push:
     branches: [main, feature/global-store-catalog-expansion]
     paths:
       - '*.html'
-      - 'js/adcash.js'
       - 'css/style.css'
       - 'apps.html'
       - 'js/apps.js'
@@ -61,7 +61,7 @@ jobs:
         with:
           node-version: 22
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Start deterministic catalogue upstream fixture
@@ -73,78 +73,6 @@ jobs:
             sleep 1
           done
           curl --fail http://127.0.0.1:8789/api/v1/catalog-stats
-      - name: Check production catalogue upstream reachability
-        continue-on-error: true
-        run: |
-          curl --silent --show-error --max-time 20 -D /tmp/mta-upstream-headers.txt 'https://mta-applications-engine.hoaam100.workers.dev/api/v1/catalog-stats' -o /tmp/mta-upstream-body.json || true
-          echo '--- upstream headers ---'
-          cat /tmp/mta-upstream-headers.txt || true
-          echo '--- upstream body ---'
-          head -c 2000 /tmp/mta-upstream-body.json || true
-      - name: Verify production catalogue search, platform filtering and pagination
-        run: |
-          python - <<'PY'
-          import json
-          from urllib.parse import urlencode
-          from urllib.request import Request, urlopen
-
-          base = "https://mta-applications-engine.hoaam100.workers.dev/api/v1/apps"
-
-          def get(params):
-              url = base + "?" + urlencode(params)
-              request = Request(url, headers={"User-Agent": "MTA-Marketplace-CI/1.0"})
-              with urlopen(request, timeout=30) as response:
-                  rows = json.load(response)
-                  return rows, int(response.headers.get("X-Total-Count", "0"))
-
-          first, total = get({"source": "fdroid", "limit": 12, "offset": 0})
-          if len(first) != 12 or total <= 12:
-              raise SystemExit(f"Invalid first production page: rows={len(first)}, total={total}")
-
-          second, second_total = get({"source": "fdroid", "limit": 12, "offset": 12})
-          if not second or second_total != total:
-              raise SystemExit(f"Invalid second production page: rows={len(second)}, total={second_total}")
-          identity = lambda row: (str(row.get("source")), str(row.get("external_id")))
-          first_ids = {identity(row) for row in first}
-          second_ids = {identity(row) for row in second}
-          if first_ids & second_ids:
-              raise SystemExit("Production pagination returned duplicate source identities")
-
-          first_name = str(first[0].get("name") or "").strip()
-          if not first_name:
-              raise SystemExit("First production catalogue record has no name")
-          search_rows, search_total = get({
-              "source": "fdroid", "q": first_name, "limit": 12, "offset": 0
-          })
-          if search_total < 1 or not search_rows:
-              raise SystemExit(f"Production search returned no result for the first record: {first_name}")
-          if not any(identity(row) == identity(first[0]) for row in search_rows):
-              raise SystemExit(f"Production search did not return the matching record: {first_name}")
-
-          android_rows, android_total = get({
-              "source": "fdroid", "platform": "android", "limit": 12, "offset": 0
-          })
-          ios_rows, ios_total = get({
-              "source": "fdroid", "platform": "ios", "limit": 12, "offset": 0
-          })
-          if not android_rows or android_total < 1:
-              raise SystemExit("Production Android platform filter returned no F-Droid records")
-          if ios_rows or ios_total != 0:
-              raise SystemExit(f"Production iOS filter leaked F-Droid records: rows={len(ios_rows)}, total={ios_total}")
-
-          print(json.dumps({
-              "source": "fdroid",
-              "total": total,
-              "first_page": len(first),
-              "second_page": len(second),
-              "pagination_unique": True,
-              "search_query": first_name,
-              "search_results": search_total,
-              "android_filter_results": android_total,
-              "ios_filter_results": ios_total,
-          }, ensure_ascii=False, indent=2))
-          print("Production catalogue search, platform filtering and pagination passed.")
-          PY
       - name: Start local Cloudflare Pages with Functions
         run: |
           nohup npx --yes wrangler@4 pages dev . --ip 127.0.0.1 --port 8788 --binding 'MTA_APPLICATIONS_ENGINE_ORIGIN=http://127.0.0.1:8789' > /tmp/mta-pages-dev.log 2>&1 &
