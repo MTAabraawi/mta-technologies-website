@@ -23,7 +23,8 @@ const lastKnownSources={
  "homebrew-formulae":8732,
  "homebrew-cask":7839,
  "steam":82,
- "mta-curated-web":7
+ "mta-curated-web":7,
+ "open-vsx":0
 };
 const lastKnownTotal=Object.values(lastKnownSources).reduce((sum,n)=>sum+n,0);
 
