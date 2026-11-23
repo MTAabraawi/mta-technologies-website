@@ -5,7 +5,7 @@ const STORE_NAMES = {
   "snap-store":"Snap Store","arch-linux":"Arch Linux Packages",
   "debian-packages":"Debian Packages","homebrew":"Homebrew Cask",
   "steam":"Steam","mta-web-apps":"MTA Web Apps",
-  "fedora-packages":"Fedora Packages","firefox-addons":"Firefox Add-ons",
+  "open-vsx":"Open VSX Registry","fedora-packages":"Fedora Packages","firefox-addons":"Firefox Add-ons",
   "wordpress-plugins":"WordPress Plugin Directory","homebrew-formulae":"Homebrew Formulae",
   "scoop":"Scoop Buckets","gnome-extensions":"GNOME Shell Extensions",
   "alpine-linux":"Alpine Linux Packages","jetbrains-marketplace":"JetBrains Marketplace"

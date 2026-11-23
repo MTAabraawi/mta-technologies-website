@@ -613,3 +613,12 @@ test('application profiles without meaningful source descriptions remain noindex
   expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
   expect(html).not.toContain('id="application-ssr-schema"');
 });
+
+
+test('Open VSX has a dedicated internal store profile and preserves registry context', async ({ page }) => {
+  const response = await page.goto('/store?store=open-vsx');
+  expect(response.status()).toBe(200);
+  await expect(page.locator('#store-title')).toHaveText('Open VSX Registry');
+  await expect(page.locator('#store-editorial-what')).toContainText('إضافات محررات VS Code');
+  await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
+});
