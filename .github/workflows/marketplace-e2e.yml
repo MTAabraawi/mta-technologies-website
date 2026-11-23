@@ -14,6 +14,7 @@ on:
       - 'js/apps.js'
       - 'js/store.js'
       - 'js/application.js'
+      - 'js/application.js'
       - 'js/store-directory.js'
       - 'css/apps.css'
       - 'marketplace-config.js'
