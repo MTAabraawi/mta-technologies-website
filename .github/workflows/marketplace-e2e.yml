@@ -13,6 +13,7 @@ on:
       - 'store.html'
       - 'js/apps.js'
       - 'js/store.js'
+      - 'js/application.js'
       - 'js/store-directory.js'
       - 'css/apps.css'
       - 'marketplace-config.js'
@@ -23,7 +24,7 @@ on:
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
   push:
-    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23]
+    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23, audit/catalogue-metadata-page-quality]
     paths:
       - '*.html'
       - 'css/style.css'
