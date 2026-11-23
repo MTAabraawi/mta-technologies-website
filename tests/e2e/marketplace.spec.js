@@ -445,6 +445,34 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
   }
 });
 
+test('internal links across the public site resolve without broken routes or redirects', async ({ page }) => {
+  const pages = [
+    '/','/about.html','/projects.html','/apps.html','/innovation.html','/knowledge.html',
+    '/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html',
+    '/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'
+  ];
+  const checked = new Set();
+  const base = new URL('http://127.0.0.1:8788');
+  for (const path of pages) {
+    const response = await page.request.get(path);
+    expect(response.status(), 'Source page should load: ' + path).toBe(200);
+    const html = await response.text();
+    const hrefs = [...html.matchAll(/<a\\b[^>]*href=["']([^"']+)["']/gi)].map(match => match[1]);
+    for (const href of hrefs) {
+      if (!href || href.startsWith('#') || /^(mailto:|tel:|javascript:|data:|https?:|\/\/)/i.test(href)) continue;
+      const url = new URL(href, base.origin + path);
+      if (url.origin !== base.origin) continue;
+      url.hash = '';
+      const target = url.pathname + url.search;
+      if (checked.has(target)) continue;
+      checked.add(target);
+      const linked = await page.request.get(target, { maxRedirects: 0 });
+      expect(linked.status(), 'Internal link ' + href + ' from ' + path).toBe(200);
+    }
+  }
+  expect(checked.size).toBeGreaterThan(20);
+});
+
 test('unknown routes return a real HTTP 404 response', async ({ page }) => {
   const response = await page.request.get('/this-route-must-not-exist-seo-check');
   expect(response.status()).toBe(404);
