@@ -12,6 +12,7 @@ on:
       - 'apps.html'
       - 'store.html'
       - 'js/apps.js'
+      - 'js/application.js'
       - 'js/store.js'
       - 'js/application.js'
       - 'js/application.js'
