@@ -51,14 +51,9 @@ function makeCard(app, storeKey, store) {
     "&name=" + encodeURIComponent(name);
   const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); } catch { return {}; } })();
   const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
-  let publisherHost = "";
-  for (const candidate of [metadata.homepage, metadata.website, metadata.project_url, app.app_url, app.source_url]) {
-    try { publisherHost = new URL(candidate).hostname.replace(/^www\./, ""); if (publisherHost) break; } catch {}
-  }
   const icon = safeHttps(app.icon_url || metadata.icon_url || metadata.iconUrl ||
     (typeof metadata.icon === "string" ? metadata.icon : "") || iconObject.url || iconObject.path ||
-    metadata.logo || metadata.image || metadata.image_url || metadata.artworkUrl512) ||
-    (publisherHost ? "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(publisherHost) + "&sz=256" : "");
+    metadata.logo || metadata.image || metadata.image_url || metadata.artworkUrl512);
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "APP";
   const original = safeHttps(app.source_url || app.app_url) || store.url || "#";
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
