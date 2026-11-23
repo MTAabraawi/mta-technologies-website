@@ -28,6 +28,17 @@ test('local test guard recognizes analytics and advertising hosts', async () => 
   expect(trackingAndAdHosts.test('www.mtahqq.dpdns.org')).toBe(false);
 });
 
+
+test('local and preview HTML suppresses production GA4 without changing AdSense markup', async ({ page }) => {
+  const response = await page.request.get('/apps.html');
+  expect(response.ok()).toBeTruthy();
+  const html = await response.text();
+  expect(html).not.toContain('googletagmanager.com/gtag/js');
+  expect(html).not.toContain('G-PLS74VD22C');
+  // AdSense is intentionally left untouched; its account setup is deferred.
+  expect(html).toContain('ca-pub-8004171697196640');
+});
+
 test('marketplace API is served from the same origin', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
