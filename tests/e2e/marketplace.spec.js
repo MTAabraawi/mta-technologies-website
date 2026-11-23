@@ -406,7 +406,7 @@ test('all public HTML pages use the approved AdSense publisher and contain no re
 
 test('corporate homepage leads with company identity and features only the released product', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('main > section')).toHaveCount(5);
+  await expect(page.locator('main > section')).toHaveCount(6);
   await expect(page.locator('main h1')).toHaveCount(1);
   await expect(page.locator('.mta-home-project-card')).toHaveCount(0);
   await expect(page.locator('.mta-home-featured-product')).toContainText('MTA Net Blocker');
