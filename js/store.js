@@ -114,8 +114,10 @@ else{
  const profile=store.source&&editorialProfiles[store.source];
  if(profile){const texts=lang()?profile.en:profile.ar;if(editorialIntro)editorialIntro.textContent=texts[0];if(editorialWhat)editorialWhat.textContent=texts[1];if(editorialVerify)editorialVerify.textContent=texts[2];if(editorialAvailability)editorialAvailability.textContent=lang()?(store.name+" availability, pricing and regional access can vary across "+store.platforms.join(", ")+". Check the publisher listing for current regional and device requirements."):( "قد يختلف توفر "+store.name+" وأسعاره والوصول إليه بحسب "+store.platforms.join(" و")+" والمنطقة والجهاز. راجع صفحة الناشر للتأكد من المتطلبات الحالية.");}
  const storeSchema=document.createElement("script");storeSchema.type="application/ld+json";storeSchema.id="store-profile-schema";storeSchema.textContent=JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":store.name+" catalogue","description":store.desc,"url":location.href,"inLanguage":["ar","en"],"about":{"@type":"Thing","name":store.name+" app catalogue"}});document.head.append(storeSchema);
- const logoUrl="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.host)+"&sz=128",logoFallback="https://icons.duckduckgo.com/ip3/"+encodeURIComponent(store.host)+".ico";
- logo.src=logoUrl;logo.setAttribute("alt",copy("شعار "+store.name,"Logo of "+store.name));logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.webp"}};
+ // Do not infer a store's official logo from its domain favicon.
+ logo.src="images/mta-logo-square.webp";
+ logo.setAttribute("alt","MTA TECHNOLOGIES catalogue mark");
+ logo.onerror=()=>{logo.onerror=null;logo.hidden=true};
  official.href=store.url;
  $("store-platforms").replaceChildren(...store.platforms.map(p=>{const s=document.createElement("span");s.textContent=p;return s}));
  const connected=!!store.source;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
