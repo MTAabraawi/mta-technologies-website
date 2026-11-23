@@ -265,5 +265,18 @@
 
 
 
+
+<script>
+(function () {
+  const form = document.getElementById('visitor-suggestion-form');
+  if (!form) return;
+  form.addEventListener('submit', function () {
+    try {
+      sessionStorage.setItem('mta:lead-pending', String(Date.now()));
+    } catch (_) {}
+  }, { once: true });
+})();
+</script>
+
 </body>
 </html>
