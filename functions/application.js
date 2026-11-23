@@ -111,7 +111,12 @@ export async function onRequest(context) {
       ["الترخيص",app.license],["مصدر البيانات",app.source || source],["معرّف المصدر",app.external_id || app.id]
     ].filter(pair => pair[1] != null && String(pair[1]).trim() !== "");
     html = setIdHtml(html, "application-facts", facts.map(pair => "<dt>"+esc(pair[0])+"</dt><dd>"+esc(pair[1])+"</dd>").join(""));
-    const iconMetadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
+    const iconMetadata = (() => {
+      try {
+        return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) :
+          (app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {});
+      } catch { return {}; }
+    })();
     const iconObject = iconMetadata.icon && typeof iconMetadata.icon === "object" ? iconMetadata.icon : {};
     const iconCollection = Array.isArray(iconMetadata.icons) ? iconMetadata.icons :
       (iconMetadata.icons && typeof iconMetadata.icons === "object" ? Object.values(iconMetadata.icons) : []);
