@@ -457,7 +457,7 @@ test('internal links across the public site resolve without broken routes or red
     const response = await page.request.get(path);
     expect(response.status(), 'Source page should load: ' + path).toBe(200);
     const html = await response.text();
-    const hrefs = [...html.matchAll(/<a\\b[^>]*href=["']([^"']+)["']/gi)].map(match => match[1]);
+    const hrefs = [...html.matchAll(/<a\b[^>]*href=["']([^"']+)["']/gi)].map(match => match[1]);
     for (const href of hrefs) {
       if (!href || href.startsWith('#') || /^(mailto:|tel:|javascript:|data:|https?:|\/\/)/i.test(href)) continue;
       const url = new URL(href, base.origin + path);
