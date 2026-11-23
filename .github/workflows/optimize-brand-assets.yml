@@ -15,15 +15,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: main
           fetch-depth: 0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
+          package-manager-cache: false
 
       - name: Install image encoder
         run: npm install --no-save sharp
@@ -35,7 +36,7 @@ jobs:
         run: git diff --binary > /tmp/brand-assets-optimization.patch
 
       - name: Upload optimized assets and patch
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: optimized-brand-assets
           path: |

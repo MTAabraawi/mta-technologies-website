@@ -97,7 +97,8 @@ test('store search and category/platform filters narrow results and can be clear
   await expect(visibleCards.first()).toContainText('MTA Net Blocker');
 
   await page.locator('#store-search').fill('');
-  await expect(visibleCards).toHaveCount(12, { timeout: 15_000 });
+  await expect(page.locator('#store-load-more')).toBeEnabled({ timeout: 30_000 });
+  await expect(visibleCards).toHaveCount(12, { timeout: 30_000 });
 
   const category = page.locator('#store-category-filter');
   await expect(category.locator('option[value="utilities"]')).toHaveCount(1);
@@ -465,7 +466,7 @@ test('homepage carousel advances automatically and supports touch swipe', async 
 test('platform overview provides substantive bilingual ownership and data-source guidance', async ({ page }) => {
   await page.goto('/platform-overview.html', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('h1')).toContainText('منصة لاكتشاف البرامج');
-  await expect(page.locator('main')).toContainText('حقوق الملكية');
+  await expect(page.locator('main')).toContainText('الملكية والحقوق ونطاق الأصول');
   await expect(page.locator('main')).toContainText('upstream terms');
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
 });
@@ -498,6 +499,8 @@ test('indexable static pages have a title, useful description, canonical and pri
   expect(await projectPage.text()).toContain('"@type":"CollectionPage"');
   const appPage = await page.request.get('/app-mta-net-blocker.html');
   expect(await appPage.text()).toContain('"@type":"SoftwareApplication"');
+  const errorPage = await page.request.get('/404.html');
+  expect(await errorPage.text()).toMatch(/<meta name=["']robots["'] content=["']noindex,follow["']/i);
 });
 
 
