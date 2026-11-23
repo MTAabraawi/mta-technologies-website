@@ -111,7 +111,19 @@ export async function onRequest(context) {
       ["الترخيص",app.license],["مصدر البيانات",app.source || source],["معرّف المصدر",app.external_id || app.id]
     ].filter(pair => pair[1] != null && String(pair[1]).trim() !== "");
     html = setIdHtml(html, "application-facts", facts.map(pair => "<dt>"+esc(pair[0])+"</dt><dd>"+esc(pair[1])+"</dd>").join(""));
-    const icon = safe(app.icon_url);
+    const iconMetadata = app.metadata_json && typeof app.metadata_json === "object" ? app.metadata_json : {};
+    const iconObject = iconMetadata.icon && typeof iconMetadata.icon === "object" ? iconMetadata.icon : {};
+    const iconCollection = Array.isArray(iconMetadata.icons) ? iconMetadata.icons :
+      (iconMetadata.icons && typeof iconMetadata.icons === "object" ? Object.values(iconMetadata.icons) : []);
+    const iconCandidates = [
+      app.icon_url, iconMetadata.icon_url, iconMetadata.iconUrl,
+      iconMetadata.appIconUrl, iconMetadata.app_icon_url,
+      typeof iconMetadata.icon === "string" ? iconMetadata.icon : "",
+      iconObject.url, iconObject.path, iconMetadata.artworkUrl512, iconMetadata.artworkUrl100,
+      ...iconCollection.map(item => typeof item === "string" ? item :
+        (item && typeof item === "object" ? (item.url || item.path || "") : ""))
+    ].map(safe).filter(Boolean);
+    const icon = [...new Set(iconCandidates)][0] || "";
     if (icon) {
       html = html.replace('<img id="application-icon" alt="" hidden>',
         '<img id="application-icon" src="' + esc(icon) + '" alt="' + esc(title) + ' icon" loading="lazy" decoding="async">');
