@@ -313,3 +313,26 @@
     aspect-ratio: 1.6;
   }
 }
+
+/* Keep the Net Blocker interface artwork visible as a distinct preview image. */
+.mta-home-refresh .mta-project-art-stage .mta-motion-app > img.mta-motion-app-preview {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 112px;
+  max-height: 176px;
+  aspect-ratio: 36 / 23;
+  object-fit: contain !important;
+  flex: 0 0 auto !important;
+  align-self: stretch;
+  animation: none !important;
+}
+@media (max-width: 760px) {
+  .mta-home-refresh .mta-project-art-stage .mta-motion-app > img.mta-motion-app-preview {
+    min-height: 105px;
+    max-height: 105px;
+  }
+}
