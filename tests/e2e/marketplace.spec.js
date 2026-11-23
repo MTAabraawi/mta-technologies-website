@@ -516,4 +516,10 @@ test('Open VSX application details preserve publisher, licence, version and sour
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/application\?source=open-vsx&id=ms-python\.python$/);
   await expect(page.locator('#application-extra-facts')).toContainText('2026.4.0');
+  const ssr = await page.request.get('/application?source=open-vsx&id=ms-python.python&name=Python');
+  expect(ssr.status()).toBe(200);
+  const ssrHtml = await ssr.text();
+  expect(ssrHtml).toContain('2026.4.0');
+  expect(ssrHtml).toContain('123,456');
+  expect(ssrHtml).toContain('"ratingValue":4.5');
 });

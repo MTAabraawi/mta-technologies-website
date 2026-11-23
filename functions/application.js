@@ -48,6 +48,31 @@ function setIdText(html, id, value) {
 function setIdHtml(html, id, value) {
   return replaceInner(html, id, value);
 }
+function metadataObject(value) {
+  if (value && typeof value === "object") return value;
+  if (typeof value === "string") { try { const parsed = JSON.parse(value); if (parsed && typeof parsed === "object") return parsed; } catch {} }
+  return {};
+}
+function firstMetadataValue(metadata, keys) {
+  for (const key of keys) {
+    const value = metadata[key];
+    if (value !== undefined && value !== null && String(value).trim() !== "") return value;
+  }
+  return "";
+}
+function metadataDate(value) {
+  if (value === undefined || value === null || value === "") return "";
+  const numeric = Number(value);
+  const date = Number.isFinite(numeric) && numeric > 1000000000
+    ? new Date(numeric > 1000000000000 ? numeric : numeric * 1000)
+    : new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toISOString().slice(0, 10);
+}
+function metadataDisplay(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).join(", ");
+  if (value && typeof value === "object") return value.final != null ? [value.final, value.currency].filter(Boolean).join(" ") : "";
+  return typeof value === "number" ? value.toLocaleString("en-US") : String(value ?? "");
+}
 export async function onRequest(context) {
   const response = await context.next();
   const url = new URL(context.request.url);
@@ -68,7 +93,7 @@ export async function onRequest(context) {
     const api = new URL("/api/v1/apps", engine);
     api.searchParams.set("source", source);
     api.searchParams.set("q", name);
-    api.searchParams.set("limit", "100");
+    api.searchParams.set("limit", "200");
     api.searchParams.set("offset", "0");
     const upstream = await fetch(api, { headers: { accept: "application/json" }, cf: { cacheTtl: 0 } });
     if (!upstream.ok) throw new Error("Application API HTTP " + upstream.status);
@@ -83,6 +108,25 @@ export async function onRequest(context) {
     const description = (rawDescription || "Review the original publisher listing for current application details.").slice(0, 5000);
     const sourceUrl = safe(app.source_url || app.app_url);
     const indexable = rawDescription.length >= 80 || Boolean(app.developer && app.platform && app.category && sourceUrl);
+    const metadata = metadataObject(app.metadata_json);
+    const version = firstMetadataValue(metadata, ["versionString", "version", "latest_version"]);
+    const downloads = firstMetadataValue(metadata, ["estimatedDownloads", "downloadCount", "download_count"]);
+    const rating = firstMetadataValue(metadata, ["rating", "averageRating", "average_rating"]);
+    const ratingCount = firstMetadataValue(metadata, ["ratingCount", "reviewCount", "review_count"]);
+    const updated = metadataDate(firstMetadataValue(metadata, ["lastAppUpdateTime", "published_at", "updated_at"]));
+    const verified = metadata.verifiedPublisher === true || metadata.verified_publisher === true || metadata.verified === true;
+    const extraFacts = [
+      ["الإصدار", version],
+      ["التنزيلات لدى المصدر", downloads],
+      ["التقييم", rating],
+      ["عدد التقييمات", ratingCount],
+      ["تاريخ النشر أو التحديث", updated],
+      ["الناشر موثّق", verified ? "نعم" : ""]
+    ].filter(pair => pair[1] !== undefined && pair[1] !== null && String(pair[1]).trim() !== "");
+    if (extraFacts.length) {
+      html = setIdHtml(html, "application-extra-facts", extraFacts.map(pair => "<dt>" + esc(pair[0]) + "</dt><dd>" + esc(metadataDisplay(pair[1])) + "</dd>").join(""));
+      html = html.replace(/(<section\\b[^>]*id="application-source-metadata"[^>]*)\\s+hidden/i, "$1");
+    }
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
     html = meta(html, "description", summary);
@@ -125,8 +169,14 @@ export async function onRequest(context) {
       "applicationCategory":String(app.category || "Software"),
       "publisher":app.developer ? {"@type":"Organization","name":String(app.developer)} : undefined,
       "image":icon || undefined,
+      "license":app.license || metadata.license || undefined,
+      "softwareVersion":version ? String(version) : undefined,
       "sameAs":sourceUrl || undefined
     };
+    const ratingNumber = Number(rating), ratingCountNumber = Number(ratingCount);
+    if (Number.isFinite(ratingNumber) && ratingNumber >= 0 && ratingNumber <= 5 && Number.isFinite(ratingCountNumber) && ratingCountNumber > 0) {
+      schema.aggregateRating = { "@type": "AggregateRating", "ratingValue": ratingNumber, "ratingCount": ratingCountNumber, "bestRating": 5, "worstRating": 0 };
+    }
     const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
     html = html.replace("</head>", json + "</head>");
   } catch (error) {
