@@ -708,12 +708,15 @@ const editorialSlugs = [
   'detect-ai-generated-media',
   'password-managers-passkeys',
   'browser-privacy-tracking',
-  'ai-agents-security-governance'
+  'ai-agents-security-governance',
+  'whatsapp-end-to-end-encrypted-backups',
+  'telegram-secret-cloud-chats-explained',
+  'ai-developments-november-2026'
 ];
 
 test('editorial library is featured on the homepage and lists bilingual articles', async ({ page }) => {
   await page.goto('/articles.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.editorial-card')).toHaveCount(8);
+  await expect(page.locator('.editorial-card')).toHaveCount(11);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('.editorial-card .en-only').first()).toBeAttached();
   for (const slug of editorialSlugs) {
