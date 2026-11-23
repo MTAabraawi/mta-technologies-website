@@ -52,8 +52,9 @@ function makeCard(app, storeKey, store) {
   const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); } catch { return {}; } })();
   const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
   const icon = safeHttps(app.icon_url || metadata.icon_url || metadata.iconUrl ||
+    metadata.appIconUrl || metadata.app_icon_url ||
     (typeof metadata.icon === "string" ? metadata.icon : "") || iconObject.url || iconObject.path ||
-    metadata.logo || metadata.image || metadata.image_url || metadata.artworkUrl512);
+    metadata.artworkUrl512 || metadata.artworkUrl100);
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "APP";
   const original = safeHttps(app.source_url || app.app_url) || store.url || "#";
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
