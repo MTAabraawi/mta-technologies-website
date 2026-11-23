@@ -13,7 +13,8 @@ const rows = Array.from({ length: total }, (_, i) => ({
   license: null,
   source_url: 'https://example.org/apps/' + (i + 1),
   app_url: 'https://example.org/apps/' + (i + 1),
-  icon_url: i === 0 ? 'https://www.mtahqq.dpdns.org/images/mta-net-blocker-icon.png' : 'https://example.org/icon.png'
+  icon_url: i === 0 ? 'https://www.mtahqq.dpdns.org/images/mta-net-blocker-icon.png' : 'https://example.org/icon.png',
+  metadata_json: i === 0 ? { versionString: '1.0.1', minSdkVersion: '26' } : {}
 }));
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1:8789');

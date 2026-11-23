@@ -461,6 +461,15 @@ test('application detail SSR matches exact source IDs and normalizes canonical q
   expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
 });
 
+test('application browser profile renders source metadata and preserves normalized canonical', async ({ page }) => {
+  await page.goto('/application?source=fdroid&store=fdroid&id=1&name=MTA%20Net%20Blocker&utm_campaign=check', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
+  await expect(page.locator('#application-source-metadata')).toBeVisible();
+  await expect(page.locator('#application-extra-facts')).toContainText('1.0.1');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/application\?source=fdroid&store=fdroid&id=1&name=/);
+  await expect(page.locator('link[rel="canonical"]')).not.toHaveAttribute('href', /utm_campaign/);
+});
+
 test('application SSR refuses a name-only match when the source ID is wrong', async ({ page }) => {
   const response = await page.request.get('/application?source=fdroid&store=fdroid&id=does-not-exist&name=MTA%20Net%20Blocker');
   expect(response.status()).toBe(200);
