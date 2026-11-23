@@ -520,6 +520,7 @@ test('Open VSX application details preserve publisher, licence, version and sour
   expect(ssr.status()).toBe(200);
   const ssrHtml = await ssr.text();
   expect(ssrHtml).toContain('2026.4.0');
+  expect(ssrHtml).toMatch(/<section class=["']application-source-metadata["'] id=["']application-source-metadata["']>/);
   expect(ssrHtml).toContain('123,456');
   expect(ssrHtml).toContain('"ratingValue":4.5');
 });
