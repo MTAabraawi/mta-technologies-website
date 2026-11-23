@@ -6,6 +6,7 @@ on:
     branches: [main, feature/global-store-catalog-expansion]
     paths:
       - '*.html'
+      - 'articles/**'
       - 'css/style.css'
       - 'css/home-carousel.css'
       - 'js/main.js'
@@ -26,7 +27,7 @@ on:
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
   push:
-    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23, audit/catalogue-metadata-page-quality]
+    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23, audit/catalogue-metadata-page-quality, audit/editorial-knowledge-hub]
     paths:
       - '*.html'
       - 'css/style.css'
