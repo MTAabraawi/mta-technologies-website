@@ -261,6 +261,13 @@ test('catalogue stores are separated by verified live source counts', async ({ p
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
+  const sitemapIndex = await page.request.get('/sitemap-index.xml', { maxRedirects: 0 });
+  expect(sitemapIndex.status()).toBe(200);
+  expect(sitemapIndex.headers()['content-type']).toContain('xml');
+  const indexXml = await sitemapIndex.text();
+  expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+  expect(indexXml).not.toContain('sitemap-pages.xml');
+
   const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
   expect(sitemap.status()).toBe(200);
   expect(sitemap.headers()['content-type']).toContain('xml');
