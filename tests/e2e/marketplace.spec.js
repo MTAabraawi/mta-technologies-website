@@ -172,6 +172,17 @@ test('marketplace includes the MTA Net Blocker first-party product listing', asy
   await expect(card.locator('a')).toHaveAttribute('href', 'app-mta-net-blocker.html');
 });
 
+test('new external store cards provide useful bilingual descriptions without claiming live integration', async ({ page }) => {
+  await page.goto('/apps.html');
+  const keys = ['honor-app-market','360-mobile-assistant','baidu-mobile-assistant','wandoujia','rustore','altstore','skich-store','npackd','ea-app','itch-io'];
+  for (const key of keys) {
+    const card = page.locator('[data-store-key="' + key + '"]');
+    await expect(card).toBeVisible();
+    await expect(card.locator('.store-card-description')).toBeVisible();
+    await expect(card.locator('.store-card-state')).toContainText('استكشف كتالوج المتجر داخل MTA');
+  }
+});
+
 test('connected store cards show live indexed counts from catalogue statistics', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const stats = await page.evaluate(async () => (await fetch('/api/v1/catalog-stats', { cache: 'no-store' })).json());
