@@ -604,3 +604,12 @@ test('application detail can resolve by exact source ID without a display-name q
   expect(html).toContain('id="application-ssr-schema"');
   expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
 });
+
+
+test('application profiles without meaningful source descriptions remain noindex', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&id=3&name=Fixture%20Application%200002');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toContain('id="application-ssr-schema"');
+});

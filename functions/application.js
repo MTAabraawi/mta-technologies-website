@@ -95,10 +95,11 @@ export async function onRequest(context) {
     const title = String(app.name || name || "Application");
     const summary = String(app.summary || app.description || "Application details and source information from the MTA directory.").slice(0, 500);
     const description = String(app.description || app.summary || "Review the original publisher listing for current application details.").slice(0, 5000);
+    const usefulDescription = [app.summary, app.description].some(value => typeof value === "string" && value.trim().length >= 40);
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
     html = meta(html, "description", summary);
-    html = meta(html, "robots", "index,follow");
+    html = meta(html, "robots", usefulDescription ? "index,follow" : "noindex,follow");
     html = canonical(html, canonicalUrl);
     html = setIdText(html, "application-name", title);
     html = setIdText(html, "application-breadcrumb", title);
@@ -129,7 +130,8 @@ export async function onRequest(context) {
       html = html.replace('<span id="application-icon-fallback" class="store-app-icon-fallback">MTA</span>',
         '<span id="application-icon-fallback" class="store-app-icon-fallback">' + esc(initials) + '</span>');
     }
-    const schema = {
+    if (usefulDescription) {
+      const schema = {
       "@context":"https://schema.org","@type":"SoftwareApplication",
       "name":title,"description":summary,"url":canonicalUrl,
       "operatingSystem":String(app.platform || "Unspecified"),
@@ -141,8 +143,9 @@ export async function onRequest(context) {
       "sameAs":sourceUrl || undefined,
       "inLanguage":["ar","en"]
     };
-    const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
-    html = html.replace("</head>", json + "</head>");
+      const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
+      html = html.replace("</head>", json + "</head>");
+    }
   } catch (error) {
     console.error("MTA application SSR failed:", error);
     html = meta(html, "robots", "noindex,follow");
