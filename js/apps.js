@@ -44,8 +44,8 @@
     } catch { return ""; }
   };
   const safeLocalIconPath = value => {
-    const path = String(value || "").trim().replace(/^\\//, "");
-    return /^images\\/[A-Za-z0-9._/-]+$/.test(path) && !path.split("/").includes("..") ? "/" + path : "";
+    const path = String(value || "").trim().replace(/^\//, "");
+    return /^images\/[A-Za-z0-9._/-]+$/.test(path) && !path.split("/").includes("..") ? "/" + path : "";
   };
   const safeIconUrl = value => safeHttpsUrl(value) || safeLocalIconPath(value);
   const platformName = value => ({
