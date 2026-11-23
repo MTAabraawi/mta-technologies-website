@@ -679,6 +679,7 @@ test('homepage catalogue cards do not invent icons or developer identities when 
   expect(script).not.toContain('google.com/s2/favicons');
   expect(script).not.toContain('Independent developer');
   expect(script).toContain('metadata.appIconUrl');
+  expect(script).toContain('safeLocalIconPath');
   expect(script).toContain('Developer not specified by source');
   expect(script).toContain('No description provided by source');
 });
