@@ -43,6 +43,11 @@
       return url.protocol === "https:" && !url.username && !url.password ? url.href : "";
     } catch { return ""; }
   };
+  const safeLocalIconPath = value => {
+    const path = String(value || "").trim().replace(/^\\//, "");
+    return /^images\\/[A-Za-z0-9._/-]+$/.test(path) && !path.split("/").includes("..") ? "/" + path : "";
+  };
+  const safeIconUrl = value => safeHttpsUrl(value) || safeLocalIconPath(value);
   const platformName = value => ({
     android: "Android", ios: "iOS", windows: "Windows",
     macos: "macOS", linux: "Linux", web: "Web"
@@ -111,7 +116,7 @@
       iconObject.url, iconObject.path, metadata.artworkUrl512, metadata.artworkUrl100,
       ...iconCollection.map(item => typeof item === "string" ? item :
         (item && typeof item === "object" ? (item.url || item.path || "") : ""))
-    ].map(safeHttpsUrl).find(Boolean) || "";
+    ].map(safeIconUrl).find(Boolean) || "";
     const fallbackIcon = () => {
       const mark = document.createElement("span");
       mark.className = "app-icon-fallback";
