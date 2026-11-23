@@ -125,7 +125,7 @@ export async function onRequest(context) {
     ].filter(pair => pair[1] !== undefined && pair[1] !== null && String(pair[1]).trim() !== "");
     if (extraFacts.length) {
       html = setIdHtml(html, "application-extra-facts", extraFacts.map(pair => "<dt>" + esc(pair[0]) + "</dt><dd>" + esc(metadataDisplay(pair[1])) + "</dd>").join(""));
-      html = html.replace(/(<section\\b[^>]*id="application-source-metadata"[^>]*)\\s+hidden/i, "$1");
+      html = html.replace(/(<section\b[^>]*id="application-source-metadata"[^>]*)\s+hidden/i, "$1");
     }
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
