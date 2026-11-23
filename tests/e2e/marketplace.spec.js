@@ -39,6 +39,29 @@ test('local and preview HTML suppresses production GA4 without changing AdSense 
   expect(html).toContain('ca-pub-8004171697196640');
 });
 
+
+test('visitor suggestion confirmation emits one generate_lead event only after submission', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__mtaAnalyticsEvents = [];
+    window.gtag = (...args) => window.__mtaAnalyticsEvents.push(args);
+  });
+  await page.goto('/suggestions.html');
+  await page.locator('#visitor-suggestion-form').dispatchEvent('submit');
+  const pending = await page.evaluate(() => sessionStorage.getItem('mta:lead-pending'));
+  expect(Number(pending)).toBeGreaterThan(0);
+
+  await page.goto('/contact-thanks.html');
+  const confirmation = await page.evaluate(() => ({
+    events: window.__mtaAnalyticsEvents,
+    pending: sessionStorage.getItem('mta:lead-pending')
+  }));
+  expect(confirmation.events).toEqual([['event', 'generate_lead', { method: 'visitor_suggestion_form' }]]);
+  expect(confirmation.pending).toBeNull();
+
+  await page.reload();
+  expect(await page.evaluate(() => window.__mtaAnalyticsEvents)).toEqual([]);
+});
+
 test('marketplace API is served from the same origin', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
