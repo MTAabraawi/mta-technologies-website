@@ -58,7 +58,12 @@ export async function onRequest(context) {
   const id = url.searchParams.get("id") || "";
   const name = url.searchParams.get("name") || "";
   const canonicalOrigin = (context.env && context.env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
-  const canonicalUrl = canonicalOrigin + url.pathname + url.search;
+  const canonicalParams = new URLSearchParams();
+  if (source) canonicalParams.set("source", source);
+  if (store) canonicalParams.set("store", store);
+  if (id) canonicalParams.set("id", id);
+  if (name) canonicalParams.set("name", name);
+  const canonicalUrl = canonicalOrigin + "/application" + (canonicalParams.size ? "?" + canonicalParams.toString() : "");
   const engine = (context.env && context.env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
   try {
     if (!source || !id || !name) throw new Error("Missing app reference");
@@ -71,8 +76,7 @@ export async function onRequest(context) {
     if (!upstream.ok) throw new Error("Application API HTTP " + upstream.status);
     const rows = await upstream.json();
     if (!Array.isArray(rows)) throw new Error("Invalid application response");
-    const app = rows.find(row => String(row.external_id || row.id || "") === id) ||
-      rows.find(row => String(row.name || "").toLocaleLowerCase() === name.toLocaleLowerCase());
+    const app = rows.find(row => String(row.external_id || row.id || "") === id);
     if (!app) throw new Error("Application not found");
     const title = String(app.name || name);
     const summary = String(app.summary || app.description || "Application details and source information from the MTA directory.").slice(0, 500);
