@@ -242,3 +242,6 @@ html[lang="en"],html[lang="en"] body{font-family:"Plus Jakarta Sans","IBM Plex S
     grid-column: 1 / -1;
   }
 }
+
+/* Editorial context for external-only store directory entries */
+.store-card-description{margin:0;font-size:.74rem;line-height:1.65;color:var(--text-secondary);font-weight:400}

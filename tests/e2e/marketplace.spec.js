@@ -28,6 +28,38 @@ test('local test guard recognizes analytics and advertising hosts', async () => 
   expect(trackingAndAdHosts.test('www.mtahqq.dpdns.org')).toBe(false);
 });
 
+
+test('local and preview HTML suppresses production GA4 without changing AdSense markup', async ({ page }) => {
+  const response = await page.request.get('/apps.html');
+  expect(response.ok()).toBeTruthy();
+  const html = await response.text();
+  expect(html).not.toContain('googletagmanager.com/gtag/js');
+  expect(html).not.toContain('G-PLS74VD22C');
+  expect(html).toContain('ca-pub-8004171697196640');
+});
+
+test('visitor suggestion confirmation emits one generate_lead event only after submission', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__mtaAnalyticsEvents = [];
+    window.gtag = (...args) => window.__mtaAnalyticsEvents.push(args);
+  });
+  await page.goto('/suggestions.html');
+  await page.locator('#visitor-suggestion-form').dispatchEvent('submit');
+  const pending = await page.evaluate(() => sessionStorage.getItem('mta:lead-pending'));
+  expect(Number(pending)).toBeGreaterThan(0);
+
+  await page.goto('/contact-thanks.html');
+  const confirmation = await page.evaluate(() => ({
+    events: window.__mtaAnalyticsEvents,
+    pending: sessionStorage.getItem('mta:lead-pending')
+  }));
+  expect(confirmation.events).toEqual([['event', 'generate_lead', { method: 'visitor_suggestion_form' }]]);
+  expect(confirmation.pending).toBeNull();
+
+  await page.reload();
+  expect(await page.evaluate(() => window.__mtaAnalyticsEvents)).toEqual([]);
+});
+
 test('marketplace API is served from the same origin', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const result = await page.evaluate(async () => {
@@ -172,6 +204,18 @@ test('marketplace includes the MTA Net Blocker first-party product listing', asy
   await expect(card.locator('a')).toHaveAttribute('href', 'app-mta-net-blocker.html');
 });
 
+test('new external store cards provide useful bilingual descriptions without claiming live integration', async ({ page }) => {
+  await page.goto('/apps.html');
+  const keys = ['honor-app-market','360-mobile-assistant','baidu-mobile-assistant','wandoujia','rustore','altstore','skich-store','npackd','ea-app','itch-io'];
+  for (const key of keys) {
+    const card = page.locator('[data-store-key="' + key + '"]');
+    await expect(card).toBeVisible();
+    await expect(card.locator('.store-card-description')).toBeVisible();
+    await expect(card).toHaveAttribute('data-catalogue-state', 'coming-soon');
+    await expect(card.locator('.store-card-state')).toContainText('نعمل على توفيرها قريباً');
+  }
+});
+
 test('connected store cards show live indexed counts from catalogue statistics', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const stats = await page.evaluate(async () => (await fetch('/api/v1/catalog-stats', { cache: 'no-store' })).json());
@@ -179,6 +223,32 @@ test('connected store cards show live indexed counts from catalogue statistics',
     const actual = await page.locator('[data-source-count="' + source + '"]').getAttribute('data-count');
     expect(Number(actual)).toBe(Number(stats.sources[source] || 0));
   }
+});
+
+test('stale catalogue fallback keeps every recently verified source visible with dated counts', async ({ page }) => {
+  await page.route('**/api/v1/catalog-stats', route => route.fulfill({
+    status: 503,
+    contentType: 'application/json',
+    body: JSON.stringify({ error: 'temporary upstream outage' })
+  }));
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+
+  const expected = {
+    'fedora-packages': '83426',
+    'firefox-addons': '3190',
+    'wordpress-plugins': '4590',
+    'scoop': '5269',
+    'gnome-extensions': '153',
+    'bluejetty': '200049',
+    'openuse': '976'
+  };
+  for (const [source, count] of Object.entries(expected)) {
+    const card = page.locator('.store-connected-group .store-picker-card').filter({ has: page.locator('[data-source-count="' + source + '"]') });
+    await expect(card, source + ' should remain connected during a stats outage').toHaveAttribute('data-catalogue-state', 'connected');
+    await expect(card.locator('[data-source-count]')).toHaveAttribute('data-count', count);
+  }
+  await expect(page.locator('.catalogue-icon-note')).toContainText('22 نوفمبر 2026');
+  await expect(page.locator('#catalog-stats')).toContainText('362,354');
 });
 
 test('public catalogue can be paginated without duplicate source identities', async ({ page }) => {
@@ -223,6 +293,13 @@ test('catalogue stores are separated by verified live source counts', async ({ p
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
+  const sitemapIndex = await page.request.get('/sitemap-index.xml', { maxRedirects: 0 });
+  expect(sitemapIndex.status()).toBe(200);
+  expect(sitemapIndex.headers()['content-type']).toContain('xml');
+  const indexXml = await sitemapIndex.text();
+  expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+  expect(indexXml).not.toContain('sitemap-pages.xml');
+
   const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
   expect(sitemap.status()).toBe(200);
   expect(sitemap.headers()['content-type']).toContain('xml');
@@ -303,101 +380,28 @@ test('applications without original artwork still receive a visible icon fallbac
   await expect(page.locator('.store-app-icon-fallback').first()).toBeVisible({ timeout: 15_000 });
 });
 
-test('all public HTML pages are free of Google AdSense integrations', async ({ page }) => {
+test('all public HTML pages use the approved AdSense publisher and contain no retired ad network code', async ({ page }) => {
   const pages = [
-    '/index.html', '/about.html', '/projects.html', '/innovation.html',
-    '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
-    '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
-    '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
-    '/suggestions.html', '/application.html', '/store.html',
-    '/store?store=fdroid'
+    '/index.html','/about.html','/app-mta-net-blocker.html','/application.html',
+    '/apps.html','/contact.html','/cookies.html','/data-subject-rights.html',
+    '/disclaimer.html','/gallery.html','/innovation.html','/knowledge.html',
+    '/privacy-policy.html','/projects.html','/store.html','/suggestions.html','/terms.html',
+    '/contact-thanks.html','/404.html'
   ];
-  const adCode = /pagead2\.googlesyndication\.com|adsbygoogle|ca-pub-|google_ad|data-ad-client|data-ad-slot|doubleclick\.net/i;
+  const retired = /acscdn[.]com|aclib[.]js|js[/]adcash[.]js|12478774|12478782|12481106|mta-ad-slot|hilltopads?/i;
   for (const path of pages) {
     const response = await page.request.get(path);
     expect(response.status(), 'Page should load: ' + path).toBe(200);
     const html = await response.text();
-    expect(html, 'Page must not load ad code: ' + path).not.toMatch(adCode);
+    expect(html, 'Retired ad code must be absent: ' + path).not.toMatch(retired);
+    if (!['/contact-thanks.html','/404.html'].includes(path)) {
+      expect(html, 'Approved AdSense publisher must be present: ' + path).toContain('ca-pub-8004171697196640');
+      expect(html).toContain('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js');
+    }
   }
-});
-
-
-test('all site pages and store/application routes use the shared Adcash Display placement', async ({ page }) => {
-  const pages = [
-    '/index.html', '/about.html', '/projects.html', '/innovation.html',
-    '/knowledge.html', '/gallery.html', '/contact.html', '/apps.html',
-    '/app-mta-net-blocker.html', '/privacy-policy.html', '/terms.html',
-    '/disclaimer.html', '/cookies.html', '/data-subject-rights.html',
-    '/suggestions.html', '/application.html', '/store.html',
-    '/contact-thanks.html', '/404.html',
-    '/store?store=fdroid', '/store?store=google-play',
-    '/application?source=fdroid&id=1&name=MTA%20Net%20Blocker'
-  ];
-  const hilltop = /hilltop\s*ads?|hilltopads?\.(?:com|net)|hilltopads?/i;
-  for (const path of pages) {
-    const response = await page.request.get(path);
-    expect(response.status(), 'Page should load: ' + path).toBe(200);
-    const html = await response.text();
-    expect(html, 'HilltopAds must be absent: ' + path).not.toMatch(hilltop);
-    expect(html, 'Adcash library must be present: ' + path).toContain('acscdn.com/script/aclib.js');
-    expect(html, 'Shared Adcash initializer must be present: ' + path).toContain('js/adcash.js');
-    expect(html, 'Top 728x90 Adcash slot must be present: ' + path).toContain('class="mta-ad-slot mta-ad-slot-top"');
-    expect(html, 'Bottom 300x250 Adcash slot must be present: ' + path).toContain('class="mta-ad-slot mta-ad-slot-bottom"');
-    expect(html, 'Top Adcash zone must be configured: ' + path).toContain('data-ad-zone="12478774"');
-    expect(html, 'Bottom Adcash zone must be configured: ' + path).toContain('data-ad-zone="12478782"');
-    expect(html, 'Inline banner code must not be embedded in HTML: ' + path).not.toMatch(/aclib\.runBanner\s*\(/i);
-  }
-});
-
-test('shared Adcash initializer waits for visible carousel slides and never exposes provider code as text', async ({ page }) => {
-  await page.route('**/acscdn.com/script/aclib.js', route => route.fulfill({
-    status: 200,
-    contentType: 'application/javascript',
-    body: "window.__mtaAdcashZoneIds = []; window.aclib = { runBanner: function (options) { window.__mtaAdcashZoneIds.push(options.zoneId); var frame = document.createElement('iframe'); frame.title = 'Advertisement'; frame.src = 'about:blank'; document.querySelector(options.renderIn).appendChild(frame); } };"
-  }));
-  await page.setViewportSize({ width: 1280, height: 800 });
-  await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-  const topSlot = page.locator('.mta-ad-slot-top');
-  const bottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(topSlot).toHaveCount(1);
-  await expect(bottomSlot).toBeVisible();
-  await expect(bottomSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
-
-  await page.locator('[data-carousel-to="1"]').click();
-  await expect(topSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await page.locator('[data-carousel-to="2"]').click();
-  await expect(topSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478774']);
-
-  for (const slot of [topSlot, bottomSlot]) {
-    const visibleText = await slot.evaluate(element => Array.from(element.childNodes).filter(node => node.nodeType !== Node.ELEMENT_NODE || !["SCRIPT", "STYLE"].includes(node.tagName)).map(node => node.textContent || "").join(" ").trim());
-    expect(visibleText).not.toContain('aclib.runBanner');
-    expect(visibleText).not.toContain('zoneId');
-    expect(visibleText).not.toContain('12478774');
-    expect(visibleText).not.toContain('12478782');
-    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-  }
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.reload({ waitUntil: 'domcontentloaded' });
-  const mobileTopSlot = page.locator('.mta-ad-slot-top');
-  const mobileBottomSlot = page.locator('.mta-ad-slot-bottom');
-  await expect(mobileBottomSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect(mobileTopSlot).not.toHaveAttribute('data-ad-status', 'requested');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782']);
-  await page.locator('[data-carousel-to="2"]').click();
-  await expect(mobileTopSlot).toHaveAttribute('data-ad-status', 'creative-inserted');
-  await expect.poll(() => page.evaluate(() => window.__mtaAdcashZoneIds)).toEqual(['12478782', '12478782']);
-  for (const slot of [mobileTopSlot, mobileBottomSlot]) {
-    const visibleText = await slot.evaluate(element => element.innerText);
-    expect(visibleText).not.toContain('aclib.runBanner');
-    expect(visibleText).not.toContain('zoneId');
-    expect(visibleText).not.toContain('12478782');
-    await expect(slot.locator('iframe[title="Advertisement"]')).toHaveCount(1);
-    await expect(slot.locator('script')).toHaveCount(0);
-  }
+  const ads = await page.request.get('/ads.txt');
+  expect(ads.status()).toBe(200);
+  expect(await ads.text()).toContain('google.com, pub-8004171697196640, DIRECT, f08c47fec0942fa0');
 });
 
 test('corporate homepage leads with company identity and features only the released product', async ({ page }) => {
@@ -410,33 +414,21 @@ test('corporate homepage leads with company identity and features only the relea
   await expect(page.locator('.mta-home-contact')).toBeVisible();
 });
 
-test('cinematic homepage carousel animates the MTA logo, projects, and embedded Adcash slide', async ({ page }) => {
+test('cinematic homepage carousel animates the MTA logo and project slides', async ({ page }) => {
   await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
   const carousel = page.locator('[data-mta-carousel]');
   await expect(carousel).toBeVisible();
-  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(3);
+  await expect(carousel.locator('[data-carousel-slide]')).toHaveCount(2);
   await expect(carousel).toHaveAttribute('data-autoplay', '4200');
   await expect(carousel.locator('.mta-cinema-logo img')).toHaveAttribute('src', 'images/mta-logo-square.webp');
   await expect(carousel.locator('[data-carousel-slide]').nth(0)).toBeVisible();
   await carousel.locator('[data-carousel-next]').click();
   await expect(carousel.locator('[data-carousel-slide]').nth(1)).toBeVisible();
   await expect(carousel.locator('.mta-motion-app')).toHaveCount(4);
-  await carousel.locator('[data-carousel-to="2"]').click();
-  await expect(carousel.locator('[data-carousel-slide]').nth(2)).toBeVisible();
-  await expect(carousel.locator('.mta-ad-slot-top')).toBeVisible();
-  await expect(carousel.locator('.mta-ad-slot-top')).toHaveAttribute('data-ad-zone', '12478774');
-  await expect(carousel.locator('[data-carousel-pause]')).toHaveCount(0);
   await expect(carousel.locator('.mta-motion-app img')).toHaveCount(5);
-  const previews = carousel.locator('.mta-motion-app .mta-motion-app-preview');
-  await expect(previews).toHaveCount(1);
-  for (const image of await previews.all()) {
-    await expect(image).toHaveAttribute('src', /images\/project-.*\.svg$/);
-  }
-  const netBlockerIcon = carousel.locator('.mta-motion-app .mta-motion-app-app-icon');
-  await expect(netBlockerIcon).toHaveCount(1);
-  await expect(netBlockerIcon).toHaveAttribute('src', 'images/apps/mta-net-blocker.svg');
+  await expect(carousel.locator('.mta-motion-app .mta-motion-app-preview')).toHaveCount(1);
+  await expect(carousel.locator('.mta-motion-app .mta-motion-app-app-icon')).toHaveCount(1);
 });
-
 
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -504,5 +496,137 @@ test('homepage carousel advances automatically and supports touch swipe', async 
   const carousel = page.locator('[data-mta-carousel]');
   await carousel.dispatchEvent('pointerdown', { pointerType: 'touch', pointerId: 7, clientX: 320, clientY: 350 });
   await carousel.dispatchEvent('pointerup', { pointerType: 'touch', pointerId: 7, clientX: 210, clientY: 352 });
-  await expect(slides.nth(2)).toBeVisible();
+  await expect(slides.nth(0)).toBeVisible();
+});
+test('public content pages expose unique titles, descriptions, canonical URLs and valid JSON-LD', async ({ page }) => {
+  const paths = ['/','/about.html','/projects.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
+  const titles = new Set();
+  const canonicals = new Set();
+  for (const path of paths) {
+    const response = await page.request.get(path);
+    expect(response.status(), path).toBe(200);
+    const html = await response.text();
+    const title = html.match(/<title[^>]*>(.*?)<\/title>/i)?.[1]?.trim() || '';
+    const description = html.match(/<meta\s+name=["']description["']\s+content=["']([^"']+)["']/i)?.[1]?.trim() || '';
+    const canonical = html.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i)?.[1] || '';
+    expect(title.length, path + ' title').toBeGreaterThan(12);
+    expect(titles.has(title), path + ' duplicate title').toBe(false);
+    titles.add(title);
+    expect(description.length, path + ' description').toBeGreaterThan(60);
+    expect(canonical, path + ' canonical').toMatch(/^https:\/\//);
+    expect(canonicals.has(canonical), path + ' duplicate canonical').toBe(false);
+    canonicals.add(canonical);
+    const blocks = [...html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+    expect(blocks.length, path + ' JSON-LD').toBeGreaterThan(0);
+    for (const block of blocks) expect(() => JSON.parse(block[1])).not.toThrow();
+  }
+});
+
+test('internal links across the public site resolve without broken routes', async ({ page }) => {
+  const pages = [
+    '/','/about.html','/projects.html','/apps.html','/innovation.html','/knowledge.html',
+    '/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html',
+    '/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'
+  ];
+  const checked = new Set();
+  const base = new URL('http://127.0.0.1:8788');
+  for (const path of pages) {
+    const response = await page.request.get(path);
+    expect(response.status(), 'Source page should load: ' + path).toBe(200);
+    const html = await response.text();
+    const hrefs = [...html.matchAll(/<a\b[^>]*href=["']([^"']+)["']/gi)].map(match => match[1]);
+    for (const href of hrefs) {
+      if (!href || href.startsWith('#') || /^(mailto:|tel:|javascript:|data:|https?:|\/\/)/i.test(href)) continue;
+      const url = new URL(href, base.origin + path);
+      if (url.origin !== base.origin) continue;
+      url.hash = '';
+      const target = url.pathname + url.search;
+      if (checked.has(target)) continue;
+      checked.add(target);
+      const linked = await page.request.get(target, { maxRedirects: 0 });
+      if ([301, 302, 307, 308].includes(linked.status())) {
+        const location = linked.headers()['location'];
+        expect(location, 'Redirect must declare a destination: ' + target).toBeTruthy();
+        const destination = new URL(location, base.origin + target);
+        expect(destination.origin, 'Internal link must not redirect off-site: ' + target).toBe(base.origin);
+        const finalResponse = await page.request.get(destination.pathname + destination.search, { maxRedirects: 0 });
+        expect(finalResponse.status(), 'Redirect destination for ' + target).toBe(200);
+      } else {
+        expect(linked.status(), 'Internal link ' + href + ' from ' + path).toBe(200);
+      }
+    }
+  }
+  expect(checked.size).toBeGreaterThan(20);
+});
+
+test('404 page is excluded from indexing and does not declare a canonical entity URL', async ({ page }) => {
+  const response = await page.goto('/missing-seo-audit-route');
+  expect(response.status()).toBe(404);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toMatch(/<link[^>]+rel=["']canonical["']/i);
+  expect(html).not.toContain('application/ld+json');
+});
+
+test('data rights page suppresses GA4 on local preview hosts', async ({ page }) => {
+  const response = await page.goto('/data-subject-rights.html');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).not.toContain('G-PLS74VD22C');
+  expect(html).not.toContain('googletagmanager.com/gtag/js');
+});
+
+test('base store route stays noindex until a specific connected store is selected', async ({ page }) => {
+  const response = await page.goto('/store');
+  expect(response.status()).toBe(200);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex,follow');
+});
+
+test('unknown routes return a real HTTP 404 response', async ({ page }) => {
+  const response = await page.request.get('/this-route-must-not-exist-seo-check');
+  expect(response.status()).toBe(404);
+});
+
+test('application detail SSR matches exact source IDs and normalizes canonical query parameters', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=1&name=MTA%20Net%20Blocker&utm_source=automated-test');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('MTA Net Blocker');
+  expect(html).toContain('id="application-ssr-schema"');
+  expect(html).toContain('SoftwareApplication');
+  expect(html).not.toContain('utm_source');
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+});
+
+test('application browser profile renders source metadata and preserves normalized canonical', async ({ page }) => {
+  await page.goto('/application?source=fdroid&store=fdroid&id=1&name=MTA%20Net%20Blocker&utm_campaign=check', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#application-name')).toHaveText('MTA Net Blocker');
+  await expect(page.locator('#application-source-metadata')).toBeVisible();
+  await expect(page.locator('#application-extra-facts')).toContainText('1.0.1');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/application\?source=fdroid&store=fdroid&id=1&name=/);
+  await expect(page.locator('link[rel="canonical"]')).not.toHaveAttribute('href', /utm_campaign/);
+});
+
+test('application SSR refuses a name-only match when the source ID is wrong', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=does-not-exist&name=MTA%20Net%20Blocker');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toContain('id="application-ssr-schema"');
+});
+
+test('application profiles with insufficient source descriptions remain noindex and omit SoftwareApplication schema', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=2&name=Fixture%20Application%200001');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
+  expect(html).not.toContain('id="application-ssr-schema"');
+  expect(html).toContain('لم يوفر مصدر البيانات وصفاً كافياً');
+});
+
+test('application detail pages keep noindex when required identifiers are missing', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']noindex,follow["']/i);
 });

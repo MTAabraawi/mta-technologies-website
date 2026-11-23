@@ -7,13 +7,14 @@ const rows = Array.from({ length: total }, (_, i) => ({
   platform: 'android',
   name: i === 0 ? 'MTA Net Blocker' : 'Fixture Application ' + String(i).padStart(4, '0'),
   developer: i === 0 ? 'MTA TECHNOLOGIES' : 'Fixture Publisher',
-  summary: 'Deterministic catalogue fixture for proxy integration tests',
+  summary: i === 1 ? '' : 'Deterministic catalogue fixture for proxy integration tests',
   description: '',
   category: i % 2 === 0 ? 'utilities' : 'productivity',
   license: null,
   source_url: 'https://example.org/apps/' + (i + 1),
   app_url: 'https://example.org/apps/' + (i + 1),
-  icon_url: i === 0 ? 'https://www.mtahqq.dpdns.org/images/mta-net-blocker-icon.png' : 'https://example.org/icon.png'
+  icon_url: i === 0 ? 'https://www.mtahqq.dpdns.org/images/mta-net-blocker-icon.png' : 'https://example.org/icon.png',
+  metadata_json: i === 0 ? { versionString: '1.0.1', minSdkVersion: '26' } : {}
 }));
 http.createServer((req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1:8789');
@@ -27,11 +28,12 @@ http.createServer((req, res) => {
     const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit') || 50)));
     const offset = Math.max(0, Number(url.searchParams.get('offset') || 0));
     const requestedSource = url.searchParams.get('source');
+    const externalId = url.searchParams.get('external_id');
     const query = String(url.searchParams.get('q') || '').trim().toLocaleLowerCase();
     const platform = String(url.searchParams.get('platform') || '').trim().toLocaleLowerCase();
     const matched = rows.filter(row => {
       const searchable = [row.name, row.developer, row.summary, row.description].join(' ').toLocaleLowerCase();
-      return (!query || searchable.includes(query)) && (!platform || row.platform.toLocaleLowerCase() === platform);
+      return (!query || searchable.includes(query)) && (!platform || row.platform.toLocaleLowerCase() === platform) && (!externalId || row.external_id === externalId);
     });
     const filtered = requestedSource ? matched.map(row => ({ ...row, source: requestedSource })) : matched;
     res.setHeader('x-total-count', String(filtered.length));

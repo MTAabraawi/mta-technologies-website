@@ -1,31 +1,22 @@
-name: Optimize brand images
+name: Optimize brand images (review artifact only)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/optimize-brand-assets.yml'
-      - 'scripts/optimize-brand-assets.mjs'
-      - 'images/mta-logo-horizontal.png'
-      - 'images/mta-logo-square.png'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: optimize-brand-images
-  cancel-in-progress: false
+  group: optimize-brand-images-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   optimize:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - name: Check out repository
+      - name: Check out selected ref
         uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -33,20 +24,23 @@ jobs:
           node-version: 22
 
       - name: Install image encoder
-        run: npm install --no-save sharp
+        run: npm install --no-save --no-package-lock sharp
 
       - name: Generate modern logo formats and update references
         run: node scripts/optimize-brand-assets.mjs
 
-      - name: Commit optimized assets
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add images/mta-logo-horizontal.webp images/mta-logo-horizontal.avif images/mta-logo-square.webp images/mta-logo-square.avif
-          git add -u
-          if git diff --cached --quiet; then
-            echo "No optimized image changes to commit."
-          else
-            git commit -m "Optimize brand logos as WebP and AVIF"
-            git push origin HEAD:main
-          fi
+      - name: Create review patch
+        run: git diff --binary > brand-assets-review.patch
+
+      - name: Upload optimized assets and review patch (no Git push)
+        uses: actions/upload-artifact@v4
+        with:
+          name: optimized-brand-assets-review
+          path: |
+            images/mta-logo-horizontal.webp
+            images/mta-logo-horizontal.avif
+            images/mta-logo-square.webp
+            images/mta-logo-square.avif
+            brand-assets-review.patch
+          if-no-files-found: error
+          retention-days: 14

@@ -1,10 +1,14 @@
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const STORE_NAMES = {
-  "fdroid":"F-Droid","izzyondroid":"IzzyOnDroid","apple-app-store":"Apple App Store",
+  "google-play":"Google Play","fdroid":"F-Droid","izzyondroid":"IzzyOnDroid","apple-app-store":"Apple App Store",
   "mac-app-store":"Mac App Store","winget":"WinGet","chocolatey":"Chocolatey","bluejetty-app-index":"Blue Jetty App Index","openuse":"OpenUse","flathub":"Flathub",
   "snap-store":"Snap Store","arch-linux":"Arch Linux Packages",
   "debian-packages":"Debian Packages","homebrew":"Homebrew Cask",
-  "steam":"Steam","mta-web-apps":"MTA Web Apps"
+  "steam":"Steam","mta-web-apps":"MTA Web Apps",
+  "fedora-packages":"Fedora Packages","firefox-addons":"Firefox Add-ons",
+  "wordpress-plugins":"WordPress Plugin Directory","homebrew-formulae":"Homebrew Formulae",
+  "scoop":"Scoop Buckets","gnome-extensions":"GNOME Shell Extensions",
+  "alpine-linux":"Alpine Linux Packages","jetbrains-marketplace":"JetBrains Marketplace"
 };
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, ch => ({
@@ -58,29 +62,33 @@ export async function onRequest(context) {
   const id = url.searchParams.get("id") || "";
   const name = url.searchParams.get("name") || "";
   const canonicalOrigin = (context.env && context.env.MTA_SITE_ORIGIN) || "https://www.mtahqq.dpdns.org";
-  const canonicalUrl = canonicalOrigin + url.pathname + url.search;
+  const canonicalParams = new URLSearchParams();
+  if (source) canonicalParams.set("source", source);
+  if (store) canonicalParams.set("store", store);
+  if (id) canonicalParams.set("id", id);
+  if (name) canonicalParams.set("name", name);
+  const canonicalUrl = canonicalOrigin + "/application" + (canonicalParams.size ? "?" + canonicalParams.toString() : "");
   const engine = (context.env && context.env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
   try {
     if (!source || !id || !name) throw new Error("Missing app reference");
     const api = new URL("/api/v1/apps", engine);
     api.searchParams.set("source", source);
-    api.searchParams.set("q", name);
-    api.searchParams.set("limit", "100");
-    api.searchParams.set("offset", "0");
+    api.searchParams.set("external_id", id);
     const upstream = await fetch(api, { headers: { accept: "application/json" }, cf: { cacheTtl: 0 } });
     if (!upstream.ok) throw new Error("Application API HTTP " + upstream.status);
     const rows = await upstream.json();
     if (!Array.isArray(rows)) throw new Error("Invalid application response");
-    const app = rows.find(row => String(row.external_id || row.id || "") === id) ||
-      rows.find(row => String(row.name || "").toLocaleLowerCase() === name.toLocaleLowerCase());
+    const app = rows.find(row => String(row.external_id || row.id || "") === id);
     if (!app) throw new Error("Application not found");
     const title = String(app.name || name);
-    const summary = String(app.summary || app.description || "Application details and source information from the MTA directory.").slice(0, 500);
-    const description = String(app.description || app.summary || "Review the original publisher listing for current application details.").slice(0, 5000);
+    const sourceDescription = [app.summary, app.description].find(value => typeof value === "string" && value.trim().length >= 40) || "";
+    const hasSubstantiveContent = Boolean(sourceDescription);
+    const summary = String(sourceDescription || "لم يوفر مصدر البيانات وصفاً كافياً لهذا التطبيق بعد. راجع صفحة المصدر الأصلية للتحقق من التفاصيل.").slice(0, 500);
+    const description = String(app.description || app.summary || "لا تتوفر تفاصيل وصفية كافية للفهرسة حالياً. راجع صفحة المصدر الأصلية للحصول على المعلومات المحدثة.").slice(0, 5000);
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
     html = meta(html, "description", summary);
-    html = meta(html, "robots", "index,follow");
+    html = meta(html, "robots", hasSubstantiveContent ? "index,follow" : "noindex,follow");
     html = canonical(html, canonicalUrl);
     html = setIdText(html, "application-name", title);
     html = setIdText(html, "application-breadcrumb", title);
@@ -113,7 +121,8 @@ export async function onRequest(context) {
       html = html.replace('<span id="application-icon-fallback" class="store-app-icon-fallback">MTA</span>',
         '<span id="application-icon-fallback" class="store-app-icon-fallback">' + esc(initials) + '</span>');
     }
-    const schema = {
+    if (hasSubstantiveContent) {
+      const schema = {
       "@context":"https://schema.org","@type":"SoftwareApplication",
       "name":title,"description":summary,"url":canonicalUrl,
       "operatingSystem":String(app.platform || "Unspecified"),
@@ -123,7 +132,8 @@ export async function onRequest(context) {
       "sameAs":sourceUrl || undefined
     };
     const json = '<script type="application/ld+json" id="application-ssr-schema">' + JSON.stringify(schema).replace(/</g,"\\u003c") + "</script>";
-    html = html.replace("</head>", json + "</head>");
+      html = html.replace("</head>", json + "</head>");
+    }
   } catch (error) {
     console.error("MTA application SSR failed:", error);
     html = meta(html, "robots", "noindex,follow");

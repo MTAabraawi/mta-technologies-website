@@ -34,10 +34,10 @@
 .mta-projects-motion-core{position:absolute;left:50%;top:50%;display:grid;place-items:center;width:74px;height:74px;border:1px solid rgba(56,189,248,.4);border-radius:50%;background:#071326;box-shadow:0 0 32px rgba(56,189,248,.25);transform:translate(-50%,-50%);animation:mta-core-pulse 3s ease-in-out infinite}
 .mta-projects-motion-core img{width:75%;height:75%;object-fit:contain}
 .mta-slide-cta{display:table;margin:1rem auto 0;color:#7dd3fc;text-decoration:none;font-weight:800;font-size:.82rem}
-.mta-home-slide-ad{display:flex;flex-direction:column;justify-content:center;align-items:center;grid-template-columns:1fr;text-align:center}
-.mta-cinema-ad-frame{width:min(100%,780px);min-height:180px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.65rem;padding:1.1rem;border:1px solid rgba(56,189,248,.24);border-radius:22px;background:linear-gradient(145deg,rgba(13,31,54,.9),rgba(5,13,26,.92));box-shadow:0 22px 65px rgba(0,0,0,.3);animation:mta-ad-glow 4s ease-in-out infinite}
-.mta-cinema-ad-frame .mta-ad-label{color:#9bb4d1;font-size:.68rem}
-.mta-cinema-ad-frame .mta-ad-slot-top{margin:.2rem auto;width:min(100%,728px);min-height:118px}
+
+
+
+
 .mta-carousel-controls{position:absolute;z-index:10;bottom:1.1rem;left:50%;display:flex;align-items:center;gap:.85rem;transform:translateX(-50%)}
 .mta-carousel-arrow,.mta-carousel-pause,.mta-carousel-dots button{display:grid;place-items:center;border:1px solid rgba(125,211,252,.3);background:rgba(5,15,30,.72);color:#e0f2fe;cursor:pointer}
 .mta-carousel-arrow,.mta-carousel-pause{width:34px;height:34px;border-radius:50%;font-size:1.15rem}
@@ -54,7 +54,7 @@
 @keyframes mta-grid-drift{to{background-position:46px 46px}}
 @keyframes mta-copy-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes mta-app-arrive{0%,8%{opacity:0;transform:translateY(22px) rotateY(-10deg) scale(.94)}18%,75%{opacity:1;transform:translateY(0) rotateY(0) scale(1)}90%,100%{opacity:0;transform:translateY(-14px) rotateY(8deg) scale(.96)}}
-@keyframes mta-ad-glow{0%,100%{box-shadow:0 22px 65px rgba(0,0,0,.3)}50%{box-shadow:0 22px 65px rgba(0,0,0,.3),0 0 35px rgba(56,189,248,.13)}}
+50%{box-shadow:0 22px 65px rgba(0,0,0,.3),0 0 35px rgba(56,189,248,.13)}}
 @media(max-width:760px){
  .mta-home-carousel,.mta-home-slide{min-height:650px}
  .mta-home-slide-brand{grid-template-columns:1fr;grid-template-rows:auto 220px;gap:1.4rem;padding:3rem 1.2rem 5rem;text-align:center}
@@ -66,8 +66,8 @@
  .mta-projects-motion-stage{grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:1.5rem auto}
  .mta-motion-app{min-height:115px;padding:.7rem .4rem}.mta-motion-app strong{font-size:.7rem}.mta-motion-app small{font-size:.6rem}
  .mta-projects-motion-core{width:55px;height:55px}
- .mta-home-slide-ad{padding:3rem 1rem 5rem}
- .mta-cinema-ad-frame{padding:.8rem;min-height:220px}
+ 
+ 
  .mta-carousel-controls{bottom:.8rem}
 }
 
@@ -149,19 +149,9 @@
   .mta-projects-motion-core { display:none; }
   .mta-slide-cta { margin-top:1rem; }
 
-  .mta-home-slide-ad { padding:4.5rem 2.5rem 5.5rem; }
-  .mta-cinema-ad-frame {
-    width:min(100%,900px);
-    min-height:190px;
-    padding:1.5rem 2rem;
-    border-radius:18px;
-  }
-  .mta-cinema-ad-frame .mta-ad-slot-top {
-    width:min(100%,728px);
-    min-height:112px;
-    margin:.3rem auto;
-    overflow:hidden;
-  }
+  
+  
+  
   .mta-carousel-controls { bottom:1.35rem; }
   .mta-carousel-arrow,.mta-carousel-pause { width:38px; height:38px; }
   .mta-home-intro,.mta-home-projects,.mta-home-platforms,.mta-home-contact {
@@ -196,143 +186,11 @@
   .mta-motion-app-two { animation-delay:1.05s; }
   .mta-motion-app-three { animation-delay:2.1s; }
   .mta-motion-app-four { animation-delay:3.15s; }
-  .mta-cinema-ad-frame .mta-ad-slot-top {
-    width:min(100%,300px);
-    min-height:278px;
-    overflow:hidden;
-  }
+  
 }
 
 @media (max-width: 767px) {
-  .mta-corporate-home .mta-ad-slot-bottom[data-ad-status="skipped-responsive"] {
-    display:none;
-  }
+  
 }
 
 
-/* Keep dynamically executed Adcash source code out of the visible page. */
-.mta-ad-slot > script,
-.mta-ad-slot > script[hidden] {
-  display: none !important;
-}
-
-/* Explicit two-column desktop layout for the cinematic project stage. */
-@media (min-width: 761px) {
-  body.mta-home-refresh .mta-home-slide-projects .mta-projects-motion-stage {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-auto-flow: row;
-  }
-}
-
-
-/* Corporate portfolio artwork and mobile-first visual rhythm. */
-.mta-project-art-stage{width:min(100%,920px);gap:1rem}
-.mta-project-art-stage .mta-motion-app{display:flex;min-height:0;padding:.75rem;gap:.65rem;text-decoration:none;color:#f8fafc;opacity:1;animation:mta-art-card-enter .7s both;overflow:hidden}
-.mta-project-art-stage .mta-motion-app img{display:block;width:100%;height:clamp(112px,16vw,176px);object-fit:cover;border-radius:12px;border:1px solid rgba(125,211,252,.18);transition:transform .45s ease}
-.mta-project-art-stage .mta-motion-app .mta-motion-app-app-icon{width:52px;height:52px;flex:0 0 52px;object-fit:contain;padding:4px;border-radius:14px;border:1px solid rgba(56,189,248,.38);background:rgba(56,189,248,.1);transition:transform .3s ease}
-.mta-project-art-stage .mta-motion-app:hover .mta-motion-app-app-icon{transform:scale(1.06)}
-.mta-project-art-stage .mta-motion-app:hover img{transform:scale(1.035)}
-.mta-project-art-stage .mta-motion-app strong{font-size:.9rem}
-.mta-project-art-stage .mta-motion-app small{font-size:.72rem;color:#9fc2df}
-.mta-project-art-stage .mta-motion-app-one{animation-delay:.08s}
-.mta-project-art-stage .mta-motion-app-two{animation-delay:.18s}
-.mta-project-art-stage .mta-motion-app-three{animation-delay:.28s}
-.mta-project-art-stage .mta-motion-app-four{animation-delay:.38s}
-.mta-project-art-stage .mta-motion-app:hover{border-color:rgba(56,189,248,.6);transform:translateY(-3px)}
-@keyframes mta-art-card-enter{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.mta-home-featured-work .mta-home-section-head{margin-bottom:1.6rem}
-.mta-home-featured-product{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(1.25rem,4vw,3.5rem);padding:clamp(1rem,3vw,2rem);border:1px solid var(--border-color);border-radius:24px;background:linear-gradient(135deg,rgba(14,22,41,.96),rgba(8,20,37,.9))}
-.mta-home-featured-product>img{display:block;width:100%;aspect-ratio:1.56;object-fit:cover;border-radius:16px}
-.mta-home-featured-product h3{margin:.5rem 0;font-size:clamp(1.35rem,3vw,2rem)}
-.mta-home-featured-product p{max-width:520px;color:var(--text-secondary);line-height:1.9;margin-bottom:1rem}
-.mta-home-featured-product .mta-status{display:inline-flex;margin-inline-end:.8rem}
-.mta-home-featured-product .mta-home-card-link{display:inline-flex;margin-top:1rem}
-.mta-home-actions{gap:.5rem}
-@media(max-width:760px){
- .mta-project-art-stage{grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem}
- .mta-project-art-stage .mta-motion-app{padding:.5rem;border-radius:14px}
- .mta-project-art-stage .mta-motion-app img{height:105px}
- .mta-project-art-stage .mta-motion-app strong{font-size:.72rem}
- .mta-project-art-stage .mta-motion-app small{font-size:.62rem}
- .mta-home-featured-product{grid-template-columns:1fr;gap:1rem}
- .mta-home-featured-product>img{aspect-ratio:1.6}
- .mta-home-featured-product>div{padding:.25rem .2rem .5rem}
-}
-
-
-
-/* Ensure homepage project artwork remains visible independently of card animations. */
-.mta-home-refresh .mta-home-featured-product > svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1.56;
-  max-width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  flex: 0 0 auto;
-}
-.mta-home-refresh .mta-home-featured-product > img,
-.mta-home-refresh .mta-project-art-stage .mta-motion-app > img:not(.mta-motion-app-app-icon) {
-  display: block;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative;
-  z-index: 1;
-  flex: 0 0 auto;
-  max-width: 100%;
-  animation: none !important;
-}
-.mta-home-refresh .mta-home-featured-product > img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1.56;
-  object-fit: contain;
-}
-.mta-home-refresh .mta-project-art-stage .mta-motion-app > img:not(.mta-motion-app-app-icon) {
-  width: 100%;
-  height: clamp(112px, 16vw, 176px);
-  object-fit: contain;
-}
-.mta-home-refresh .mta-project-art-stage .mta-motion-app > img.mta-motion-app-app-icon {
-  display:block;
-  width:52px;
-  height:52px;
-  min-width:52px;
-  max-width:52px;
-  flex:0 0 52px;
-  object-fit:contain;
-  padding:4px;
-  border-radius:14px;
-}
-@media (max-width: 760px) {
-  .mta-home-refresh .mta-project-art-stage .mta-motion-app > img {
-    height: 105px;
-  }
-  .mta-home-refresh .mta-home-featured-product > img {
-    aspect-ratio: 1.6;
-  }
-}
-
-/* Keep the Net Blocker interface artwork visible as a distinct preview image. */
-.mta-home-refresh .mta-project-art-stage .mta-motion-app > img.mta-motion-app-preview {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 112px;
-  max-height: 176px;
-  aspect-ratio: 36 / 23;
-  object-fit: contain !important;
-  flex: 0 0 auto !important;
-  align-self: stretch;
-  animation: none !important;
-}
-@media (max-width: 760px) {
-  .mta-home-refresh .mta-project-art-stage .mta-motion-app > img.mta-motion-app-preview {
-    min-height: 105px;
-    max-height: 105px;
-  }
-}
