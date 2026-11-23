@@ -53,5 +53,20 @@
 
   <script src="js/main.js"></script>
 
+
+<script>
+(function () {
+  let submittedAt = 0;
+  try {
+    submittedAt = Number(sessionStorage.getItem('mta:lead-pending') || 0);
+    sessionStorage.removeItem('mta:lead-pending');
+  } catch (_) {}
+  const age = Date.now() - submittedAt;
+  if (submittedAt > 0 && age >= 0 && age < 10 * 60 * 1000 && typeof window.gtag === 'function') {
+    window.gtag('event', 'generate_lead', { method: 'visitor_suggestion_form' });
+  }
+})();
+</script>
+
 </body>
 </html>
