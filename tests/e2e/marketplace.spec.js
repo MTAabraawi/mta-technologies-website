@@ -259,7 +259,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(54);
+  await expect(page.locator('.store-picker-card')).toHaveCount(55);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
@@ -345,7 +345,7 @@ test('applications without original artwork still receive a visible icon fallbac
 
 test('all public HTML pages use the approved AdSense publisher and contain no retired ad network code', async ({ page }) => {
   const pages = [
-    '/index.html','/about.html','/app-mta-net-blocker.html','/application.html',
+    '/index.html','/about.html','/app-mta-net-blocker.html','/application.html?source=fdroid&id=1&name=MTA%20Net%20Blocker',
     '/apps.html','/contact.html','/cookies.html','/data-subject-rights.html',
     '/disclaimer.html','/gallery.html','/innovation.html','/knowledge.html',
     '/privacy-policy.html','/projects.html','/store.html','/suggestions.html','/terms.html',
