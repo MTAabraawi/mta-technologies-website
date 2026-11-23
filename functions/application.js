@@ -118,8 +118,8 @@ export async function onRequest(context) {
     const extraFacts = [
       ["الإصدار", version],
       ["التنزيلات لدى المصدر", downloads],
-      ["التقييم", rating],
-      ["عدد التقييمات", ratingCount],
+      ["التقييم لدى المصدر", rating],
+      ["عدد التقييمات لدى المصدر", ratingCount],
       ["تاريخ النشر أو التحديث", updated],
       ["الناشر موثّق", verified ? "نعم" : ""]
     ].filter(pair => pair[1] !== undefined && pair[1] !== null && String(pair[1]).trim() !== "");

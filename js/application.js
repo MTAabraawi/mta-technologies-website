@@ -2,7 +2,7 @@
 const api=String(window.MTA_MARKETPLACE_API||"").replace(/\/$/,""),params=new URLSearchParams(location.search),source=params.get("source")||"",storeKey=params.get("store")||source,externalId=params.get("id")||"",requestedName=params.get("name")||"";
 const $=id=>document.getElementById(id),en=()=>document.documentElement.lang==="en",w=(ar,eng)=>en()?eng:ar,safe=value=>{try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch{return""}};
 function metadata(value){if(value&&typeof value==="object")return value;if(typeof value==="string"){try{return JSON.parse(value)}catch{}}return{}}
-function normalizedMetadata(app){const m=metadata(app.metadata_json);return{...m,versionString:m.versionString||m.version||m.latest_version,estimatedDownloads:m.estimatedDownloads??m.downloadCount??m.download_count,rating:m.rating??m.averageRating??m.average_rating,ratingCount:m.ratingCount??m.reviewCount??m.review_count,lastAppUpdateTime:m.lastAppUpdateTime??m.published_at??m.updated_at,verifiedPublisher:m.verifiedPublisher??m.verified_publisher??m.verified}}
+function normalizedMetadata(app){const m=metadata(app.metadata_json);return{...m,versionString:m.versionString||m.version||m.latest_version,estimatedDownloads:m.estimatedDownloads??m.estimated_downloads,downloadCount:m.downloadCount??m.download_count,rating:m.rating??m.averageRating??m.average_rating,ratingCount:m.ratingCount??m.reviewCount??m.review_count,lastAppUpdateTime:m.lastAppUpdateTime??m.published_at??m.updated_at,verifiedPublisher:m.verifiedPublisher??m.verified_publisher??m.verified}}
 function fact(label,value){if(value==null||String(value).trim()==="")return;const dt=document.createElement("dt"),dd=document.createElement("dd");dt.textContent=label;dd.textContent=String(value);$("application-facts").append(dt,dd)}
 function renderSourceMetadata(app){
  const m=normalizedMetadata(app),root=$("application-source-metadata"),facts=$("application-extra-facts"),lists=$("application-metadata-lists"),shots=$("application-screenshots");
@@ -13,16 +13,16 @@ function renderSourceMetadata(app){
   ["price","السعر","Price"],["apkSize","حجم ملف التطبيق","App / IPA size"],
   ["maturityLevel","مستوى النضج العمري","Maturity level"],["minSdkVersion","أدنى إصدار Android","Minimum Android SDK"],
   ["maxSdkVersion","أقصى إصدار Android","Maximum Android SDK"],["supportsApp2SD","دعم التخزين الخارجي","External storage support"],
-  ["downloadsCategory","فئة التنزيلات","Downloads category"],["estimatedDownloads","التنزيلات التقديرية","Estimated downloads"],
+  ["downloadsCategory","فئة التنزيلات","Downloads category"],["estimatedDownloads","التنزيلات التقديرية","Estimated downloads"],["downloadCount","التنزيلات لدى المصدر","Downloads on this registry"],
   ["estimatedRecentDownloads","التنزيلات خلال آخر 30 يوماً","Estimated downloads (30 days)"],
-  ["rating","التقييم","Rating"],["recentRating","التقييم الحديث","Recent rating"],["ratingCount","عدد التقييمات","Rating count"],
+  ["rating","التقييم لدى المصدر","Source rating"],["recentRating","التقييم الحديث","Recent rating"],["ratingCount","عدد التقييمات لدى المصدر","Source review count"],
   ["rating1StarCount","تقييم نجمة واحدة","1-star ratings"],["rating2StarCount","تقييم نجمتين","2-star ratings"],
   ["rating3StarCount","تقييم ثلاث نجوم","3-star ratings"],["rating4StarCount","تقييم أربع نجوم","4-star ratings"],
   ["rating5StarCount","تقييم خمس نجوم","5-star ratings"],["plusOneCount","عدد +1","Google +1 count"],["commentCount","عدد التعليقات","Comment count"],["launchTime","تاريخ إطلاق التطبيق","App launch date"],["infoRefreshTime","آخر تحديث لبيانات AppBrain","AppBrain metadata refresh"],
   ["contentAdvisoryRating","التصنيف العمري في Apple","Apple age rating"],
   ["developerEmail","بريد المطور المنشور","Published developer email"],
   ["developerAddress","عنوان المطور المنشور","Published developer address"],
-  ["lastAppUpdateTime","آخر تحديث لدى المتجر","Store last update"]
+  ["lastAppUpdateTime","آخر تحديث لدى المصدر","Source last update"],["verifiedPublisher","توثيق الناشر","Verified publisher"]
  ];
  const dateValue=v=>{if(v==null||v==="")return v;const n=Number(v);if(Number.isFinite(n)&&n>1000000000){const d=new Date(n*1000);return Number.isNaN(d.getTime())?v:d.toLocaleDateString(en()?"en":"ar",{year:"numeric",month:"short",day:"numeric"})}return v};
  for(const [key,ar,eng] of fields){let v=m[key];if(["lastAppUpdateTime","launchTime","infoRefreshTime"].includes(key))v=dateValue(v);if(key==="apkSize"&&Number.isFinite(Number(v)))v=(Number(v)/1048576).toFixed(2)+" MB";if(v!==undefined&&v!==null&&String(value(v)).trim()!=="")factExtra(en()?eng:ar,value(v))}
