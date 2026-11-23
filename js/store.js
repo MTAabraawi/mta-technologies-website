@@ -123,7 +123,7 @@ else{
  if(!connected){const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
 }
 
-let offset=0,total=0,loading=false,exhausted=false,query="",timer=null,autoLoadPaused=false,autoLoadObserver=null;
+let offset=0,total=0,loading=false,exhausted=false,query="",timer=null,autoLoadPaused=false,autoLoadObserver=null,requestGeneration=0;
 const initialServerRenderedCount=grid.querySelectorAll(".store-app-card").length;
 function populateCategoryOptionsFromRenderedCards(){
  const select=$("store-category-filter");
@@ -182,7 +182,8 @@ function makeCard(app){
 function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
 function applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
 async function fetchPage(reset=false){
- if(!store?.source||loading||(!reset&&exhausted)||!API)return;
+ if(!store?.source||(!reset&&(loading||exhausted))||!API)return;
+ const requestId=++requestGeneration;
  let keepServerRendered=false;
  if(reset){autoLoadPaused=false;keepServerRendered=!query&&!platform.value&&initialServerRenderedCount>0;offset=0;exhausted=false;total=indexedTotal;if(!keepServerRendered)grid.replaceChildren();$("store-empty").hidden=true}
  loading=true;load.hidden=false;load.disabled=true;load.textContent=copy("جارٍ التحميل...","Loading...");
@@ -206,7 +207,7 @@ async function fetchPage(reset=false){
    if(attempt<2)await new Promise(resolve=>setTimeout(resolve,800*(attempt+1)));
   }
   if(!response||!response.ok)throw lastError||new Error("Catalogue request failed");
-  const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");autoLoadPaused=false;
+  const items=await response.json();if(!Array.isArray(items))throw new Error("Invalid catalogue response");if(requestId!==requestGeneration)return;autoLoadPaused=false;
   if(keepServerRendered)grid.replaceChildren();
   total=Number(response.headers.get("X-Total-Count")||total||0);
   if(offset===0){status.textContent=total>0?copy("متصل · "+total.toLocaleString()+" سجل مفهرس","Connected · "+total.toLocaleString()+" indexed records"):copy("نعمل على توفير التطبيقات قريباً","Apps integration coming soon");status.classList.toggle("is-connected",total>0);const robots=document.querySelector("meta[name=robots]");if(robots)robots.content=total>0?"index,follow":"noindex,follow"}
@@ -217,8 +218,8 @@ async function fetchPage(reset=false){
   count.textContent=total?total.toLocaleString()+" "+copy("سجل مفهرس","indexed records"):offset.toLocaleString()+" "+copy("تطبيق معروض","apps shown");
   $("store-results-note").textContent=total?copy("تُعرض بيانات المصدر على دفعات. إجمالي السجلات المفهرسة لهذا المصدر: "+total.toLocaleString(),"Results load in batches. Indexed records for this source: "+total.toLocaleString()):copy("نتائج من واجهة المصدر المتاحة لمحرك MTA.","Results from the source integration available to MTA.");
   load.hidden=exhausted;load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
- }catch(e){autoLoadPaused=true;console.error("Store catalogue fetch failed",e);if(keepServerRendered){offset=initialServerRenderedCount;status.textContent=copy("تعذر تحديث الاتصال؛ نعرض التطبيقات المحمّلة مسبقاً.","Live refresh failed; showing preloaded applications.");status.classList.add("is-connected");count.textContent=initialServerRenderedCount.toLocaleString()+" "+copy("تطبيقات معروضة","apps shown");$("store-results-note").textContent=copy("تعذر تحديث الدفعة الآن، لكن التطبيقات المحمّلة مسبقاً ما زالت متاحة. يمكنك إعادة المحاولة لتحميل المزيد.","The latest batch could not be refreshed, but preloaded applications remain available. Retry to load more.");}else if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
- finally{loading=false;load.disabled=false;if(autoLoadObserver){autoLoadObserver.unobserve(load);if(!load.hidden&&!autoLoadPaused)autoLoadObserver.observe(load)}}
+ }catch(e){if(requestId!==requestGeneration)return;autoLoadPaused=true;console.error("Store catalogue fetch failed",e);if(keepServerRendered){offset=initialServerRenderedCount;status.textContent=copy("تعذر تحديث الاتصال؛ نعرض التطبيقات المحمّلة مسبقاً.","Live refresh failed; showing preloaded applications.");status.classList.add("is-connected");count.textContent=initialServerRenderedCount.toLocaleString()+" "+copy("تطبيقات معروضة","apps shown");$("store-results-note").textContent=copy("تعذر تحديث الدفعة الآن، لكن التطبيقات المحمّلة مسبقاً ما زالت متاحة. يمكنك إعادة المحاولة لتحميل المزيد.","The latest batch could not be refreshed, but preloaded applications remain available. Retry to load more.");}else if(!offset)setEmpty(copy("تعذر الاتصال بكتالوج التطبيقات الآن. أعد المحاولة بعد قليل.","The app catalogue could not be reached. Please retry shortly."));load.hidden=false;load.disabled=false;load.textContent=copy("إعادة المحاولة","Retry");}
+ finally{if(requestId===requestGeneration){loading=false;load.disabled=false;if(autoLoadObserver){autoLoadObserver.unobserve(load);if(!load.hidden&&!autoLoadPaused)autoLoadObserver.observe(load)}}}
 }
 function setupAutomaticLoading(){
  if(!load||!("IntersectionObserver" in window))return;
