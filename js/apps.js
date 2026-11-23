@@ -45,9 +45,9 @@
   const platformName = value => ({
     android: "Android", ios: "iOS", windows: "Windows",
     macos: "macOS", linux: "Linux", web: "Web"
-  }[String(value || "").toLowerCase()] || String(value || "Other"));
+  }[String(value || "").toLowerCase()] || String(value || text("غير محدد", "Unspecified")));
   const categoryName = value => {
-    const raw = String(value || "Other").split(",")[0].trim().toLowerCase();
+    const raw = String(value || "").split(",")[0].trim().toLowerCase();
     const map = {
       games: "Games", game: "Games", security: "Security",
       productivity: "Productivity", education: "Education", office: "Office",
@@ -61,7 +61,7 @@
       weather: "Tools", travel: "Tools", finance: "Productivity",
       health: "Education", lifestyle: "Tools", food: "Tools", books: "Education"
     };
-    return map[raw] || (raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "Other");
+    return map[raw] || (raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : text("غير مصنف من المصدر", "Uncategorised by source"));
   };
 
   function makeCard(app) {
@@ -70,12 +70,12 @@
     card.dataset.dynamicApp = "true";
     const platforms = Array.isArray(app.platforms)
       ? app.platforms.map(platformName)
-      : String(app.platform || "Other").split(/\s*,\s*/).filter(Boolean).map(platformName);
+      : String(app.platform || text("غير محدد", "Unspecified")).split(/\s*,\s*/).filter(Boolean).map(platformName);
     const description = isEnglish()
-      ? (app.description_en || app.summary || app.description || "")
-      : (app.description_ar || app.summary || app.description || "");
+      ? (app.description_en || app.summary || app.description || text("لم يقدم المصدر وصفاً لهذا التطبيق.", "No description provided by source."))
+      : (app.description_ar || app.summary || app.description || text("لم يقدم المصدر وصفاً لهذا التطبيق.", "No description provided by source."));
     const name = String(app.app_name || app.name || "Application");
-    const dev = String(app.developer_name || app.developer || "Independent developer");
+    const dev = String(app.developer_name || app.developer || text("المطور غير محدد في المصدر", "Developer not specified by source"));
     const cat = categoryName(app.category);
     const categorySelect = document.getElementById("category-filter");
     if (categorySelect && cat && ![...categorySelect.options].some(option => option.value === cat)) {
@@ -96,14 +96,7 @@
     const icon = document.createElement("div");
     icon.className = "app-icon app-icon-image";
     const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
-    const homepageUrl = safeHttpsUrl(app.app_url || app.homepage || app.source_url);
-    let faviconUrl = "";
-    try {
-      if (homepageUrl) {
-        const host = new URL(homepageUrl).hostname.replace(/^www\./, "");
-        faviconUrl = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(host) + "&sz=128";
-      }
-    } catch {}
+    const iconUrl = safeHttpsUrl(app.icon_url || app.icon_path);
     const fallbackIcon = () => {
       const mark = document.createElement("span");
       mark.className = "app-icon-fallback";
@@ -129,8 +122,7 @@
       });
       icon.append(img);
     };
-    if (iconUrl) appendIconImage(iconUrl, faviconUrl && faviconUrl !== iconUrl ? faviconUrl : "");
-    else if (faviconUrl) appendIconImage(faviconUrl, "");
+    if (iconUrl) appendIconImage(iconUrl, "");
     else icon.append(fallbackIcon());
     top.append(icon);
     const status = document.createElement("span");
