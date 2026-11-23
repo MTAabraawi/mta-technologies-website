@@ -659,3 +659,11 @@ test('application SSR uses explicitly labelled icon metadata when the direct ico
   expect(html).toContain('src="https://example.org/publisher-icon.png"');
   expect(html).toContain('Fixture Application 0002 icon');
 });
+
+
+test('server-rendered store cards read publisher icon metadata and use an honest store placeholder', async ({ page }) => {
+  await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#store-logo')).toHaveAttribute('src', 'images/mta-logo-square.webp');
+  const metadataIcon = page.locator('.store-app-card').nth(2).locator('.store-app-icon');
+  await expect(metadataIcon).toHaveAttribute('src', 'https://example.org/publisher-icon.png');
+});
