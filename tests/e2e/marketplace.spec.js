@@ -426,10 +426,15 @@ test('cinematic homepage carousel animates the MTA logo, projects, and embedded 
   await expect(carousel.locator('.mta-ad-slot-top')).toBeVisible();
   await expect(carousel.locator('.mta-ad-slot-top')).toHaveAttribute('data-ad-zone', '12478774');
   await expect(carousel.locator('[data-carousel-pause]')).toHaveCount(0);
-  await expect(carousel.locator('.mta-motion-app img')).toHaveCount(4);
-  for (const image of await carousel.locator('.mta-motion-app img').all()) {
+  await expect(carousel.locator('.mta-motion-app img')).toHaveCount(5);
+  const previews = carousel.locator('.mta-motion-app .mta-motion-app-preview');
+  await expect(previews).toHaveCount(1);
+  for (const image of await previews.all()) {
     await expect(image).toHaveAttribute('src', /images\/project-.*\.svg$/);
   }
+  const netBlockerIcon = carousel.locator('.mta-motion-app .mta-motion-app-app-icon');
+  await expect(netBlockerIcon).toHaveCount(1);
+  await expect(netBlockerIcon).toHaveAttribute('src', 'images/apps/mta-net-blocker.svg');
 });
 
 

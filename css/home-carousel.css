@@ -229,6 +229,8 @@
 .mta-project-art-stage{width:min(100%,920px);gap:1rem}
 .mta-project-art-stage .mta-motion-app{display:flex;min-height:0;padding:.75rem;gap:.65rem;text-decoration:none;color:#f8fafc;opacity:1;animation:mta-art-card-enter .7s both;overflow:hidden}
 .mta-project-art-stage .mta-motion-app img{display:block;width:100%;height:clamp(112px,16vw,176px);object-fit:cover;border-radius:12px;border:1px solid rgba(125,211,252,.18);transition:transform .45s ease}
+.mta-project-art-stage .mta-motion-app .mta-motion-app-app-icon{width:52px;height:52px;flex:0 0 52px;object-fit:contain;padding:4px;border-radius:14px;border:1px solid rgba(56,189,248,.38);background:rgba(56,189,248,.1);transition:transform .3s ease}
+.mta-project-art-stage .mta-motion-app:hover .mta-motion-app-app-icon{transform:scale(1.06)}
 .mta-project-art-stage .mta-motion-app:hover img{transform:scale(1.035)}
 .mta-project-art-stage .mta-motion-app strong{font-size:.9rem}
 .mta-project-art-stage .mta-motion-app small{font-size:.72rem;color:#9fc2df}
