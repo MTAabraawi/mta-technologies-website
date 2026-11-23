@@ -348,7 +348,7 @@ test('all public HTML pages use the approved AdSense publisher and contain no re
     '/index.html','/about.html','/app-mta-net-blocker.html','/application.html?source=fdroid&id=1&name=MTA%20Net%20Blocker',
     '/apps.html','/contact.html','/cookies.html','/data-subject-rights.html',
     '/disclaimer.html','/gallery.html','/innovation.html','/knowledge.html',
-    '/privacy-policy.html','/projects.html','/store.html','/suggestions.html','/terms.html',
+    '/privacy-policy.html','/projects.html','/store.html?store=fdroid','/suggestions.html','/terms.html',
     '/contact-thanks.html','/404.html'
   ];
   const retired = /acscdn[.]com|aclib[.]js|js[/]adcash[.]js|12478774|12478782|12481106|mta-ad-slot|hilltopads?/i;
