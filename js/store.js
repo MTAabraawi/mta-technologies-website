@@ -106,9 +106,9 @@ const title=$("store-title"), subtitle=$("store-subtitle"), logo=$("store-logo")
 if(!store){$("store-results-note").textContent=copy("لم يتم العثور على المتجر المطلوب. ارجع إلى دليل المتاجر لاختيار متجر آخر.","Store not found. Return to the marketplace and choose another store.");$("store-catalogue-section").hidden=true;}
 else{
  title.textContent=store.name; $("breadcrumb-store").textContent=store.name; document.title=store.name+" | MTA TECHNOLOGIES"; const canonical=document.querySelector("link[rel=canonical]"); if(canonical)canonical.href=location.origin+location.pathname+"?store="+encodeURIComponent(key); const descriptionMeta=document.querySelector("meta[name=description]"); if(descriptionMeta)descriptionMeta.content=lang()?(store.name+" app catalogue on MTA. Browse available listings and original publisher links."):( "دليل "+store.name+" على MTA. تصفح التطبيقات المتاحة وروابط الناشرين الأصلية.");
- $("store-description").textContent=store.desc; subtitle.textContent=store.platforms.join(" · ");
+ $("store-description").textContent=copy(store.desc,store.descEn||store.desc); subtitle.textContent=store.platforms.join(" · ");
  const editorialIntro=$("store-editorial-intro"),editorialWhat=$("store-editorial-what"),editorialVerify=$("store-editorial-verify"),editorialAvailability=$("store-editorial-availability");
- if(editorialIntro)editorialIntro.textContent=lang()?("Browse "+store.name+" through MTA's source-aware catalogue. "+store.platforms.join(", ")+". "+store.desc):("تصفح "+store.name+" عبر دليل MTA مع توضيح مصدر البيانات وحالة الفهرسة. "+store.desc);
+ if(editorialIntro)editorialIntro.textContent=lang()?("Browse "+store.name+" through MTA's source-aware catalogue. "+store.platforms.join(", ")+". "+(store.descEn||store.desc)):("تصفح "+store.name+" عبر دليل MTA مع توضيح مصدر البيانات وحالة الفهرسة. "+store.desc);
  if(editorialWhat)editorialWhat.textContent=lang()?"Explore indexed app names, developers, categories, descriptions, platform compatibility and publisher icons when supplied.":"تصفح أسماء التطبيقات المفهرسة والمطورين والتصنيفات والأوصاف والمنصات والأيقونات التي يوفرها الناشر.";
  if(editorialVerify)editorialVerify.textContent=lang()?"MTA keeps each catalogue source separate, checks live indexed-record counts and links every listing to its original source.":"نفصل بيانات كل متجر عن غيره، ونتحقق من عدد السجلات المفهرسة فعلياً، ونربط كل تطبيق بصفحته الأصلية.";
  if(editorialAvailability)editorialAvailability.textContent=lang()?"Store availability, pricing and regional access are controlled by the original provider and may vary by country, device and account.":"تخضع إتاحة التطبيقات وأسعارها والوصول الإقليمي لسياسات المتجر الأصلي، وقد تختلف حسب البلد والجهاز والحساب.";
@@ -161,13 +161,13 @@ function makeCard(app){
  if(candidates.length){top.append(icon,badge);icon.src=candidates[0]}else{top.append(makeMonogram(),badge)}
  const h=document.createElement("h3");
  const detailParams=new URLSearchParams({source:String(app.source||store.source||""),store:key,id:String(app.external_id||app.id||""),name:String(app.name||"Application")});
- const detailUrl="application.html?"+detailParams.toString();
- const titleLink=document.createElement("a");titleLink.href=detailUrl;titleLink.textContent=app.name||"Application";titleLink.setAttribute("aria-label",copy("تفاصيل "+(app.name||"التطبيق"),"Details for "+(app.name||"application")));h.append(titleLink);
- const detailLink=document.createElement("a");detailLink.className="store-app-detail-link";detailLink.href=detailUrl;detailLink.textContent=copy("تفاصيل التطبيق داخل MTA","View app details on MTA");
+ const detailUrl=store?.curatedFile?(safe(app.source_url||app.app_url)||store.url):("application.html?"+detailParams.toString());
+ const titleLink=document.createElement("a");titleLink.href=detailUrl;titleLink.textContent=app.name||"Application";titleLink.setAttribute("aria-label",copy("تفاصيل "+(app.name||"التطبيق"),"Details for "+(app.name||"application")));if(store?.curatedFile){titleLink.target="_blank";titleLink.rel="noopener noreferrer"}h.append(titleLink);
+ const detailLink=document.createElement("a");detailLink.className="store-app-detail-link";detailLink.href=detailUrl;detailLink.textContent=copy("تفاصيل التطبيق داخل MTA","View app details on MTA");if(store?.curatedFile)detailLink.hidden=true;
  const meta=document.createElement("p");meta.className="store-app-meta";const platformLabel=app.platform==="pc-games"?"PC Games":app.platform;meta.textContent=[app.developer,platformLabel,app.category].filter(Boolean).join(" · ");
- const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=app.summary||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
- let details=null;const fullDescription=String(app.description||"").trim();
- if(fullDescription&&fullDescription!==String(app.summary||"").trim()){
+ const summary=document.createElement("p");summary.className="store-app-summary";summary.textContent=(lang()?(metadata.summary_en||app.summary_en||app.summary):(app.summary))||app.description||copy("لا يتوفر وصف مختصر لهذا التطبيق في بيانات المصدر.","No short description is available in the source metadata.");
+ let details=null;const fullDescription=String(lang()?(metadata.description_en||app.description_en||app.description):(app.description)||"").trim();
+ if(fullDescription&&fullDescription!==String(lang()?(metadata.summary_en||app.summary_en||app.summary):(app.summary)||"").trim()){
   details=document.createElement("details");details.className="store-app-details";
   const summaryToggle=document.createElement("summary");summaryToggle.textContent=copy("قراءة التفاصيل","Read full description");
   const body=document.createElement("p");body.textContent=fullDescription;details.append(summaryToggle,body);
