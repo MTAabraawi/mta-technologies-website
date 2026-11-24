@@ -316,7 +316,7 @@ test('sitemap index exposes unique page, store, and article maps with canonical 
     expect(locations.length).toBeGreaterThan(0);
     allLocations.push(...locations);
   }
-  expect(allLocations.length).toBe(44);
+  expect(allLocations.length).toBe(49);
   expect(new Set(allLocations).size).toBe(allLocations.length);
   for (const location of allLocations) {
     const url = new URL(location);
@@ -725,12 +725,17 @@ const editorialSlugs = [
   'google-drive-secure-sharing',
   'android-private-space-guide',
   'qr-code-scams-safety',
-  'google-admob-ai-tools-publishers'
+  'google-admob-ai-tools-publishers',
+  'android-theft-protection-guide',
+  'google-maps-offline-maps-guide',
+  'cloudflare-one-one-one-one-warp-guide',
+  'powertoys-advanced-paste-guide',
+  'gemini-skills-gems-transition-guide'
 ];
 
 test('editorial library is featured on the homepage and lists bilingual articles', async ({ page }) => {
   await page.goto('/articles.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.editorial-card')).toHaveCount(16);
+  await expect(page.locator('.editorial-card')).toHaveCount(21);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('.editorial-card .en-only').first()).toBeAttached();
   for (const slug of editorialSlugs) {

@@ -21,7 +21,7 @@ test('editorial collection cards, CollectionPage schema, and sitemap agree', asy
   const collection = JSON.parse(jsonLd);
   expect(collection['@type']).toBe('CollectionPage');
   expect(collection.hasPart).toHaveLength(21);
-  expect(new Set(collection.hasPart.map(item => item.url)).size).toBe(16);
+  expect(new Set(collection.hasPart.map(item => item.url)).size).toBe(21);
 
   const [articleMap, storeMap, index] = await Promise.all([
     page.request.get('/sitemap-articles.xml'),
