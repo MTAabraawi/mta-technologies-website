@@ -63,15 +63,18 @@ function arrange(sources,stale){
   for(const card of cards){
    const badge=card.querySelector("[data-source-count]")||card.querySelector(".store-card-state");
    const key=badge?.dataset.sourceCount||"";
-   const count=stale?Number(lastKnownSources[key]||0):Number(sources[key]||0);
+   const staticCatalogue=card.dataset.staticCatalogue==="true";
+   const count=staticCatalogue?Number(card.dataset.catalogueCount||0):(stale?Number(lastKnownSources[key]||0):Number(sources[key]||0));
    if(count>0){
     if(badge){
      badge.className="store-card-state is-connected";
-     badge.textContent=stale
-      ?w("آخر عدد متحقق: "+count.toLocaleString(),"Last verified: "+count.toLocaleString())
-      :(key==="steam"?w("نتائج جزئية · "+count.toLocaleString()+" سجل","Partial results · "+count.toLocaleString()+" records"):count.toLocaleString()+" "+w("تطبيق مفهرس","indexed apps"));
+     badge.textContent=staticCatalogue
+      ?w(count.toLocaleString()+" إدخالاً أولياً",count.toLocaleString()+" initial listings")
+      :(stale
+       ?w("آخر عدد متحقق: "+count.toLocaleString(),"Last verified: "+count.toLocaleString())
+       :(key==="steam"?w("نتائج جزئية · "+count.toLocaleString()+" سجل","Partial results · "+count.toLocaleString()+" records"):count.toLocaleString()+" "+w("تطبيق مفهرس","indexed apps")));
      badge.dataset.count=String(count);
-     badge.title=stale?w("تعذر الاتصال المباشر؛ آخر لقطة مؤكدة: 22 نوفمبر 2026.","Live verification is unavailable; last verified snapshot: 22 Nov 2026."):"";
+     badge.title=staticCatalogue?w("كتالوج أولي مستقل؛ لا يمثل جميع تطبيقات الذكاء الاصطناعي.","Initial independent catalogue; it does not represent every AI application."):(stale?w("تعذر الاتصال المباشر؛ آخر لقطة مؤكدة: 22 نوفمبر 2026.","Live verification is unavailable; last verified snapshot: 22 Nov 2026."):"");
     } else if(badge) badge.removeAttribute("data-count");
     card.dataset.catalogueState="connected";live.push({card,count});
    } else {
