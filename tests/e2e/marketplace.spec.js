@@ -292,23 +292,33 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(page.locator('.store-picker-card')).toHaveCount(54);
 });
 
-test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
+test('sitemap index exposes unique page, store, and article maps with canonical destinations', async ({ page }) => {
   const sitemapIndex = await page.request.get('/sitemap-index.xml', { maxRedirects: 0 });
   expect(sitemapIndex.status()).toBe(200);
   expect(sitemapIndex.headers()['content-type']).toContain('xml');
   const indexXml = await sitemapIndex.text();
-  expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
-  expect(indexXml).not.toContain('sitemap-pages.xml');
+  const sitemapUrls = [...indexXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  expect(sitemapUrls).toHaveLength(3);
+  expect(indexXml).toContain('sitemap-pages.xml');
+  expect(indexXml).toContain('sitemap.xml');
+  expect(indexXml).toContain('sitemap-articles.xml');
 
-  const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
-  expect(sitemap.status()).toBe(200);
-  expect(sitemap.headers()['content-type']).toContain('xml');
-  const xml = await sitemap.text();
-  expect(xml.trim().startsWith('<?xml')).toBe(true);
-  const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
-  expect(locations.length).toBeGreaterThan(15);
-  expect(new Set(locations).size).toBe(locations.length);
-  for (const location of locations) {
+  const allLocations = [];
+  for (const sitemapUrl of sitemapUrls) {
+    const sitemapAddress = new URL(sitemapUrl);
+    expect(sitemapAddress.hostname).toBe('www.mtahqq.dpdns.org');
+    const sitemap = await page.request.get(sitemapAddress.pathname, { maxRedirects: 0 });
+    expect(sitemap.status()).toBe(200);
+    expect(sitemap.headers()['content-type']).toContain('xml');
+    const xml = await sitemap.text();
+    expect(xml.trim().startsWith('<?xml')).toBe(true);
+    const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+    expect(locations.length).toBeGreaterThan(0);
+    allLocations.push(...locations);
+  }
+  expect(allLocations.length).toBe(44);
+  expect(new Set(allLocations).size).toBe(allLocations.length);
+  for (const location of allLocations) {
     const url = new URL(location);
     expect(url.hostname).toBe('www.mtahqq.dpdns.org');
     const response = await page.request.get(url.pathname + url.search, { maxRedirects: 0 });
@@ -323,7 +333,6 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(robots.status()).toBe(200);
   expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap-index.xml');
 });
-
 test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
@@ -711,12 +720,17 @@ const editorialSlugs = [
   'ai-agents-security-governance',
   'whatsapp-end-to-end-encrypted-backups',
   'telegram-secret-cloud-chats-explained',
-  'ai-developments-november-2026'
+  'ai-developments-november-2026',
+  'google-photos-free-up-space',
+  'google-drive-secure-sharing',
+  'android-private-space-guide',
+  'qr-code-scams-safety',
+  'google-admob-ai-tools-publishers'
 ];
 
 test('editorial library is featured on the homepage and lists bilingual articles', async ({ page }) => {
   await page.goto('/articles.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.editorial-card')).toHaveCount(11);
+  await expect(page.locator('.editorial-card')).toHaveCount(16);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('.editorial-card .en-only').first()).toBeAttached();
   for (const slug of editorialSlugs) {
@@ -742,7 +756,7 @@ test('each editorial article has Arabic and English editions, canonical metadata
 });
 
 test('editorial article URLs are present in the XML sitemap', async ({ request }) => {
-  const response = await request.get('/sitemap-pages.xml');
+  const response = await request.get('/sitemap-articles.xml');
   expect(response.ok()).toBeTruthy();
   const xml = await response.text();
   for (const slug of editorialSlugs) {
