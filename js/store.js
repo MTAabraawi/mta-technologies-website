@@ -55,7 +55,7 @@ const stores={
 "jetbrains-marketplace":{name:"JetBrains Marketplace",platforms:["IntelliJ IDEA","PyCharm","WebStorm"],url:"https://plugins.jetbrains.com/",host:"plugins.jetbrains.com",source:"jetbrains-marketplace",mode:"live",desc:"JetBrains IDE plugin marketplace."},
 "gnome-extensions":{name:"GNOME Extensions",platforms:["Linux","GNOME Shell"],url:"https://extensions.gnome.org/",host:"extensions.gnome.org",source:"gnome-extensions",mode:"live",desc:"GNOME Shell extensions catalogue."},
 "fedora-packages":{name:"Fedora Packages",platforms:["Linux","Fedora"],url:"https://packages.fedoraproject.org/",host:"packages.fedoraproject.org",source:"fedora-packages",mode:"live",desc:"Official Fedora RPM package index with package names and original detail pages."},
-"ai-apps":{name:"متجر تطبيقات الذكاء الاصطناعي",nameEn:"MTA AI Apps Store",platforms:["Android","iOS","Windows","macOS","Linux","Web"],url:"https://www.mtahqq.dpdns.org/apps",host:"openai.com",mode:"curated",curatedFile:"data/ai-apps.json",desc:"دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية.",descEn:"A multi-platform directory of AI applications and tools covering assistants, research, design, audio, video, coding and local models. Every listing links to an official publisher destination."},
+"ai-apps":{name:"متجر تطبيقات الذكاء الاصطناعي",nameEn:"MTA AI Apps Store",platforms:["Android","iOS","Windows","macOS","Linux","Web"],url:"https://www.mtahqq.dpdns.org/apps",host:"openai.com",mode:"curated",curatedFile:"data/ai-apps.json",apiSources:["huggingface-ai-spaces","github-ai-applications"],desc:"دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية.",descEn:"A multi-platform directory of AI applications and tools covering assistants, research, design, audio, video, coding and local models. Every listing links to an official publisher destination."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
@@ -237,14 +237,29 @@ function setupAutomaticLoading(){
 if(store?.source || store?.curatedFile){
  if(store.curatedFile){
   status.textContent=copy("جارٍ تحميل كتالوج الذكاء الاصطناعي","Loading AI applications catalogue");
-  fetch(store.curatedFile,{cache:"no-cache",credentials:"omit"}).then(response=>{if(!response.ok)throw Error("AI catalogue HTTP "+response.status);return response.json()}).then(items=>{
+  fetch(store.curatedFile,{cache:"no-cache",credentials:"omit"}).then(response=>{if(!response.ok)throw Error("AI catalogue HTTP "+response.status);return response.json()}).then(async items=>{
    if(!Array.isArray(items))throw Error("Invalid AI catalogue data");
-   const verified=items.filter(app=>app&&String(app.name||"").trim()&&safe(app.source_url||app.app_url));
+   const baseApps=items.filter(app=>app&&String(app.name||"").trim()&&safe(app.source_url||app.app_url)).map(app=>({...app,source:app.source||"mta-ai-apps"}));
+   const aiSources=Array.isArray(store.apiSources)?store.apiSources:[];
+   const aiSourceState={};
+   let combined=baseApps.slice();
+   await Promise.all(aiSources.map(async sourceKey=>{
+    try{
+     const url=new URL(API+"/api/v1/apps");url.searchParams.set("source",sourceKey);url.searchParams.set("limit","100");url.searchParams.set("offset","0");
+     const response=await fetch(url,{cache:"no-store",credentials:"omit"});
+     if(!response.ok)throw Error("AI source "+sourceKey+" HTTP "+response.status);
+     const rows=await response.json();if(!Array.isArray(rows))throw Error("Invalid rows for "+sourceKey);
+     aiSourceState[sourceKey]={offset:rows.length,total:Number(response.headers.get("X-Total-Count")||rows.length)};
+     combined.push(...rows.map(app=>({...app,source:app.source||sourceKey})));
+    }catch(error){console.warn("MTA AI source unavailable:",sourceKey,error);aiSourceState[sourceKey]={offset:0,total:0}}
+   }));
+   const validApps=combined.filter(app=>app&&String(app.name||"").trim()&&safe(app.source_url||app.app_url));
+   const seenApps=new Set();const verified=validApps.filter(app=>{const identity=appIdentity(app);if(seenApps.has(identity))return false;seenApps.add(identity);return true});
    grid.replaceChildren();
    verified.forEach(app=>grid.append(makeCard(app)));window.__mtaAiApps=verified;
-   const categories=Array.from(new Set(verified.map(app=>String(app.category||"").split(",")[0].trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
    const categorySelect=$("store-category-filter");
-   categories.forEach(category=>{if(!Array.from(categorySelect.options).some(option=>option.value===category)){const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option)}});
+   function addCategories(apps){const categories=Array.from(new Set(apps.map(app=>String(app.category||"").split(",")[0].trim()).filter(Boolean)));categories.forEach(category=>{if(!Array.from(categorySelect.options).some(option=>option.value===category)){const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option)}})}
+   addCategories(verified);
    const empty=$("store-empty");
    function filterAI(){
     const term=search.value.trim().toLocaleLowerCase();
@@ -260,13 +275,35 @@ if(store?.source || store?.curatedFile){
     });
     if(empty){empty.hidden=visible>0;empty.textContent=copy("لا توجد تطبيقات تطابق عوامل البحث الحالية.","No AI apps match the current filters.");}
     count.textContent=visible.toLocaleString()+" "+copy("تطبيقاً معروضاً","apps shown");
-    if($("store-results-note"))$("store-results-note").textContent=copy("تظهر "+verified.length.toLocaleString()+" إدخالات أولية بروابط الناشرين الرسمية. يجري توسيع الفهرس والتحقق من بيانات المنصات والنسخ باستمرار.","Showing "+verified.length.toLocaleString()+" initial listings with official publisher links. The catalogue is being expanded and platform/version metadata is continuously reviewed.");
+    const totalAvailable=baseApps.length+Object.values(aiSourceState).reduce((sum,state)=>sum+state.total,0);
+    if($("store-results-note"))$("store-results-note").textContent=copy("يعرض الفهرس "+totalAvailable.toLocaleString()+" سجلاً أولياً ومفهرساً من مصادر متعددة. تُحمّل النتائج تدريجياً مع الحفاظ على روابط الناشرين ومصدر كل سجل.","The catalogue currently indexes "+totalAvailable.toLocaleString()+" initial and discovered records across multiple sources. Results load progressively while preserving publisher links and source provenance.");
+   }
+   let loadingAI=false;
+   function hasMoreAI(){return aiSources.some(sourceKey=>(aiSourceState[sourceKey]?.offset||0)<(aiSourceState[sourceKey]?.total||0))}
+   async function loadMoreAI(){
+    if(loadingAI||!hasMoreAI())return;
+    loadingAI=true;load.disabled=true;load.textContent=copy("جارٍ تحميل المزيد...","Loading more...");
+    try{
+     const batches=await Promise.all(aiSources.filter(sourceKey=>(aiSourceState[sourceKey]?.offset||0)<(aiSourceState[sourceKey]?.total||0)).map(async sourceKey=>{
+      const state=aiSourceState[sourceKey];const url=new URL(API+"/api/v1/apps");url.searchParams.set("source",sourceKey);url.searchParams.set("limit","100");url.searchParams.set("offset",String(state.offset));
+      const response=await fetch(url,{cache:"no-store",credentials:"omit"});if(!response.ok)throw Error("AI source "+sourceKey+" HTTP "+response.status);
+      const rows=await response.json();if(!Array.isArray(rows))throw Error("Invalid rows for "+sourceKey);
+      state.offset+=rows.length;state.total=Number(response.headers.get("X-Total-Count")||state.total);return rows.map(app=>({...app,source:app.source||sourceKey}));
+     }));
+     const seen=new Set(Array.from(grid.querySelectorAll(".store-app-card")).map(cardIdentity));let added=0;
+     batches.flat().forEach(app=>{const identity=appIdentity(app);if(seen.has(identity)||!safe(app.source_url||app.app_url))return;seen.add(identity);grid.append(makeCard(app));verified.push(app);added++});
+     window.__mtaAiApps=verified;addCategories(batches.flat());filterAI();
+     if(!added&&!hasMoreAI())status.textContent=copy("اكتمل تحميل جميع السجلات المتاحة من المصادر المتصلة.","All available records from connected sources have been loaded.");
+    }catch(error){console.error("MTA AI catalogue pagination failed",error);status.textContent=copy("تعذر تحميل الدفعة التالية؛ يمكنك إعادة المحاولة.","Could not load the next batch; you can retry.");}
+    finally{loadingAI=false;load.disabled=false;load.hidden=!hasMoreAI();load.textContent=copy("تحميل المزيد","Load more")}
    }
    const sort=$("store-sort");
    function sortAI(){if(sort.value==="name"){const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}filterAI()}
    search.addEventListener("input",filterAI);platform.addEventListener("change",filterAI);categorySelect.addEventListener("change",filterAI);sort.addEventListener("change",sortAI);
-   status.textContent=copy("كتالوج أولي متصل · "+verified.length.toLocaleString()+" تطبيقاً","Catalogue connected · "+verified.length.toLocaleString()+" listings");
-   status.classList.add("is-connected");grid.hidden=false;$("store-search-row").hidden=false;$("store-unavailable").hidden=true;load.hidden=true;
+   status.textContent=copy("كتالوج متعدد المصادر متصل · "+verified.length.toLocaleString()+" سجلاً محمّلاً","Multi-source catalogue connected · "+verified.length.toLocaleString()+" records loaded");
+   status.classList.add("is-connected");grid.hidden=false;$("store-search-row").hidden=false;$("store-unavailable").hidden=true;load.hidden=!hasMoreAI();load.disabled=false;load.textContent=copy("تحميل المزيد","Load more");
+   load.addEventListener("click",loadMoreAI);
+   if(hasMoreAI()&&"IntersectionObserver" in window){const aiObserver=new IntersectionObserver(entries=>{if(entries.some(entry=>entry.isIntersecting))loadMoreAI()},{root:null,rootMargin:"700px 0px",threshold:0});aiObserver.observe(load)}
    const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";
    filterAI();
   }).catch(error=>{
