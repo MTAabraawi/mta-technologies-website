@@ -118,10 +118,10 @@ test('MTA AI Apps Store is searchable, server-rendered and links to official pub
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute('data-static-catalogue', 'true');
   await card.click();
-  await expect(page).toHaveURL(/\\/store\\?store=ai-apps/);
+  await expect(page).toHaveURL(/\/store\?store=ai-apps/);
   await expect(page.locator('#store-title')).toHaveText('MTA AI Apps Store');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\\/store\\?store=ai-apps$/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=ai-apps$/);
   await expect(page.locator('#store-ssr-schema')).toHaveCount(1);
   const cards = page.locator('.store-app-card');
   await expect(cards).toHaveCount(30, { timeout: 30_000 });
@@ -129,13 +129,13 @@ test('MTA AI Apps Store is searchable, server-rendered and links to official pub
   await expect(cards.filter({ hasText: 'Ollama' })).toHaveCount(1);
   const destinations = await page.locator('.store-app-link').evaluateAll(links => links.map(link => link.href));
   expect(destinations).toHaveLength(30);
-  for (const destination of destinations) expect(destination).toMatch(/^https:\\/\\//);
+  for (const destination of destinations) expect(destination).toMatch(/^https:\/\//);
   await page.locator('#store-search').fill('ChatGPT');
   await expect(page.locator('.store-app-card:not([hidden])')).toHaveCount(1);
   await expect(page.locator('.store-app-card:not([hidden])').first()).toContainText('OpenAI');
   await page.locator('#store-search').fill('');
   await page.locator('#store-platform-filter').selectOption('windows');
-  await expect(page.locator('.store-app-card:not([hidden])').count()).resolves.toBeGreaterThan(0);
+  expect(await page.locator('.store-app-card:not([hidden])').count()).toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
 
