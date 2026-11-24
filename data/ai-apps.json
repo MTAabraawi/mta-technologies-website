@@ -1,542 +1,572 @@
 [
   {
-    "source": "mta-ai-apps",
     "external_id": "chatgpt",
     "name": "ChatGPT",
     "developer": "OpenAI",
     "category": "AI Assistants",
     "platform": "Android, iOS, Windows, macOS, Web",
     "summary": "مساعد ذكاء اصطناعي متعدد الاستخدامات للمحادثة والكتابة والبحث وتحليل الملفات وتوليد الصور والمساعدة البرمجية. تتوفر له واجهات ويب وتطبيقات للأجهزة المدعومة.",
-    "description": "مساعد ذكاء اصطناعي متعدد الاستخدامات للمحادثة والكتابة والبحث وتحليل الملفات وتوليد الصور والمساعدة البرمجية. تتوفر له واجهات ويب وتطبيقات للأجهزة المدعومة.\n\nA general-purpose AI assistant for conversation, writing, research, file analysis, image generation and coding assistance. Available on the web and supported device apps.",
+    "description": "مساعد ذكاء اصطناعي متعدد الاستخدامات للمحادثة والكتابة والبحث وتحليل الملفات وتوليد الصور والمساعدة البرمجية. تتوفر له واجهات ويب وتطبيقات للأجهزة المدعومة.",
     "app_url": "https://chatgpt.com/",
     "source_url": "https://chatgpt.com/",
     "metadata_json": {
       "homepage": "https://chatgpt.com/",
       "official_listing_url": "https://chatgpt.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A general-purpose AI assistant for conversation, writing, research, file analysis, image generation and coding assistance. Available on the web and supported device apps.",
+      "description_en": "A general-purpose AI assistant for conversation, writing, research, file analysis, image generation and coding assistance. Available on the web and supported device apps."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "claude",
     "name": "Claude",
     "developer": "Anthropic",
     "category": "AI Assistants",
     "platform": "Android, iOS, Windows, macOS, Web",
     "summary": "مساعد من Anthropic للكتابة والتحليل والعمل مع المستندات والبرمجة والمهام المعقدة، مع تطبيقات للأجهزة المدعومة وواجهة ويب.",
-    "description": "مساعد من Anthropic للكتابة والتحليل والعمل مع المستندات والبرمجة والمهام المعقدة، مع تطبيقات للأجهزة المدعومة وواجهة ويب.\n\nAnthropic's assistant for writing, analysis, document work, coding and complex tasks, with supported desktop, mobile and web experiences.",
+    "description": "مساعد من Anthropic للكتابة والتحليل والعمل مع المستندات والبرمجة والمهام المعقدة، مع تطبيقات للأجهزة المدعومة وواجهة ويب.",
     "app_url": "https://claude.ai/",
     "source_url": "https://claude.ai/",
     "metadata_json": {
       "homepage": "https://claude.ai/",
       "official_listing_url": "https://claude.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "Anthropic's assistant for writing, analysis, document work, coding and complex tasks, with supported desktop, mobile and web experiences.",
+      "description_en": "Anthropic's assistant for writing, analysis, document work, coding and complex tasks, with supported desktop, mobile and web experiences."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "gemini",
     "name": "Google Gemini",
     "developer": "Google",
     "category": "AI Assistants",
     "platform": "Android, iOS, Web",
     "summary": "مساعد Google متعدد الوسائط للتفاعل مع النصوص والصور والملفات والمهام اليومية، مع تكاملات ضمن منظومة Google بحسب الحساب والمنطقة.",
-    "description": "مساعد Google متعدد الوسائط للتفاعل مع النصوص والصور والملفات والمهام اليومية، مع تكاملات ضمن منظومة Google بحسب الحساب والمنطقة.\n\nGoogle's multimodal assistant for text, images, files and everyday tasks, with Google ecosystem integrations subject to account and regional availability.",
+    "description": "مساعد Google متعدد الوسائط للتفاعل مع النصوص والصور والملفات والمهام اليومية، مع تكاملات ضمن منظومة Google بحسب الحساب والمنطقة.",
     "app_url": "https://gemini.google.com/app",
     "source_url": "https://gemini.google.com/app",
     "metadata_json": {
       "homepage": "https://gemini.google.com/app",
       "official_listing_url": "https://gemini.google.com/app",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "Google's multimodal assistant for text, images, files and everyday tasks, with Google ecosystem integrations subject to account and regional availability.",
+      "description_en": "Google's multimodal assistant for text, images, files and everyday tasks, with Google ecosystem integrations subject to account and regional availability."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "copilot",
     "name": "Microsoft Copilot",
     "developer": "Microsoft",
     "category": "AI Assistants",
     "platform": "Android, iOS, Windows, Web",
     "summary": "مساعد Microsoft للبحث والكتابة وتوليد المحتوى والإنتاجية، مع تكاملات ضمن Windows وخدمات Microsoft المدعومة.",
-    "description": "مساعد Microsoft للبحث والكتابة وتوليد المحتوى والإنتاجية، مع تكاملات ضمن Windows وخدمات Microsoft المدعومة.\n\nMicrosoft's assistant for search, writing, content generation and productivity, with integrations across supported Windows and Microsoft services.",
+    "description": "مساعد Microsoft للبحث والكتابة وتوليد المحتوى والإنتاجية، مع تكاملات ضمن Windows وخدمات Microsoft المدعومة.",
     "app_url": "https://copilot.microsoft.com/",
     "source_url": "https://copilot.microsoft.com/",
     "metadata_json": {
       "homepage": "https://copilot.microsoft.com/",
       "official_listing_url": "https://copilot.microsoft.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "Microsoft's assistant for search, writing, content generation and productivity, with integrations across supported Windows and Microsoft services.",
+      "description_en": "Microsoft's assistant for search, writing, content generation and productivity, with integrations across supported Windows and Microsoft services."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "perplexity",
     "name": "Perplexity",
     "developer": "Perplexity AI",
     "category": "AI Search & Research",
     "platform": "Android, iOS, Windows, macOS, Web",
     "summary": "محرك إجابات وبحث مدعوم بالذكاء الاصطناعي، يعرض مصادر وروابط تساعد على متابعة المعلومات والتحقق منها.",
-    "description": "محرك إجابات وبحث مدعوم بالذكاء الاصطناعي، يعرض مصادر وروابط تساعد على متابعة المعلومات والتحقق منها.\n\nAn AI-powered answer and research engine that surfaces sources and links for follow-up and verification.",
+    "description": "محرك إجابات وبحث مدعوم بالذكاء الاصطناعي، يعرض مصادر وروابط تساعد على متابعة المعلومات والتحقق منها.",
     "app_url": "https://www.perplexity.ai/",
     "source_url": "https://www.perplexity.ai/",
     "metadata_json": {
       "homepage": "https://www.perplexity.ai/",
       "official_listing_url": "https://www.perplexity.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An AI-powered answer and research engine that surfaces sources and links for follow-up and verification.",
+      "description_en": "An AI-powered answer and research engine that surfaces sources and links for follow-up and verification."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "meta-ai",
     "name": "Meta AI",
     "developer": "Meta",
     "category": "AI Assistants",
     "platform": "Android, iOS, Web",
     "summary": "مساعد Meta للبحث والمحادثة وإنشاء المحتوى، ويرتبط بتجارب Meta المدعومة وتختلف خصائصه حسب البلد والحساب.",
-    "description": "مساعد Meta للبحث والمحادثة وإنشاء المحتوى، ويرتبط بتجارب Meta المدعومة وتختلف خصائصه حسب البلد والحساب.\n\nMeta's assistant for search, conversation and content creation. Available features vary by country and account.",
+    "description": "مساعد Meta للبحث والمحادثة وإنشاء المحتوى، ويرتبط بتجارب Meta المدعومة وتختلف خصائصه حسب البلد والحساب.",
     "app_url": "https://www.meta.ai/",
     "source_url": "https://www.meta.ai/",
     "metadata_json": {
       "homepage": "https://www.meta.ai/",
       "official_listing_url": "https://www.meta.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "Meta's assistant for search, conversation and content creation. Available features vary by country and account.",
+      "description_en": "Meta's assistant for search, conversation and content creation. Available features vary by country and account."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "grok",
     "name": "Grok",
     "developer": "xAI",
     "category": "AI Assistants",
     "platform": "Android, iOS, Web",
     "summary": "مساعد xAI للمحادثة والبحث والمهام الإبداعية، مع مزايا مرتبطة بخدمات xAI وX بحسب الإتاحة.",
-    "description": "مساعد xAI للمحادثة والبحث والمهام الإبداعية، مع مزايا مرتبطة بخدمات xAI وX بحسب الإتاحة.\n\nxAI's assistant for conversation, research and creative tasks, with xAI and X-related capabilities depending on availability.",
+    "description": "مساعد xAI للمحادثة والبحث والمهام الإبداعية، مع مزايا مرتبطة بخدمات xAI وX بحسب الإتاحة.",
     "app_url": "https://grok.com/",
     "source_url": "https://grok.com/",
     "metadata_json": {
       "homepage": "https://grok.com/",
       "official_listing_url": "https://grok.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "xAI's assistant for conversation, research and creative tasks, with xAI and X-related capabilities depending on availability.",
+      "description_en": "xAI's assistant for conversation, research and creative tasks, with xAI and X-related capabilities depending on availability."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "deepseek",
     "name": "DeepSeek",
     "developer": "DeepSeek",
     "category": "AI Assistants",
     "platform": "Android, iOS, Web",
     "summary": "مساعد محادثة للبحث والاستدلال والكتابة والبرمجة، مع بوابة ويب وتطبيقات للهواتف المدعومة.",
-    "description": "مساعد محادثة للبحث والاستدلال والكتابة والبرمجة، مع بوابة ويب وتطبيقات للهواتف المدعومة.\n\nAn AI assistant for research, reasoning, writing and coding, with a web interface and supported mobile apps.",
+    "description": "مساعد محادثة للبحث والاستدلال والكتابة والبرمجة، مع بوابة ويب وتطبيقات للهواتف المدعومة.",
     "app_url": "https://chat.deepseek.com/",
     "source_url": "https://chat.deepseek.com/",
     "metadata_json": {
       "homepage": "https://chat.deepseek.com/",
       "official_listing_url": "https://chat.deepseek.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An AI assistant for research, reasoning, writing and coding, with a web interface and supported mobile apps.",
+      "description_en": "An AI assistant for research, reasoning, writing and coding, with a web interface and supported mobile apps."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "le-chat",
     "name": "Le Chat",
     "developer": "Mistral AI",
     "category": "AI Assistants",
     "platform": "Android, iOS, Web",
     "summary": "مساعد Mistral AI للمحادثة والبحث والكتابة والعمل مع الملفات، ضمن منظومة نماذج Mistral.",
-    "description": "مساعد Mistral AI للمحادثة والبحث والكتابة والعمل مع الملفات، ضمن منظومة نماذج Mistral.\n\nMistral AI's assistant for conversation, research, writing and file workflows, built around Mistral models.",
+    "description": "مساعد Mistral AI للمحادثة والبحث والكتابة والعمل مع الملفات، ضمن منظومة نماذج Mistral.",
     "app_url": "https://chat.mistral.ai/",
     "source_url": "https://chat.mistral.ai/",
     "metadata_json": {
       "homepage": "https://chat.mistral.ai/",
       "official_listing_url": "https://chat.mistral.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "Mistral AI's assistant for conversation, research, writing and file workflows, built around Mistral models.",
+      "description_en": "Mistral AI's assistant for conversation, research, writing and file workflows, built around Mistral models."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "poe",
     "name": "Poe",
     "developer": "Quora",
     "category": "AI Assistants",
     "platform": "Android, iOS, Web",
     "summary": "منصة تجمع روبوتات محادثة ونماذج متعددة في واجهة واحدة، وتتيح اكتشاف بوتات أنشأها المستخدمون.",
-    "description": "منصة تجمع روبوتات محادثة ونماذج متعددة في واجهة واحدة، وتتيح اكتشاف بوتات أنشأها المستخدمون.\n\nA platform that brings multiple AI models and chatbots into one interface and lets users discover community-created bots.",
+    "description": "منصة تجمع روبوتات محادثة ونماذج متعددة في واجهة واحدة، وتتيح اكتشاف بوتات أنشأها المستخدمون.",
     "app_url": "https://poe.com/",
     "source_url": "https://poe.com/",
     "metadata_json": {
       "homepage": "https://poe.com/",
       "official_listing_url": "https://poe.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A platform that brings multiple AI models and chatbots into one interface and lets users discover community-created bots.",
+      "description_en": "A platform that brings multiple AI models and chatbots into one interface and lets users discover community-created bots."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "notebooklm",
     "name": "NotebookLM",
     "developer": "Google",
     "category": "AI Research & Knowledge",
     "platform": "Android, iOS, Web",
     "summary": "دفتر بحث مدعوم بالذكاء الاصطناعي يساعد على تنظيم المصادر التي يضيفها المستخدم وطرح الأسئلة عليها وإنشاء ملخصات.",
-    "description": "دفتر بحث مدعوم بالذكاء الاصطناعي يساعد على تنظيم المصادر التي يضيفها المستخدم وطرح الأسئلة عليها وإنشاء ملخصات.\n\nAn AI research notebook that helps organize user-provided sources, answer questions about them and generate summaries.",
+    "description": "دفتر بحث مدعوم بالذكاء الاصطناعي يساعد على تنظيم المصادر التي يضيفها المستخدم وطرح الأسئلة عليها وإنشاء ملخصات.",
     "app_url": "https://notebooklm.google.com/",
     "source_url": "https://notebooklm.google.com/",
     "metadata_json": {
       "homepage": "https://notebooklm.google.com/",
       "official_listing_url": "https://notebooklm.google.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An AI research notebook that helps organize user-provided sources, answer questions about them and generate summaries.",
+      "description_en": "An AI research notebook that helps organize user-provided sources, answer questions about them and generate summaries."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "google-ai-studio",
     "name": "Google AI Studio",
     "developer": "Google",
     "category": "AI Developer Tools",
     "platform": "Web",
     "summary": "بيئة ويب لتجربة نماذج Gemini وبناء النماذج الأولية واختبار المطالبات وإعداد تكاملات المطورين.",
-    "description": "بيئة ويب لتجربة نماذج Gemini وبناء النماذج الأولية واختبار المطالبات وإعداد تكاملات المطورين.\n\nA web environment for experimenting with Gemini models, prototyping, prompt testing and developer integrations.",
+    "description": "بيئة ويب لتجربة نماذج Gemini وبناء النماذج الأولية واختبار المطالبات وإعداد تكاملات المطورين.",
     "app_url": "https://aistudio.google.com/",
     "source_url": "https://aistudio.google.com/",
     "metadata_json": {
       "homepage": "https://aistudio.google.com/",
       "official_listing_url": "https://aistudio.google.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A web environment for experimenting with Gemini models, prototyping, prompt testing and developer integrations.",
+      "description_en": "A web environment for experimenting with Gemini models, prototyping, prompt testing and developer integrations."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "hugging-face",
     "name": "Hugging Face",
     "developer": "Hugging Face",
     "category": "AI Models & Platforms",
     "platform": "Web",
     "summary": "منصة لاستكشاف نماذج الذكاء الاصطناعي ومجموعات البيانات والمساحات والتجارب وأدوات المطورين مفتوحة المصدر.",
-    "description": "منصة لاستكشاف نماذج الذكاء الاصطناعي ومجموعات البيانات والمساحات والتجارب وأدوات المطورين مفتوحة المصدر.\n\nA platform for discovering AI models, datasets, Spaces, experiments and open-source developer tools.",
+    "description": "منصة لاستكشاف نماذج الذكاء الاصطناعي ومجموعات البيانات والمساحات والتجارب وأدوات المطورين مفتوحة المصدر.",
     "app_url": "https://huggingface.co/",
     "source_url": "https://huggingface.co/",
     "metadata_json": {
       "homepage": "https://huggingface.co/",
       "official_listing_url": "https://huggingface.co/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A platform for discovering AI models, datasets, Spaces, experiments and open-source developer tools.",
+      "description_en": "A platform for discovering AI models, datasets, Spaces, experiments and open-source developer tools."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "replicate",
     "name": "Replicate",
     "developer": "Replicate",
     "category": "AI Models & Platforms",
     "platform": "Web",
     "summary": "منصة سحابية لتشغيل نماذج الذكاء الاصطناعي عبر واجهات وتجارب جاهزة وواجهات برمجية للمطورين.",
-    "description": "منصة سحابية لتشغيل نماذج الذكاء الاصطناعي عبر واجهات وتجارب جاهزة وواجهات برمجية للمطورين.\n\nA cloud platform for running AI models through ready-to-use interfaces and developer APIs.",
+    "description": "منصة سحابية لتشغيل نماذج الذكاء الاصطناعي عبر واجهات وتجارب جاهزة وواجهات برمجية للمطورين.",
     "app_url": "https://replicate.com/",
     "source_url": "https://replicate.com/",
     "metadata_json": {
       "homepage": "https://replicate.com/",
       "official_listing_url": "https://replicate.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A cloud platform for running AI models through ready-to-use interfaces and developer APIs.",
+      "description_en": "A cloud platform for running AI models through ready-to-use interfaces and developer APIs."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "midjourney",
     "name": "Midjourney",
     "developer": "Midjourney",
     "category": "AI Image Generation",
     "platform": "Web",
     "summary": "منصة لتوليد الصور والأعمال البصرية باستخدام الأوامر النصية وأدوات التحكم الإبداعي.",
-    "description": "منصة لتوليد الصور والأعمال البصرية باستخدام الأوامر النصية وأدوات التحكم الإبداعي.\n\nAn image-generation platform for creating visual artwork from prompts and creative controls.",
+    "description": "منصة لتوليد الصور والأعمال البصرية باستخدام الأوامر النصية وأدوات التحكم الإبداعي.",
     "app_url": "https://www.midjourney.com/",
     "source_url": "https://www.midjourney.com/",
     "metadata_json": {
       "homepage": "https://www.midjourney.com/",
       "official_listing_url": "https://www.midjourney.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An image-generation platform for creating visual artwork from prompts and creative controls.",
+      "description_en": "An image-generation platform for creating visual artwork from prompts and creative controls."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "adobe-firefly",
     "name": "Adobe Firefly",
     "developer": "Adobe",
     "category": "AI Image & Design",
     "platform": "Web",
     "summary": "مجموعة أدوات Adobe التوليدية لإنشاء الصور والتأثيرات والمواد الإبداعية وتحريرها ضمن سير عمل التصميم.",
-    "description": "مجموعة أدوات Adobe التوليدية لإنشاء الصور والتأثيرات والمواد الإبداعية وتحريرها ضمن سير عمل التصميم.\n\nAdobe's generative tools for creating and editing images, effects and creative assets within design workflows.",
+    "description": "مجموعة أدوات Adobe التوليدية لإنشاء الصور والتأثيرات والمواد الإبداعية وتحريرها ضمن سير عمل التصميم.",
     "app_url": "https://firefly.adobe.com/",
     "source_url": "https://firefly.adobe.com/",
     "metadata_json": {
       "homepage": "https://firefly.adobe.com/",
       "official_listing_url": "https://firefly.adobe.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "Adobe's generative tools for creating and editing images, effects and creative assets within design workflows.",
+      "description_en": "Adobe's generative tools for creating and editing images, effects and creative assets within design workflows."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "canva",
     "name": "Canva",
     "developer": "Canva",
     "category": "AI Image & Design",
     "platform": "Android, iOS, Windows, macOS, Web",
     "summary": "منصة تصميم متعددة الأجهزة للعروض والمنشورات والفيديو والمواد التسويقية، وتتضمن أدوات ذكاء اصطناعي ضمن منتجاتها.",
-    "description": "منصة تصميم متعددة الأجهزة للعروض والمنشورات والفيديو والمواد التسويقية، وتتضمن أدوات ذكاء اصطناعي ضمن منتجاتها.\n\nA cross-platform design suite for presentations, social posts, video and marketing assets, with AI features across its products.",
+    "description": "منصة تصميم متعددة الأجهزة للعروض والمنشورات والفيديو والمواد التسويقية، وتتضمن أدوات ذكاء اصطناعي ضمن منتجاتها.",
     "app_url": "https://www.canva.com/",
     "source_url": "https://www.canva.com/",
     "metadata_json": {
       "homepage": "https://www.canva.com/",
       "official_listing_url": "https://www.canva.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A cross-platform design suite for presentations, social posts, video and marketing assets, with AI features across its products.",
+      "description_en": "A cross-platform design suite for presentations, social posts, video and marketing assets, with AI features across its products."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "runway",
     "name": "Runway",
     "developer": "Runway AI",
     "category": "AI Video Generation",
     "platform": "iOS, Web",
     "summary": "منصة إبداعية لتوليد الفيديو وتحريره باستخدام نماذج وأدوات ذكاء اصطناعي موجهة لصناع المحتوى.",
-    "description": "منصة إبداعية لتوليد الفيديو وتحريره باستخدام نماذج وأدوات ذكاء اصطناعي موجهة لصناع المحتوى.\n\nA creative platform for generating and editing video with AI models and tools for content creators.",
+    "description": "منصة إبداعية لتوليد الفيديو وتحريره باستخدام نماذج وأدوات ذكاء اصطناعي موجهة لصناع المحتوى.",
     "app_url": "https://runwayml.com/",
     "source_url": "https://runwayml.com/",
     "metadata_json": {
       "homepage": "https://runwayml.com/",
       "official_listing_url": "https://runwayml.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A creative platform for generating and editing video with AI models and tools for content creators.",
+      "description_en": "A creative platform for generating and editing video with AI models and tools for content creators."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "elevenlabs",
     "name": "ElevenLabs",
     "developer": "ElevenLabs",
     "category": "AI Audio & Voice",
     "platform": "Android, iOS, Web",
     "summary": "منصة للصوت الاصطناعي تشمل تحويل النص إلى كلام واستنساخ الأصوات والدبلجة ومعالجة الصوت وفق أدواتها وسياساتها.",
-    "description": "منصة للصوت الاصطناعي تشمل تحويل النص إلى كلام واستنساخ الأصوات والدبلجة ومعالجة الصوت وفق أدواتها وسياساتها.\n\nAn AI audio platform covering text-to-speech, voice generation, dubbing and audio workflows under its usage policies.",
+    "description": "منصة للصوت الاصطناعي تشمل تحويل النص إلى كلام واستنساخ الأصوات والدبلجة ومعالجة الصوت وفق أدواتها وسياساتها.",
     "app_url": "https://elevenlabs.io/",
     "source_url": "https://elevenlabs.io/",
     "metadata_json": {
       "homepage": "https://elevenlabs.io/",
       "official_listing_url": "https://elevenlabs.io/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An AI audio platform covering text-to-speech, voice generation, dubbing and audio workflows under its usage policies.",
+      "description_en": "An AI audio platform covering text-to-speech, voice generation, dubbing and audio workflows under its usage policies."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "suno",
     "name": "Suno",
     "developer": "Suno",
     "category": "AI Music Generation",
     "platform": "Android, iOS, Web",
     "summary": "أداة لتوليد الموسيقى والأغاني من الأوصاف النصية، مع إمكانات إنشاء وتحرير ضمن المنصة.",
-    "description": "أداة لتوليد الموسيقى والأغاني من الأوصاف النصية، مع إمكانات إنشاء وتحرير ضمن المنصة.\n\nA tool for generating music and songs from text prompts, with creation and editing features in the platform.",
+    "description": "أداة لتوليد الموسيقى والأغاني من الأوصاف النصية، مع إمكانات إنشاء وتحرير ضمن المنصة.",
     "app_url": "https://suno.com/",
     "source_url": "https://suno.com/",
     "metadata_json": {
       "homepage": "https://suno.com/",
       "official_listing_url": "https://suno.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A tool for generating music and songs from text prompts, with creation and editing features in the platform.",
+      "description_en": "A tool for generating music and songs from text prompts, with creation and editing features in the platform."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "ideogram",
     "name": "Ideogram",
     "developer": "Ideogram",
     "category": "AI Image Generation",
     "platform": "Web",
     "summary": "منصة لتوليد الصور والتصاميم، مع تركيز على الصور الإبداعية والنصوص داخل التصاميم.",
-    "description": "منصة لتوليد الصور والتصاميم، مع تركيز على الصور الإبداعية والنصوص داخل التصاميم.\n\nAn image-generation platform for creative visuals and designs, including text rendered within images.",
+    "description": "منصة لتوليد الصور والتصاميم، مع تركيز على الصور الإبداعية والنصوص داخل التصاميم.",
     "app_url": "https://ideogram.ai/",
     "source_url": "https://ideogram.ai/",
     "metadata_json": {
       "homepage": "https://ideogram.ai/",
       "official_listing_url": "https://ideogram.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An image-generation platform for creative visuals and designs, including text rendered within images.",
+      "description_en": "An image-generation platform for creative visuals and designs, including text rendered within images."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "cursor",
     "name": "Cursor",
     "developer": "Anysphere",
     "category": "AI Coding",
     "platform": "Windows, macOS, Linux",
     "summary": "محرر برمجي يدمج مساعدات الذكاء الاصطناعي في فهم قواعد الشفرة وتحرير الملفات وتنفيذ مهام التطوير.",
-    "description": "محرر برمجي يدمج مساعدات الذكاء الاصطناعي في فهم قواعد الشفرة وتحرير الملفات وتنفيذ مهام التطوير.\n\nAn AI-focused code editor that helps understand codebases, edit files and carry out software development tasks.",
+    "description": "محرر برمجي يدمج مساعدات الذكاء الاصطناعي في فهم قواعد الشفرة وتحرير الملفات وتنفيذ مهام التطوير.",
     "app_url": "https://cursor.com/",
     "source_url": "https://cursor.com/",
     "metadata_json": {
       "homepage": "https://cursor.com/",
       "official_listing_url": "https://cursor.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An AI-focused code editor that helps understand codebases, edit files and carry out software development tasks.",
+      "description_en": "An AI-focused code editor that helps understand codebases, edit files and carry out software development tasks."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "github-copilot",
     "name": "GitHub Copilot",
     "developer": "GitHub",
     "category": "AI Coding",
     "platform": "Windows, macOS, Linux, Web",
     "summary": "مساعد برمجي من GitHub يعمل داخل بيئات تطوير مدعومة ويساعد على الإكمال والشرح وكتابة الشفرة ومراجعتها.",
-    "description": "مساعد برمجي من GitHub يعمل داخل بيئات تطوير مدعومة ويساعد على الإكمال والشرح وكتابة الشفرة ومراجعتها.\n\nGitHub's coding assistant for supported development environments, helping with code completion, explanation, generation and review.",
+    "description": "مساعد برمجي من GitHub يعمل داخل بيئات تطوير مدعومة ويساعد على الإكمال والشرح وكتابة الشفرة ومراجعتها.",
     "app_url": "https://github.com/features/copilot",
     "source_url": "https://github.com/features/copilot",
     "metadata_json": {
       "homepage": "https://github.com/features/copilot",
       "official_listing_url": "https://github.com/features/copilot",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "GitHub's coding assistant for supported development environments, helping with code completion, explanation, generation and review.",
+      "description_en": "GitHub's coding assistant for supported development environments, helping with code completion, explanation, generation and review."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "replit",
     "name": "Replit",
     "developer": "Replit",
     "category": "AI Coding & App Building",
     "platform": "Web, Android, iOS",
     "summary": "بيئة تطوير سحابية لبناء التطبيقات وتشغيلها ومشاركتها، مع أدوات ووكالات ذكاء اصطناعي للمساعدة في البرمجة.",
-    "description": "بيئة تطوير سحابية لبناء التطبيقات وتشغيلها ومشاركتها، مع أدوات ووكالات ذكاء اصطناعي للمساعدة في البرمجة.\n\nA cloud development environment for building, running and sharing apps, with AI agents and coding assistance.",
+    "description": "بيئة تطوير سحابية لبناء التطبيقات وتشغيلها ومشاركتها، مع أدوات ووكالات ذكاء اصطناعي للمساعدة في البرمجة.",
     "app_url": "https://replit.com/",
     "source_url": "https://replit.com/",
     "metadata_json": {
       "homepage": "https://replit.com/",
       "official_listing_url": "https://replit.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A cloud development environment for building, running and sharing apps, with AI agents and coding assistance.",
+      "description_en": "A cloud development environment for building, running and sharing apps, with AI agents and coding assistance."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "ollama",
     "name": "Ollama",
     "developer": "Ollama",
     "category": "Local AI & Models",
     "platform": "Windows, macOS, Linux",
     "summary": "أداة لتشغيل نماذج لغوية محلياً على الحاسوب وإدارتها من خلال واجهة سطر أوامر وواجهات تكامل.",
-    "description": "أداة لتشغيل نماذج لغوية محلياً على الحاسوب وإدارتها من خلال واجهة سطر أوامر وواجهات تكامل.\n\nA tool for running and managing language models locally on a computer through a command-line interface and integrations.",
+    "description": "أداة لتشغيل نماذج لغوية محلياً على الحاسوب وإدارتها من خلال واجهة سطر أوامر وواجهات تكامل.",
     "app_url": "https://ollama.com/",
     "source_url": "https://ollama.com/",
     "metadata_json": {
       "homepage": "https://ollama.com/",
       "official_listing_url": "https://ollama.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A tool for running and managing language models locally on a computer through a command-line interface and integrations.",
+      "description_en": "A tool for running and managing language models locally on a computer through a command-line interface and integrations."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "lm-studio",
     "name": "LM Studio",
     "developer": "Element Labs",
     "category": "Local AI & Models",
     "platform": "Windows, macOS, Linux",
     "summary": "تطبيق سطح مكتب لتنزيل نماذج لغوية محلية وتشغيلها والتفاعل معها وإتاحة واجهات محلية للتطبيقات الأخرى.",
-    "description": "تطبيق سطح مكتب لتنزيل نماذج لغوية محلية وتشغيلها والتفاعل معها وإتاحة واجهات محلية للتطبيقات الأخرى.\n\nA desktop app for discovering, downloading and running local language models, with local endpoints for other applications.",
+    "description": "تطبيق سطح مكتب لتنزيل نماذج لغوية محلية وتشغيلها والتفاعل معها وإتاحة واجهات محلية للتطبيقات الأخرى.",
     "app_url": "https://lmstudio.ai/",
     "source_url": "https://lmstudio.ai/",
     "metadata_json": {
       "homepage": "https://lmstudio.ai/",
       "official_listing_url": "https://lmstudio.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A desktop app for discovering, downloading and running local language models, with local endpoints for other applications.",
+      "description_en": "A desktop app for discovering, downloading and running local language models, with local endpoints for other applications."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "jan",
     "name": "Jan",
     "developer": "Jan",
     "category": "Local AI & Models",
     "platform": "Windows, macOS, Linux",
     "summary": "تطبيق مفتوح المصدر لتشغيل مساعدين ونماذج ذكاء اصطناعي محلياً مع واجهة مكتبية وإمكانات تكامل.",
-    "description": "تطبيق مفتوح المصدر لتشغيل مساعدين ونماذج ذكاء اصطناعي محلياً مع واجهة مكتبية وإمكانات تكامل.\n\nAn open-source desktop application for running local AI assistants and models with integration capabilities.",
+    "description": "تطبيق مفتوح المصدر لتشغيل مساعدين ونماذج ذكاء اصطناعي محلياً مع واجهة مكتبية وإمكانات تكامل.",
     "app_url": "https://jan.ai/",
     "source_url": "https://jan.ai/",
     "metadata_json": {
       "homepage": "https://jan.ai/",
       "official_listing_url": "https://jan.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An open-source desktop application for running local AI assistants and models with integration capabilities.",
+      "description_en": "An open-source desktop application for running local AI assistants and models with integration capabilities."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "comfyui",
     "name": "ComfyUI",
     "developer": "ComfyUI",
     "category": "AI Image & Video Workflows",
     "platform": "Windows, macOS, Linux",
     "summary": "واجهة عقد مرئية لبناء سير عمل توليد الصور والفيديو والوسائط باستخدام نماذج الذكاء الاصطناعي.",
-    "description": "واجهة عقد مرئية لبناء سير عمل توليد الصور والفيديو والوسائط باستخدام نماذج الذكاء الاصطناعي.\n\nA node-based interface for building image, video and media generation workflows with AI models.",
+    "description": "واجهة عقد مرئية لبناء سير عمل توليد الصور والفيديو والوسائط باستخدام نماذج الذكاء الاصطناعي.",
     "app_url": "https://www.comfy.org/",
     "source_url": "https://www.comfy.org/",
     "metadata_json": {
       "homepage": "https://www.comfy.org/",
       "official_listing_url": "https://www.comfy.org/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A node-based interface for building image, video and media generation workflows with AI models.",
+      "description_en": "A node-based interface for building image, video and media generation workflows with AI models."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "open-webui",
     "name": "Open WebUI",
     "developer": "Open WebUI",
     "category": "Local AI & Models",
     "platform": "Windows, macOS, Linux, Web",
     "summary": "واجهة ويب ذاتية الاستضافة للتفاعل مع نماذج الذكاء الاصطناعي وربط مزودين وأدوات متعددة.",
-    "description": "واجهة ويب ذاتية الاستضافة للتفاعل مع نماذج الذكاء الاصطناعي وربط مزودين وأدوات متعددة.\n\nA self-hosted web interface for interacting with AI models and connecting multiple providers and tools.",
+    "description": "واجهة ويب ذاتية الاستضافة للتفاعل مع نماذج الذكاء الاصطناعي وربط مزودين وأدوات متعددة.",
     "app_url": "https://openwebui.com/",
     "source_url": "https://openwebui.com/",
     "metadata_json": {
       "homepage": "https://openwebui.com/",
       "official_listing_url": "https://openwebui.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "A self-hosted web interface for interacting with AI models and connecting multiple providers and tools.",
+      "description_en": "A self-hosted web interface for interacting with AI models and connecting multiple providers and tools."
     }
   },
   {
-    "source": "mta-ai-apps",
     "external_id": "anythingllm",
     "name": "AnythingLLM",
     "developer": "Mintplex Labs",
     "category": "AI Knowledge & Workspaces",
     "platform": "Windows, macOS, Linux, Web",
     "summary": "مساحة عمل للذكاء الاصطناعي تربط النماذج بالمستندات وقواعد المعرفة ومصادر البيانات المحلية أو السحابية.",
-    "description": "مساحة عمل للذكاء الاصطناعي تربط النماذج بالمستندات وقواعد المعرفة ومصادر البيانات المحلية أو السحابية.\n\nAn AI workspace that connects models with documents, knowledge bases and local or cloud data sources.",
+    "description": "مساحة عمل للذكاء الاصطناعي تربط النماذج بالمستندات وقواعد المعرفة ومصادر البيانات المحلية أو السحابية.",
     "app_url": "https://anythingllm.com/",
     "source_url": "https://anythingllm.com/",
     "metadata_json": {
       "homepage": "https://anythingllm.com/",
       "official_listing_url": "https://anythingllm.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination"
+      "metadata_status": "initially_verified_official_destination",
+      "summary_en": "An AI workspace that connects models with documents, knowledge bases and local or cloud data sources.",
+      "description_en": "An AI workspace that connects models with documents, knowledge bases and local or cloud data sources."
     }
   }
 ]
