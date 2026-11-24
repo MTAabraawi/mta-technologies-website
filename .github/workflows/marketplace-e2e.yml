@@ -3,7 +3,7 @@ name: MTA Marketplace E2E
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main, feature/global-store-catalog-expansion]
+    branches: [main, feature/global-store-catalog-expansion, feature/mta-ai-apps-store]
     paths:
       - '*.html'
       - 'css/style.css'
@@ -15,6 +15,10 @@ on:
       - 'js/store.js'
       - 'js/store-directory.js'
       - 'css/apps.css'
+      - 'css/store.css'
+      - 'data/ai-apps.json'
+      - 'sitemap-pages.xml'
+      - 'sitemap.xml'
       - 'marketplace-config.js'
       - 'functions/**'
       - 'tests/e2e/**'
@@ -23,7 +27,7 @@ on:
       - 'package.json'
       - '.github/workflows/marketplace-e2e.yml'
   push:
-    branches: [main, feature/global-store-catalog-expansion, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23]
+    branches: [main, feature/global-store-catalog-expansion, feature/mta-ai-apps-store, audit-seo-marketplace-commercial-hardening, work/final-premerge-website-2026-11-23]
     paths:
       - '*.html'
       - 'css/style.css'
