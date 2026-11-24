@@ -255,8 +255,9 @@ if(store?.source || store?.curatedFile){
    }));
    const validApps=combined.filter(app=>app&&String(app.name||"").trim()&&safe(app.source_url||app.app_url));
    const seenApps=new Set();const verified=validApps.filter(app=>{const identity=appIdentity(app);if(seenApps.has(identity))return false;seenApps.add(identity);return true});
-   grid.replaceChildren();
-   verified.forEach(app=>grid.append(makeCard(app)));window.__mtaAiApps=verified;
+   const renderedApps=new Set(Array.from(grid.querySelectorAll(".store-app-card")).map(cardIdentity));
+   verified.forEach(app=>{const identity=appIdentity(app);if(renderedApps.has(identity))return;renderedApps.add(identity);grid.append(makeCard(app))});
+   window.__mtaAiApps=verified;
    const categorySelect=$("store-category-filter");
    function addCategories(apps){const categories=Array.from(new Set(apps.map(app=>String(app.category||"").split(",")[0].trim()).filter(Boolean)));categories.forEach(category=>{if(!Array.from(categorySelect.options).some(option=>option.value===category)){const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option)}})}
    addCategories(verified);
