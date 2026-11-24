@@ -286,13 +286,18 @@ if(store?.source || store?.curatedFile){
     try{
      const batches=await Promise.all(aiSources.filter(sourceKey=>(aiSourceState[sourceKey]?.offset||0)<(aiSourceState[sourceKey]?.total||0)).map(async sourceKey=>{
       const state=aiSourceState[sourceKey];const url=new URL(API+"/api/v1/apps");url.searchParams.set("source",sourceKey);url.searchParams.set("limit","100");url.searchParams.set("offset",String(state.offset));
-      const response=await fetch(url,{cache:"no-store",credentials:"omit"});if(!response.ok)throw Error("AI source "+sourceKey+" HTTP "+response.status);
-      const rows=await response.json();if(!Array.isArray(rows))throw Error("Invalid rows for "+sourceKey);
-      state.offset+=rows.length;state.total=Number(response.headers.get("X-Total-Count")||state.total);return rows.map(app=>({...app,source:app.source||sourceKey}));
+      try{
+       const response=await fetch(url,{cache:"no-store",credentials:"omit"});if(!response.ok)throw Error("AI source "+sourceKey+" HTTP "+response.status);
+       const rows=await response.json();if(!Array.isArray(rows))throw Error("Invalid rows for "+sourceKey);
+       return {sourceKey,rows:rows.map(app=>({...app,source:app.source||sourceKey})),nextOffset:state.offset+rows.length,total:Number(response.headers.get("X-Total-Count")||state.total)};
+      }catch(error){console.warn("MTA AI source page failed:",sourceKey,error);return {sourceKey,rows:[],nextOffset:state.offset,total:state.total,error}}
      }));
+     const successful=batches.filter(batch=>!batch.error);
+     successful.forEach(batch=>{aiSourceState[batch.sourceKey].offset=batch.nextOffset;aiSourceState[batch.sourceKey].total=batch.total});
+     const newApps=batches.flatMap(batch=>batch.rows);
      const seen=new Set(Array.from(grid.querySelectorAll(".store-app-card")).map(cardIdentity));let added=0;
-     batches.flat().forEach(app=>{const identity=appIdentity(app);if(seen.has(identity)||!safe(app.source_url||app.app_url))return;seen.add(identity);grid.append(makeCard(app));verified.push(app);added++});
-     window.__mtaAiApps=verified;addCategories(batches.flat());filterAI();
+     newApps.forEach(app=>{const identity=appIdentity(app);if(seen.has(identity)||!safe(app.source_url||app.app_url))return;seen.add(identity);grid.append(makeCard(app));verified.push(app);added++});
+     window.__mtaAiApps=verified;addCategories(newApps);filterAI();
      if(!added&&!hasMoreAI())status.textContent=copy("اكتمل تحميل جميع السجلات المتاحة من المصادر المتصلة.","All available records from connected sources have been loaded.");
     }catch(error){console.error("MTA AI catalogue pagination failed",error);status.textContent=copy("تعذر تحميل الدفعة التالية؛ يمكنك إعادة المحاولة.","Could not load the next batch; you can retry.");}
     finally{loadingAI=false;load.disabled=false;load.hidden=!hasMoreAI();load.textContent=copy("تحميل المزيد","Load more")}
