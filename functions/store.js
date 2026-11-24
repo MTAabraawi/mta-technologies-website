@@ -65,7 +65,8 @@ function makeCard(app, storeKey, store) {
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
   const meta = [app.developer, platform, app.category].filter(Boolean).join(" · ");
   const summary = app.summary || app.description || "لا يتوفر وصف مختصر في بيانات المصدر.";
-  const sourceLabel = store.curated ? store.name : source;
+  const sourceLabels = { "mta-ai-apps": store.name, "huggingface-ai-spaces": "Hugging Face Spaces", "github-ai-applications": "GitHub AI Projects" };
+  const sourceLabel = store.curated ? (sourceLabels[source] || store.name) : source;
   const category = String(app.category || "Other").split(",")[0].trim();
   const platformLabels = { android: "Google Play", ios: "App Store", windows: "Windows", macos: "macOS", linux: "Linux" };
   const platformLinks = Object.entries(metadata.platform_links || {}).map(([key, value]) => {
