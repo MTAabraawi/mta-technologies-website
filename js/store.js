@@ -158,7 +158,7 @@ function makeCard(app){
  let iconIndex=0;
  const makeMonogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();return mark};
  icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else if(icon.parentNode)icon.replaceWith(makeMonogram())};
- const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||displayStoreName();
+ const badge=document.createElement("span");badge.className="store-app-source";const sourceLabels={"mta-ai-apps":displayStoreName(),"huggingface-ai-spaces":"Hugging Face Spaces","github-ai-applications":"GitHub AI Projects"};badge.textContent=sourceLabels[app.source]||app.source||displayStoreName();
  if(candidates.length){top.append(icon,badge);icon.src=candidates[0]}else{top.append(makeMonogram(),badge)}
  const h=document.createElement("h3");
  const detailParams=new URLSearchParams({source:String(app.source||store.source||""),store:key,id:String(app.external_id||app.id||""),name:String(app.name||"Application")});
