@@ -2,7 +2,7 @@ import aiApps from "../data/ai-apps.json";
 
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const CONNECTED_STORES = {
-  "ai-apps": { name: "متجر تطبيقات الذكاء الاصطناعي", nameEn: "MTA AI Apps Store", source: "mta-ai-apps", curated: true, platforms: ["Android", "iOS", "Windows", "macOS", "Linux", "Web"], url: "https://www.mtahqq.dpdns.org/apps", description: "دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية." },
+  "ai-apps": { name: "متجر تطبيقات الذكاء الاصطناعي", nameEn: "MTA AI Apps Store", source: "mta-ai-apps", curated: true, apiSources: ["huggingface-ai-spaces", "github-ai-applications"], platforms: ["Android", "iOS", "Windows", "macOS", "Linux", "Web"], url: "https://www.mtahqq.dpdns.org/apps", description: "دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية." },
   "fedora-packages": { name: "Fedora Packages", source: "fedora-packages", platforms: ["Linux", "Fedora"], description: "فهرس حزم Fedora Linux للمستخدمين ومديري الأنظمة والمطورين. استكشف أسماء الحزم ووظائفها وصفحاتها الأصلية، وانتبه إلى إصدار Fedora والمستودع والمعمارية قبل تثبيت أي حزمة." },
 
   "jetbrains-marketplace": { name: "JetBrains Marketplace", source: "jetbrains-marketplace", platforms: ["IntelliJ IDEA", "PyCharm", "WebStorm", "IDE plugins"], description: "سوق إضافات بيئات JetBrains مثل IntelliJ IDEA وPyCharm وWebStorm. يفيد المطورين في العثور على أدوات اللغات والتنسيق والاختبار والتكامل؛ راجع توافق الإضافة مع إصدار IDE وتقييمات الناشر وتاريخ التحديث." },
@@ -120,8 +120,36 @@ export async function onRequest(context) {
       let count = 0;
       let apps = [];
       if (store.curated) {
-        apps = Array.isArray(aiApps) ? aiApps : [];
+        apps = (Array.isArray(aiApps) ? aiApps : []).map(app => ({ ...app, source: app.source || "mta-ai-apps" }));
         count = apps.length;
+        if (Array.isArray(store.apiSources) && store.apiSources.length) {
+          try {
+            const statsResponse = await fetch(new URL("/api/v1/catalog-stats", engineOrigin), {
+              headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
+            });
+            if (statsResponse.ok) {
+              const stats = await statsResponse.json();
+              for (const sourceKey of store.apiSources) {
+                const sourceCount = Number((stats.sources || {})[sourceKey] || 0);
+                count += sourceCount;
+                if (!sourceCount) continue;
+                const appsUrl = new URL("/api/v1/apps", engineOrigin);
+                appsUrl.searchParams.set("source", sourceKey);
+                appsUrl.searchParams.set("limit", "12");
+                appsUrl.searchParams.set("offset", "0");
+                const appsResponse = await fetch(appsUrl, {
+                  headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
+                });
+                if (appsResponse.ok) {
+                  const sourceApps = await appsResponse.json();
+                  if (Array.isArray(sourceApps)) apps.push(...sourceApps.map(app => ({ ...app, source: app.source || sourceKey })));
+                }
+              }
+            }
+          } catch (error) {
+            console.warn("MTA global AI source SSR unavailable:", error);
+          }
+        }
       } else {
         const statsResponse = await fetch(new URL("/api/v1/catalog-stats", engineOrigin), {
           headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
