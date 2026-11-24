@@ -1,5 +1,8 @@
+import aiApps from "../data/ai-apps.json";
+
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const CONNECTED_STORES = {
+  "ai-apps": { name: "MTA AI Apps Store", source: "mta-ai-apps", curated: true, platforms: ["Android", "iOS", "Windows", "macOS", "Linux", "Web"], url: "https://www.mtahqq.dpdns.org/apps", description: "دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية." },
   "fedora-packages": { name: "Fedora Packages", source: "fedora-packages", platforms: ["Linux", "Fedora"], description: "فهرس حزم Fedora Linux للمستخدمين ومديري الأنظمة والمطورين. استكشف أسماء الحزم ووظائفها وصفحاتها الأصلية، وانتبه إلى إصدار Fedora والمستودع والمعمارية قبل تثبيت أي حزمة." },
 
   "jetbrains-marketplace": { name: "JetBrains Marketplace", source: "jetbrains-marketplace", platforms: ["IntelliJ IDEA", "PyCharm", "WebStorm", "IDE plugins"], description: "سوق إضافات بيئات JetBrains مثل IntelliJ IDEA وPyCharm وWebStorm. يفيد المطورين في العثور على أدوات اللغات والتنسيق والاختبار والتكامل؛ راجع توافق الإضافة مع إصدار IDE وتقييمات الناشر وتاريخ التحديث." },
@@ -44,11 +47,7 @@ function replaceOnce(html, pattern, replacement) {
 function makeCard(app, storeKey, store) {
   const name = String(app.name || "Application");
   const id = String(app.external_id || app.id || "");
-  const source = String(app.source || store.source);
-  const detail = "application.html?source=" + encodeURIComponent(source) +
-    "&store=" + encodeURIComponent(storeKey) +
-    "&id=" + encodeURIComponent(id) +
-    "&name=" + encodeURIComponent(name);
+  const source = String(app.source || store.source || (store.curated ? "mta-ai-apps" : ""));
   const metadata = (() => { try { return typeof app.metadata_json === "string" ? JSON.parse(app.metadata_json) : (app.metadata_json || {}); } catch { return {}; } })();
   const iconObject = metadata.icon && typeof metadata.icon === "object" ? metadata.icon : {};
   let publisherHost = "";
@@ -61,21 +60,24 @@ function makeCard(app, storeKey, store) {
     (publisherHost ? "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(publisherHost) + "&sz=256" : "");
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0] || "").join("").toUpperCase() || "APP";
   const original = safeHttps(app.source_url || app.app_url) || store.url || "#";
+  const detail = store.curated ? original : ("application.html?source=" + encodeURIComponent(source) +
+    "&store=" + encodeURIComponent(storeKey) + "&id=" + encodeURIComponent(id) + "&name=" + encodeURIComponent(name));
   const platform = app.platform === "pc-games" ? "PC Games" : (app.platform || "");
   const meta = [app.developer, platform, app.category].filter(Boolean).join(" · ");
   const summary = app.summary || app.description || "لا يتوفر وصف مختصر في بيانات المصدر.";
+  const sourceLabel = store.curated ? store.name : source;
   const category = String(app.category || "Other").split(",")[0].trim();
   return '<article class="store-app-card" data-category="' + escapeHtml(category) + '" data-platform="' + escapeHtml(String(app.platform || "").toLowerCase()) + '">' +
     '<div class="store-app-top">' +
       (icon ? '<img class="store-app-icon" loading="lazy" decoding="async" src="' + escapeHtml(icon) + '" alt="' + escapeHtml(name) + ' icon" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="store-app-icon-fallback" hidden aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>' :
         '<span class="store-app-icon-fallback" aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>') +
-      '<span class="store-app-source">' + escapeHtml(source) + '</span>' +
+      '<span class="store-app-source">' + escapeHtml(sourceLabel) + '</span>' +
     '</div>' +
-    '<h3><a href="' + escapeHtml(detail) + '">' + escapeHtml(name) + '</a></h3>' +
+    '<h3><a href="' + escapeHtml(detail) + '"' + (store.curated ? ' target="_blank" rel="noopener noreferrer"' : '') + '>' + escapeHtml(name) + '</a></h3>' +
     '<p class="store-app-meta">' + escapeHtml(meta) + '</p>' +
     '<p class="store-app-summary">' + escapeHtml(summary) + '</p>' +
     '<div class="store-app-tags">' + [platform, app.license].filter(Boolean).map(value => '<span>' + escapeHtml(value) + '</span>').join("") + '</div>' +
-    '<a class="store-app-detail-link" href="' + escapeHtml(detail) + '">تفاصيل التطبيق داخل MTA</a>' +
+    (store.curated ? '' : '<a class="store-app-detail-link" href="' + escapeHtml(detail) + '">تفاصيل التطبيق داخل MTA</a>') +
     '<a class="store-app-link" href="' + escapeHtml(original) + '" target="_blank" rel="noopener noreferrer">عرض التطبيق في مصدره الأصلي ↗</a>' +
   '</article>';
 }
@@ -106,26 +108,35 @@ export async function onRequest(context) {
   } else {
     const engineOrigin = (env && env.MTA_APPLICATIONS_ENGINE_ORIGIN) || DEFAULT_ENGINE_ORIGIN;
     try {
-      const statsResponse = await fetch(new URL("/api/v1/catalog-stats", engineOrigin), {
-        headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
-      });
-      if (!statsResponse.ok) throw new Error("Catalogue stats HTTP " + statsResponse.status);
-      const stats = await statsResponse.json();
-      const count = Number((stats.sources || {})[store.source] || 0);
+      let count = 0;
+      let apps = [];
+      if (store.curated) {
+        apps = Array.isArray(aiApps) ? aiApps : [];
+        count = apps.length;
+      } else {
+        const statsResponse = await fetch(new URL("/api/v1/catalog-stats", engineOrigin), {
+          headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
+        });
+        if (!statsResponse.ok) throw new Error("Catalogue stats HTTP " + statsResponse.status);
+        const stats = await statsResponse.json();
+        count = Number((stats.sources || {})[store.source] || 0);
+      }
       if (count <= 0) {
         html = setMeta(html, "robots", "noindex,follow");
         html = setCanonical(html, canonical);
         html = html.replace('<h1 id="store-title">Store catalogue</h1>', '<h1 id="store-title">' + escapeHtml(store.name) + '</h1>');
       } else {
-        const appsUrl = new URL("/api/v1/apps", engineOrigin);
-        appsUrl.searchParams.set("source", store.source);
-        appsUrl.searchParams.set("limit", "12");
-        appsUrl.searchParams.set("offset", "0");
-        const appsResponse = await fetch(appsUrl, {
-          headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
-        });
-        if (!appsResponse.ok) throw new Error("Catalogue apps HTTP " + appsResponse.status);
-        const apps = await appsResponse.json();
+        if (!store.curated) {
+          const appsUrl = new URL("/api/v1/apps", engineOrigin);
+          appsUrl.searchParams.set("source", store.source);
+          appsUrl.searchParams.set("limit", "12");
+          appsUrl.searchParams.set("offset", "0");
+          const appsResponse = await fetch(appsUrl, {
+            headers: { "accept": "application/json" }, cf: { cacheTtl: 0, cacheEverything: false }
+          });
+          if (!appsResponse.ok) throw new Error("Catalogue apps HTTP " + appsResponse.status);
+          apps = await appsResponse.json();
+        }
         if (!Array.isArray(apps) || !apps.length) throw new Error("No server-renderable catalogue rows");
         const description = store.description + " تصفح " + count.toLocaleString("en-US") +
           " سجلاً مفهرساً، وابحث حسب الاسم والمنصة والتصنيف. MTA يعرض بيانات المصدر وروابط الناشر الأصلية ولا يستضيف ملفات التثبيت.";
