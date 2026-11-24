@@ -13,9 +13,14 @@
       "homepage": "https://chatgpt.com/",
       "official_listing_url": "https://chatgpt.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A general-purpose AI assistant for conversation, writing, research, file analysis, image generation and coding assistance. Available on the web and supported device apps.",
-      "description_en": "A general-purpose AI assistant for conversation, writing, research, file analysis, image generation and coding assistance. Available on the web and supported device apps."
+      "description_en": "A general-purpose AI assistant for conversation, writing, research, file analysis, image generation and coding assistance. Available on the web and supported device apps.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=com.openai.chatgpt",
+        "ios": "https://apps.apple.com/us/app/chatgpt/id6448311069"
+      },
+      "download_page": "https://chatgpt.com/download/"
     }
   },
   {
@@ -32,9 +37,14 @@
       "homepage": "https://claude.ai/",
       "official_listing_url": "https://claude.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "Anthropic's assistant for writing, analysis, document work, coding and complex tasks, with supported desktop, mobile and web experiences.",
-      "description_en": "Anthropic's assistant for writing, analysis, document work, coding and complex tasks, with supported desktop, mobile and web experiences."
+      "description_en": "Anthropic's assistant for writing, analysis, document work, coding and complex tasks, with supported desktop, mobile and web experiences.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=com.anthropic.claude",
+        "ios": "https://apps.apple.com/us/app/claude-by-anthropic/id6473753684"
+      },
+      "download_page": "https://claude.com/download"
     }
   },
   {
@@ -51,9 +61,13 @@
       "homepage": "https://gemini.google.com/app",
       "official_listing_url": "https://gemini.google.com/app",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "Google's multimodal assistant for text, images, files and everyday tasks, with Google ecosystem integrations subject to account and regional availability.",
-      "description_en": "Google's multimodal assistant for text, images, files and everyday tasks, with Google ecosystem integrations subject to account and regional availability."
+      "description_en": "Google's multimodal assistant for text, images, files and everyday tasks, with Google ecosystem integrations subject to account and regional availability.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=com.google.android.apps.bard",
+        "ios": "https://apps.apple.com/us/app/google-gemini/id6477489729"
+      }
     }
   },
   {
@@ -70,9 +84,13 @@
       "homepage": "https://copilot.microsoft.com/",
       "official_listing_url": "https://copilot.microsoft.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "Microsoft's assistant for search, writing, content generation and productivity, with integrations across supported Windows and Microsoft services.",
-      "description_en": "Microsoft's assistant for search, writing, content generation and productivity, with integrations across supported Windows and Microsoft services."
+      "description_en": "Microsoft's assistant for search, writing, content generation and productivity, with integrations across supported Windows and Microsoft services.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=com.microsoft.office.officehubrow",
+        "ios": "https://apps.apple.com/us/app/microsoft-copilot/id541164041"
+      }
     }
   },
   {
@@ -89,9 +107,13 @@
       "homepage": "https://www.perplexity.ai/",
       "official_listing_url": "https://www.perplexity.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An AI-powered answer and research engine that surfaces sources and links for follow-up and verification.",
-      "description_en": "An AI-powered answer and research engine that surfaces sources and links for follow-up and verification."
+      "description_en": "An AI-powered answer and research engine that surfaces sources and links for follow-up and verification.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=ai.perplexity.app.android",
+        "ios": "https://apps.apple.com/us/app/perplexity-ai-agent-search/id1668000334"
+      }
     }
   },
   {
@@ -108,9 +130,13 @@
       "homepage": "https://www.meta.ai/",
       "official_listing_url": "https://www.meta.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "Meta's assistant for search, conversation and content creation. Available features vary by country and account.",
-      "description_en": "Meta's assistant for search, conversation and content creation. Available features vary by country and account."
+      "description_en": "Meta's assistant for search, conversation and content creation. Available features vary by country and account.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=com.facebook.stella",
+        "ios": "https://apps.apple.com/us/app/meta-ai/id1558240027"
+      }
     }
   },
   {
@@ -127,9 +153,13 @@
       "homepage": "https://grok.com/",
       "official_listing_url": "https://grok.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "xAI's assistant for conversation, research and creative tasks, with xAI and X-related capabilities depending on availability.",
-      "description_en": "xAI's assistant for conversation, research and creative tasks, with xAI and X-related capabilities depending on availability."
+      "description_en": "xAI's assistant for conversation, research and creative tasks, with xAI and X-related capabilities depending on availability.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=ai.x.grok",
+        "ios": "https://apps.apple.com/us/app/grok-ai/id6670324846"
+      }
     }
   },
   {
@@ -146,9 +176,13 @@
       "homepage": "https://chat.deepseek.com/",
       "official_listing_url": "https://chat.deepseek.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An AI assistant for research, reasoning, writing and coding, with a web interface and supported mobile apps.",
-      "description_en": "An AI assistant for research, reasoning, writing and coding, with a web interface and supported mobile apps."
+      "description_en": "An AI assistant for research, reasoning, writing and coding, with a web interface and supported mobile apps.",
+      "platform_links": {
+        "android": "https://play.google.com/store/apps/details?id=com.deepseek.chat",
+        "ios": "https://apps.apple.com/us/app/deepseek-ai-assistant/id6737597349"
+      }
     }
   },
   {
@@ -165,7 +199,7 @@
       "homepage": "https://chat.mistral.ai/",
       "official_listing_url": "https://chat.mistral.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "Mistral AI's assistant for conversation, research, writing and file workflows, built around Mistral models.",
       "description_en": "Mistral AI's assistant for conversation, research, writing and file workflows, built around Mistral models."
     }
@@ -184,7 +218,7 @@
       "homepage": "https://poe.com/",
       "official_listing_url": "https://poe.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A platform that brings multiple AI models and chatbots into one interface and lets users discover community-created bots.",
       "description_en": "A platform that brings multiple AI models and chatbots into one interface and lets users discover community-created bots."
     }
@@ -203,7 +237,7 @@
       "homepage": "https://notebooklm.google.com/",
       "official_listing_url": "https://notebooklm.google.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An AI research notebook that helps organize user-provided sources, answer questions about them and generate summaries.",
       "description_en": "An AI research notebook that helps organize user-provided sources, answer questions about them and generate summaries."
     }
@@ -222,7 +256,7 @@
       "homepage": "https://aistudio.google.com/",
       "official_listing_url": "https://aistudio.google.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A web environment for experimenting with Gemini models, prototyping, prompt testing and developer integrations.",
       "description_en": "A web environment for experimenting with Gemini models, prototyping, prompt testing and developer integrations."
     }
@@ -241,7 +275,7 @@
       "homepage": "https://huggingface.co/",
       "official_listing_url": "https://huggingface.co/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A platform for discovering AI models, datasets, Spaces, experiments and open-source developer tools.",
       "description_en": "A platform for discovering AI models, datasets, Spaces, experiments and open-source developer tools."
     }
@@ -260,7 +294,7 @@
       "homepage": "https://replicate.com/",
       "official_listing_url": "https://replicate.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A cloud platform for running AI models through ready-to-use interfaces and developer APIs.",
       "description_en": "A cloud platform for running AI models through ready-to-use interfaces and developer APIs."
     }
@@ -279,7 +313,7 @@
       "homepage": "https://www.midjourney.com/",
       "official_listing_url": "https://www.midjourney.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An image-generation platform for creating visual artwork from prompts and creative controls.",
       "description_en": "An image-generation platform for creating visual artwork from prompts and creative controls."
     }
@@ -298,7 +332,7 @@
       "homepage": "https://firefly.adobe.com/",
       "official_listing_url": "https://firefly.adobe.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "Adobe's generative tools for creating and editing images, effects and creative assets within design workflows.",
       "description_en": "Adobe's generative tools for creating and editing images, effects and creative assets within design workflows."
     }
@@ -317,7 +351,7 @@
       "homepage": "https://www.canva.com/",
       "official_listing_url": "https://www.canva.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A cross-platform design suite for presentations, social posts, video and marketing assets, with AI features across its products.",
       "description_en": "A cross-platform design suite for presentations, social posts, video and marketing assets, with AI features across its products."
     }
@@ -336,7 +370,7 @@
       "homepage": "https://runwayml.com/",
       "official_listing_url": "https://runwayml.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A creative platform for generating and editing video with AI models and tools for content creators.",
       "description_en": "A creative platform for generating and editing video with AI models and tools for content creators."
     }
@@ -355,7 +389,7 @@
       "homepage": "https://elevenlabs.io/",
       "official_listing_url": "https://elevenlabs.io/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An AI audio platform covering text-to-speech, voice generation, dubbing and audio workflows under its usage policies.",
       "description_en": "An AI audio platform covering text-to-speech, voice generation, dubbing and audio workflows under its usage policies."
     }
@@ -374,7 +408,7 @@
       "homepage": "https://suno.com/",
       "official_listing_url": "https://suno.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A tool for generating music and songs from text prompts, with creation and editing features in the platform.",
       "description_en": "A tool for generating music and songs from text prompts, with creation and editing features in the platform."
     }
@@ -393,7 +427,7 @@
       "homepage": "https://ideogram.ai/",
       "official_listing_url": "https://ideogram.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An image-generation platform for creative visuals and designs, including text rendered within images.",
       "description_en": "An image-generation platform for creative visuals and designs, including text rendered within images."
     }
@@ -412,9 +446,10 @@
       "homepage": "https://cursor.com/",
       "official_listing_url": "https://cursor.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An AI-focused code editor that helps understand codebases, edit files and carry out software development tasks.",
-      "description_en": "An AI-focused code editor that helps understand codebases, edit files and carry out software development tasks."
+      "description_en": "An AI-focused code editor that helps understand codebases, edit files and carry out software development tasks.",
+      "download_page": "https://cursor.com/download"
     }
   },
   {
@@ -431,7 +466,7 @@
       "homepage": "https://github.com/features/copilot",
       "official_listing_url": "https://github.com/features/copilot",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "GitHub's coding assistant for supported development environments, helping with code completion, explanation, generation and review.",
       "description_en": "GitHub's coding assistant for supported development environments, helping with code completion, explanation, generation and review."
     }
@@ -450,7 +485,7 @@
       "homepage": "https://replit.com/",
       "official_listing_url": "https://replit.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A cloud development environment for building, running and sharing apps, with AI agents and coding assistance.",
       "description_en": "A cloud development environment for building, running and sharing apps, with AI agents and coding assistance."
     }
@@ -469,9 +504,10 @@
       "homepage": "https://ollama.com/",
       "official_listing_url": "https://ollama.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A tool for running and managing language models locally on a computer through a command-line interface and integrations.",
-      "description_en": "A tool for running and managing language models locally on a computer through a command-line interface and integrations."
+      "description_en": "A tool for running and managing language models locally on a computer through a command-line interface and integrations.",
+      "download_page": "https://ollama.com/download"
     }
   },
   {
@@ -488,9 +524,10 @@
       "homepage": "https://lmstudio.ai/",
       "official_listing_url": "https://lmstudio.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A desktop app for discovering, downloading and running local language models, with local endpoints for other applications.",
-      "description_en": "A desktop app for discovering, downloading and running local language models, with local endpoints for other applications."
+      "description_en": "A desktop app for discovering, downloading and running local language models, with local endpoints for other applications.",
+      "download_page": "https://lmstudio.ai/download"
     }
   },
   {
@@ -507,9 +544,10 @@
       "homepage": "https://jan.ai/",
       "official_listing_url": "https://jan.ai/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An open-source desktop application for running local AI assistants and models with integration capabilities.",
-      "description_en": "An open-source desktop application for running local AI assistants and models with integration capabilities."
+      "description_en": "An open-source desktop application for running local AI assistants and models with integration capabilities.",
+      "download_page": "https://jan.ai/download"
     }
   },
   {
@@ -526,9 +564,10 @@
       "homepage": "https://www.comfy.org/",
       "official_listing_url": "https://www.comfy.org/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A node-based interface for building image, video and media generation workflows with AI models.",
-      "description_en": "A node-based interface for building image, video and media generation workflows with AI models."
+      "description_en": "A node-based interface for building image, video and media generation workflows with AI models.",
+      "download_page": "https://www.comfy.org/download"
     }
   },
   {
@@ -545,7 +584,7 @@
       "homepage": "https://openwebui.com/",
       "official_listing_url": "https://openwebui.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "A self-hosted web interface for interacting with AI models and connecting multiple providers and tools.",
       "description_en": "A self-hosted web interface for interacting with AI models and connecting multiple providers and tools."
     }
@@ -564,9 +603,10 @@
       "homepage": "https://anythingllm.com/",
       "official_listing_url": "https://anythingllm.com/",
       "source_type": "official_publisher_website",
-      "metadata_status": "initially_verified_official_destination",
+      "metadata_status": "official_publisher_link_reference",
       "summary_en": "An AI workspace that connects models with documents, knowledge bases and local or cloud data sources.",
-      "description_en": "An AI workspace that connects models with documents, knowledge bases and local or cloud data sources."
+      "description_en": "An AI workspace that connects models with documents, knowledge bases and local or cloud data sources.",
+      "download_page": "https://anythingllm.com/download"
     }
   }
 ]
