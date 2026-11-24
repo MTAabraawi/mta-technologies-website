@@ -2,7 +2,7 @@ import aiApps from "../data/ai-apps.json";
 
 const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.dev";
 const CONNECTED_STORES = {
-  "ai-apps": { name: "MTA AI Apps Store", source: "mta-ai-apps", curated: true, platforms: ["Android", "iOS", "Windows", "macOS", "Linux", "Web"], url: "https://www.mtahqq.dpdns.org/apps", description: "دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية." },
+  "ai-apps": { name: "متجر تطبيقات الذكاء الاصطناعي", nameEn: "MTA AI Apps Store", source: "mta-ai-apps", curated: true, platforms: ["Android", "iOS", "Windows", "macOS", "Linux", "Web"], url: "https://www.mtahqq.dpdns.org/apps", description: "دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية." },
   "fedora-packages": { name: "Fedora Packages", source: "fedora-packages", platforms: ["Linux", "Fedora"], description: "فهرس حزم Fedora Linux للمستخدمين ومديري الأنظمة والمطورين. استكشف أسماء الحزم ووظائفها وصفحاتها الأصلية، وانتبه إلى إصدار Fedora والمستودع والمعمارية قبل تثبيت أي حزمة." },
 
   "jetbrains-marketplace": { name: "JetBrains Marketplace", source: "jetbrains-marketplace", platforms: ["IntelliJ IDEA", "PyCharm", "WebStorm", "IDE plugins"], description: "سوق إضافات بيئات JetBrains مثل IntelliJ IDEA وPyCharm وWebStorm. يفيد المطورين في العثور على أدوات اللغات والتنسيق والاختبار والتكامل؛ راجع توافق الإضافة مع إصدار IDE وتقييمات الناشر وتاريخ التحديث." },
@@ -67,6 +67,14 @@ function makeCard(app, storeKey, store) {
   const summary = app.summary || app.description || "لا يتوفر وصف مختصر في بيانات المصدر.";
   const sourceLabel = store.curated ? store.name : source;
   const category = String(app.category || "Other").split(",")[0].trim();
+  const platformLabels = { android: "Google Play", ios: "App Store", windows: "Windows", macos: "macOS", linux: "Linux" };
+  const platformLinks = Object.entries(metadata.platform_links || {}).map(([key, value]) => {
+    const href = safeHttps(value); const label = platformLabels[key];
+    return href && label ? '<a href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(label) + '</a>' : "";
+  }).filter(Boolean).join("");
+  const downloadPage = safeHttps(metadata.download_page);
+  const downloadLink = downloadPage ? '<a class="store-app-download-link" href="' + escapeHtml(downloadPage) + '" target="_blank" rel="noopener noreferrer">التنزيلات الرسمية</a>' : "";
+  const platformLinksHtml = platformLinks || downloadLink ? '<div class="store-app-platform-links">' + platformLinks + downloadLink + '</div>' : "";
   return '<article class="store-app-card" data-category="' + escapeHtml(category) + '" data-platform="' + escapeHtml(String(app.platform || "").toLowerCase()) + '">' +
     '<div class="store-app-top">' +
       (icon ? '<img class="store-app-icon" loading="lazy" decoding="async" src="' + escapeHtml(icon) + '" alt="' + escapeHtml(name) + ' icon" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="store-app-icon-fallback" hidden aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>' :
@@ -77,6 +85,7 @@ function makeCard(app, storeKey, store) {
     '<p class="store-app-meta">' + escapeHtml(meta) + '</p>' +
     '<p class="store-app-summary">' + escapeHtml(summary) + '</p>' +
     '<div class="store-app-tags">' + [platform, app.license].filter(Boolean).map(value => '<span>' + escapeHtml(value) + '</span>').join("") + '</div>' +
+    platformLinksHtml +
     (store.curated ? '' : '<a class="store-app-detail-link" href="' + escapeHtml(detail) + '">تفاصيل التطبيق داخل MTA</a>') +
     '<a class="store-app-link" href="' + escapeHtml(original) + '" target="_blank" rel="noopener noreferrer">عرض التطبيق في مصدره الأصلي ↗</a>' +
   '</article>';
