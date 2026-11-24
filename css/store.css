@@ -110,3 +110,7 @@
 .application-screenshots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:.75rem}
 .application-screenshots-grid a{display:block;overflow:hidden;border-radius:.75rem;border:1px solid var(--border-color,rgba(148,163,184,.2));background:var(--surface,rgba(15,23,42,.35))}
 .application-screenshots-grid img{display:block;width:100%;height:180px;object-fit:contain}
+
+
+/* MTA AI Apps Store card treatment */
+.ai-store-card{border-color:color-mix(in srgb,var(--accent-blue) 48%,var(--border-color));background:radial-gradient(ellipse at 88% 0%,var(--accent-glow),transparent 58%),linear-gradient(145deg,var(--bg-surface),var(--bg-card))}.ai-store-card strong{color:var(--text-primary)}.ai-store-card .store-card-description{color:var(--text-secondary);font-size:.73rem;line-height:1.8;margin:.15rem 0}.ai-store-card img{width:44px;height:44px}
