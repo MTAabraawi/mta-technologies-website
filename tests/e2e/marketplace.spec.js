@@ -86,7 +86,7 @@ test('marketplace API is served from the same origin', async ({ page }) => {
 test('all store cards open internal MTA store pages, never external stores directly', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
   const cards = page.locator('.store-picker-card');
-  await expect(cards).toHaveCount(54);
+  await expect(cards).toHaveCount(55);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
     expect(href.startsWith('store?store=')).toBe(true);
@@ -106,6 +106,36 @@ test('F-Droid opens an internal branded catalogue and displays server-rendered a
   // must be usable without a redundant browser-side request.
   await expect(page.locator('.store-app-card')).toHaveCount(12, { timeout: 60_000 });
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
+  expect(errors).toEqual([]);
+});
+
+
+test('MTA AI Apps Store is searchable, server-rendered and links to official publishers', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
+  const card = page.locator('[data-store-key="ai-apps"]');
+  await expect(card).toBeVisible();
+  await expect(card).toHaveAttribute('data-static-catalogue', 'true');
+  await card.click();
+  await expect(page).toHaveURL(/\\/store\\?store=ai-apps/);
+  await expect(page.locator('#store-title')).toHaveText('MTA AI Apps Store');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\\/store\\?store=ai-apps$/);
+  await expect(page.locator('#store-ssr-schema')).toHaveCount(1);
+  const cards = page.locator('.store-app-card');
+  await expect(cards).toHaveCount(30, { timeout: 30_000 });
+  await expect(cards.filter({ hasText: 'ChatGPT' })).toHaveCount(1);
+  await expect(cards.filter({ hasText: 'Ollama' })).toHaveCount(1);
+  const destinations = await page.locator('.store-app-link').evaluateAll(links => links.map(link => link.href));
+  expect(destinations).toHaveLength(30);
+  for (const destination of destinations) expect(destination).toMatch(/^https:\\/\\//);
+  await page.locator('#store-search').fill('ChatGPT');
+  await expect(page.locator('.store-app-card:not([hidden])')).toHaveCount(1);
+  await expect(page.locator('.store-app-card:not([hidden])').first()).toContainText('OpenAI');
+  await page.locator('#store-search').fill('');
+  await page.locator('#store-platform-filter').selectOption('windows');
+  await expect(page.locator('.store-app-card:not([hidden])').count()).resolves.toBeGreaterThan(0);
   expect(errors).toEqual([]);
 });
 
@@ -289,7 +319,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(54);
+  await expect(page.locator('.store-picker-card')).toHaveCount(55);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
