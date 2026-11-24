@@ -55,7 +55,7 @@ const stores={
 "jetbrains-marketplace":{name:"JetBrains Marketplace",platforms:["IntelliJ IDEA","PyCharm","WebStorm"],url:"https://plugins.jetbrains.com/",host:"plugins.jetbrains.com",source:"jetbrains-marketplace",mode:"live",desc:"JetBrains IDE plugin marketplace."},
 "gnome-extensions":{name:"GNOME Extensions",platforms:["Linux","GNOME Shell"],url:"https://extensions.gnome.org/",host:"extensions.gnome.org",source:"gnome-extensions",mode:"live",desc:"GNOME Shell extensions catalogue."},
 "fedora-packages":{name:"Fedora Packages",platforms:["Linux","Fedora"],url:"https://packages.fedoraproject.org/",host:"packages.fedoraproject.org",source:"fedora-packages",mode:"live",desc:"Official Fedora RPM package index with package names and original detail pages."},
-"ai-apps":{name:"MTA AI Apps Store",platforms:["Android","iOS","Windows","macOS","Linux","Web"],url:"https://www.mtahqq.dpdns.org/apps",host:"openai.com",mode:"curated",curatedFile:"data/ai-apps.json",desc:"دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية.",descEn:"A multi-platform directory of AI applications and tools covering assistants, research, design, audio, video, coding and local models. Every listing links to an official publisher destination."},
+"ai-apps":{name:"متجر تطبيقات الذكاء الاصطناعي",nameEn:"MTA AI Apps Store",platforms:["Android","iOS","Windows","macOS","Linux","Web"],url:"https://www.mtahqq.dpdns.org/apps",host:"openai.com",mode:"curated",curatedFile:"data/ai-apps.json",desc:"دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية.",descEn:"A multi-platform directory of AI applications and tools covering assistants, research, design, audio, video, coding and local models. Every listing links to an official publisher destination."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
@@ -102,10 +102,11 @@ const editorialProfiles={
 
 const lang=()=>document.documentElement.lang==="en";
 const copy=(ar,en)=>lang()?en:ar;
+const displayStoreName=()=>copy(store?.name||"Store",store?.nameEn||store?.name||"Store");
 const title=$("store-title"), subtitle=$("store-subtitle"), logo=$("store-logo"), official=$("store-official-link"), status=$("store-status"), desc=$("store-description");
 if(!store){$("store-results-note").textContent=copy("لم يتم العثور على المتجر المطلوب. ارجع إلى دليل المتاجر لاختيار متجر آخر.","Store not found. Return to the marketplace and choose another store.");$("store-catalogue-section").hidden=true;}
 else{
- title.textContent=store.name; $("breadcrumb-store").textContent=store.name; document.title=store.name+" | MTA TECHNOLOGIES"; const canonical=document.querySelector("link[rel=canonical]"); if(canonical)canonical.href=location.origin+location.pathname+"?store="+encodeURIComponent(key); const descriptionMeta=document.querySelector("meta[name=description]"); if(descriptionMeta)descriptionMeta.content=lang()?(store.name+" app catalogue on MTA. Browse available listings and original publisher links."):( "دليل "+store.name+" على MTA. تصفح التطبيقات المتاحة وروابط الناشرين الأصلية.");
+ title.textContent=displayStoreName(); $("breadcrumb-store").textContent=displayStoreName(); document.title=displayStoreName()+" | MTA TECHNOLOGIES"; const canonical=document.querySelector("link[rel=canonical]"); if(canonical)canonical.href=location.origin+location.pathname+"?store="+encodeURIComponent(key); const descriptionMeta=document.querySelector("meta[name=description]"); if(descriptionMeta)descriptionMeta.content=lang()?(displayStoreName()+" app catalogue on MTA. Browse available listings and original publisher links."):( "دليل "+displayStoreName()+" على MTA. تصفح التطبيقات المتاحة وروابط الناشرين الأصلية.");
  $("store-description").textContent=copy(store.desc,store.descEn||store.desc); subtitle.textContent=store.platforms.join(" · ");
  const editorialIntro=$("store-editorial-intro"),editorialWhat=$("store-editorial-what"),editorialVerify=$("store-editorial-verify"),editorialAvailability=$("store-editorial-availability");
  if(editorialIntro)editorialIntro.textContent=lang()?("Browse "+store.name+" through MTA's source-aware catalogue. "+store.platforms.join(", ")+". "+(store.descEn||store.desc)):("تصفح "+store.name+" عبر دليل MTA مع توضيح مصدر البيانات وحالة الفهرسة. "+store.desc);
@@ -116,7 +117,7 @@ else{
  if(profile){const texts=lang()?profile.en:profile.ar;if(editorialIntro)editorialIntro.textContent=texts[0];if(editorialWhat)editorialWhat.textContent=texts[1];if(editorialVerify)editorialVerify.textContent=texts[2];if(editorialAvailability)editorialAvailability.textContent=lang()?(store.name+" availability, pricing and regional access can vary across "+store.platforms.join(", ")+". Check the publisher listing for current regional and device requirements."):( "قد يختلف توفر "+store.name+" وأسعاره والوصول إليه بحسب "+store.platforms.join(" و")+" والمنطقة والجهاز. راجع صفحة الناشر للتأكد من المتطلبات الحالية.");}
  const storeSchema=document.createElement("script");storeSchema.type="application/ld+json";storeSchema.id="store-profile-schema";storeSchema.textContent=JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":store.name+" catalogue","description":store.desc,"url":location.href,"inLanguage":["ar","en"],"about":{"@type":"Thing","name":store.name+" app catalogue"}});document.head.append(storeSchema);
  const logoUrl="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.host)+"&sz=128",logoFallback="https://icons.duckduckgo.com/ip3/"+encodeURIComponent(store.host)+".ico";
- logo.src=logoUrl;logo.setAttribute("alt",copy("شعار "+store.name,"Logo of "+store.name));logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.webp"}};
+ logo.src=logoUrl;logo.setAttribute("alt",copy("شعار "+displayStoreName(),"Logo of "+displayStoreName()));logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.webp"}};
  official.href=store.url;
  $("store-platforms").replaceChildren(...store.platforms.map(p=>{const s=document.createElement("span");s.textContent=p;return s}));
  const connected=!!store.source||!!store.curatedFile;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
@@ -157,7 +158,7 @@ function makeCard(app){
  let iconIndex=0;
  const makeMonogram=()=>{const mark=document.createElement("span");mark.className="store-app-icon-fallback";mark.setAttribute("aria-label",(app.name||"App")+" icon unavailable");mark.textContent=String(app.name||"A").trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase();return mark};
  icon.onerror=()=>{iconIndex++;if(iconIndex<candidates.length)icon.src=candidates[iconIndex];else if(icon.parentNode)icon.replaceWith(makeMonogram())};
- const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||store.name;
+ const badge=document.createElement("span");badge.className="store-app-source";badge.textContent=app.source||displayStoreName();
  if(candidates.length){top.append(icon,badge);icon.src=candidates[0]}else{top.append(makeMonogram(),badge)}
  const h=document.createElement("h3");
  const detailParams=new URLSearchParams({source:String(app.source||store.source||""),store:key,id:String(app.external_id||app.id||""),name:String(app.name||"Application")});
@@ -177,8 +178,12 @@ function makeCard(app){
   const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option);
  }
  const tags=document.createElement("div");tags.className="store-app-tags";[platformLabel,app.license].filter(Boolean).forEach(v=>{const x=document.createElement("span");x.textContent=v;tags.append(x)});const price=app.metadata_json?.price;if(price&&Number.isFinite(Number(price.final))&&price.currency){const p=document.createElement("span");p.className="store-app-price";p.textContent=Number(price.final)===0?copy("مجاني","Free"):(Number(price.final)/100).toLocaleString(undefined,{style:"currency",currency:String(price.currency)});tags.append(p)}
- const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("عرض التطبيق في مصدره الأصلي ↗","View original app listing ↗");
- card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags,detailLink,link);return card;
+ const platformLinks=document.createElement("div");platformLinks.className="store-app-platform-links";
+ const platformLabels={android:"Google Play",ios:"App Store",windows:"Windows",macos:"macOS",linux:"Linux"};
+ Object.entries(metadata.platform_links||{}).forEach(([platformName,url])=>{const href=safe(url);const label=platformLabels[platformName];if(!href||!label)return;const item=document.createElement("a");item.href=href;item.target="_blank";item.rel="noopener noreferrer";item.textContent=label;platformLinks.append(item)});
+ const downloadPage=safe(metadata.download_page||"");if(downloadPage){const item=document.createElement("a");item.href=downloadPage;item.target="_blank";item.rel="noopener noreferrer";item.className="store-app-download-link";item.textContent=copy("التنزيلات الرسمية","Official downloads");platformLinks.append(item)}
+ const link=document.createElement("a");link.className="store-app-link";link.href=safe(app.source_url||app.app_url)||store.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent=copy("الموقع الرسمي للتطبيق ↗","Official app website ↗");
+ card.append(top,h,meta,summary);if(details)card.append(details);card.append(tags);if(platformLinks.childElementCount)card.append(platformLinks);card.append(detailLink,link);return card;
 }
 function setEmpty(message){$("store-empty").hidden=false;$("store-empty").textContent=message}
 function applyLocalFilters(){const selected=$("store-category-filter")?.value||"";const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.forEach(card=>card.hidden=!!selected&&card.dataset.category!==selected);if($("store-sort")?.value==="name"){cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}}
@@ -236,7 +241,7 @@ if(store?.source || store?.curatedFile){
    if(!Array.isArray(items))throw Error("Invalid AI catalogue data");
    const verified=items.filter(app=>app&&String(app.name||"").trim()&&safe(app.source_url||app.app_url));
    grid.replaceChildren();
-   verified.forEach(app=>grid.append(makeCard({...app,source:"mta-ai-apps"})));
+   verified.forEach(app=>grid.append(makeCard(app)));window.__mtaAiApps=verified;
    const categories=Array.from(new Set(verified.map(app=>String(app.category||"").split(",")[0].trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
    const categorySelect=$("store-category-filter");
    categories.forEach(category=>{if(!Array.from(categorySelect.options).some(option=>option.value===category)){const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option)}});
@@ -296,5 +301,5 @@ if(store?.source || store?.curatedFile){
  load.addEventListener("click",()=>{autoLoadPaused=false;fetchPage(false)});setupAutomaticLoading();$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));
  }
 }
-window.addEventListener("mta:languagechange",()=>{if(store){document.title=store.name+" | MTA TECHNOLOGIES"}});
+window.addEventListener("mta:languagechange",()=>{if(store){document.title=displayStoreName()+" | MTA TECHNOLOGIES";if(store.curatedFile&&Array.isArray(window.__mtaAiApps)){grid.replaceChildren(...window.__mtaAiApps.map(app=>makeCard(app)));}}});
 })();
