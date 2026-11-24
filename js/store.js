@@ -55,6 +55,7 @@ const stores={
 "jetbrains-marketplace":{name:"JetBrains Marketplace",platforms:["IntelliJ IDEA","PyCharm","WebStorm"],url:"https://plugins.jetbrains.com/",host:"plugins.jetbrains.com",source:"jetbrains-marketplace",mode:"live",desc:"JetBrains IDE plugin marketplace."},
 "gnome-extensions":{name:"GNOME Extensions",platforms:["Linux","GNOME Shell"],url:"https://extensions.gnome.org/",host:"extensions.gnome.org",source:"gnome-extensions",mode:"live",desc:"GNOME Shell extensions catalogue."},
 "fedora-packages":{name:"Fedora Packages",platforms:["Linux","Fedora"],url:"https://packages.fedoraproject.org/",host:"packages.fedoraproject.org",source:"fedora-packages",mode:"live",desc:"Official Fedora RPM package index with package names and original detail pages."},
+"ai-apps":{name:"MTA AI Apps Store",platforms:["Android","iOS","Windows","macOS","Linux","Web"],url:"https://www.mtahqq.dpdns.org/apps",host:"openai.com",mode:"curated",curatedFile:"data/ai-apps.json",desc:"دليل متعدد المنصات لتطبيقات وأدوات الذكاء الاصطناعي، يشمل المساعدات والبحث والتصميم والصوت والفيديو والبرمجة والنماذج المحلية. الروابط تقود إلى مواقع الناشرين الرسمية.",descEn:"A multi-platform directory of AI applications and tools covering assistants, research, design, audio, video, coding and local models. Every listing links to an official publisher destination."},
 "product-hunt":{name:"Product Hunt",platforms:["Web"],url:"https://www.producthunt.com/",host:"producthunt.com",mode:"external",desc:"منصة اكتشاف منتجات وشركات ناشئة وأدوات ويب."}
 };
 const $=id=>document.getElementById(id), params=new URLSearchParams(location.search), key=params.get("store")||"", store=stores[key];
@@ -118,7 +119,7 @@ else{
  logo.src=logoUrl;logo.setAttribute("alt",copy("شعار "+store.name,"Logo of "+store.name));logo.onerror=()=>{if(logo.src!==logoFallback)logo.src=logoFallback;else{logo.onerror=null;logo.src="images/mta-logo-square.webp"}};
  official.href=store.url;
  $("store-platforms").replaceChildren(...store.platforms.map(p=>{const s=document.createElement("span");s.textContent=p;return s}));
- const connected=!!store.source;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
+ const connected=!!store.source||!!store.curatedFile;if(store.source==="steam"&&!Array.from($("store-platform-filter").options).some(o=>o.value==="pc-games")){const option=document.createElement("option");option.value="pc-games";option.textContent="PC Games";$("store-platform-filter").append(option)}
  status.textContent=connected?copy("جارٍ التحقق من توفر السجلات","Checking indexed records"):copy("نعمل على توفيرها قريباً","Coming soon");status.classList.remove("is-connected");
  if(!connected){const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";$("store-search-row").hidden=true;grid.hidden=true;load.hidden=true;$("store-catalogue-section").querySelector(".store-catalogue-heading").hidden=true;$("store-unavailable").hidden=false;$("store-unavailable-copy").textContent=store.desc;$("store-unavailable-link").href=store.url;$("store-results-note").textContent=copy("لا نعرض سجلات تطبيقات من هذا المتجر حتى يتوفر مصدر بيانات قابل للتحقق.","No app records are shown until a verifiable data source is available.");}
 }
@@ -228,7 +229,48 @@ function setupAutomaticLoading(){
  },{root:null,rootMargin:"700px 0px",threshold:0});
  if(!load.hidden)autoLoadObserver.observe(load);
 }
-if(store?.source){
+if(store?.source || store?.curatedFile){
+ if(store.curatedFile){
+  status.textContent=copy("جارٍ تحميل كتالوج الذكاء الاصطناعي","Loading AI applications catalogue");
+  fetch(store.curatedFile,{cache:"no-cache",credentials:"omit"}).then(response=>{if(!response.ok)throw Error("AI catalogue HTTP "+response.status);return response.json()}).then(items=>{
+   if(!Array.isArray(items))throw Error("Invalid AI catalogue data");
+   const verified=items.filter(app=>app&&String(app.name||"").trim()&&safe(app.source_url||app.app_url));
+   grid.replaceChildren();
+   verified.forEach(app=>grid.append(makeCard({...app,source:"mta-ai-apps"})));
+   const categories=Array.from(new Set(verified.map(app=>String(app.category||"").split(",")[0].trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+   const categorySelect=$("store-category-filter");
+   categories.forEach(category=>{if(!Array.from(categorySelect.options).some(option=>option.value===category)){const option=document.createElement("option");option.value=category;option.textContent=category;categorySelect.append(option)}});
+   const empty=$("store-empty");
+   function filterAI(){
+    const term=search.value.trim().toLocaleLowerCase();
+    const chosenPlatform=platform.value.trim().toLocaleLowerCase();
+    const chosenCategory=categorySelect.value;
+    let visible=0;
+    grid.querySelectorAll(".store-app-card").forEach(card=>{
+     const platformText=card.dataset.platform||"";
+     const match=(!term||card.textContent.toLocaleLowerCase().includes(term))
+      &&(!chosenPlatform||platformText.includes(chosenPlatform))
+      &&(!chosenCategory||card.dataset.category===chosenCategory);
+     card.hidden=!match;if(match)visible++;
+    });
+    if(empty){empty.hidden=visible>0;empty.textContent=copy("لا توجد تطبيقات تطابق عوامل البحث الحالية.","No AI apps match the current filters.");}
+    count.textContent=visible.toLocaleString()+" "+copy("تطبيقاً معروضاً","apps shown");
+    if($("store-results-note"))$("store-results-note").textContent=copy("تظهر "+verified.length.toLocaleString()+" إدخالات أولية بروابط الناشرين الرسمية. يجري توسيع الفهرس والتحقق من بيانات المنصات والنسخ باستمرار.","Showing "+verified.length.toLocaleString()+" initial listings with official publisher links. The catalogue is being expanded and platform/version metadata is continuously reviewed.");
+   }
+   const sort=$("store-sort");
+   function sortAI(){if(sort.value==="name"){const cards=Array.from(grid.querySelectorAll(".store-app-card"));cards.sort((a,b)=>a.querySelector("h3").textContent.localeCompare(b.querySelector("h3").textContent));cards.forEach(card=>grid.append(card))}filterAI()}
+   search.addEventListener("input",filterAI);platform.addEventListener("change",filterAI);categorySelect.addEventListener("change",filterAI);sort.addEventListener("change",sortAI);
+   status.textContent=copy("كتالوج أولي متصل · "+verified.length.toLocaleString()+" تطبيقاً","Catalogue connected · "+verified.length.toLocaleString()+" listings");
+   status.classList.add("is-connected");grid.hidden=false;$("store-search-row").hidden=false;$("store-unavailable").hidden=true;load.hidden=true;
+   const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="index,follow";
+   filterAI();
+  }).catch(error=>{
+   console.error("MTA AI apps catalogue unavailable",error);
+   status.textContent=copy("تعذر تحميل الكتالوج","Catalogue unavailable");
+   setEmpty(copy("تعذر تحميل بيانات متجر الذكاء الاصطناعي. أعد المحاولة لاحقاً.","The AI apps catalogue could not be loaded. Please retry later."));
+   const robots=document.querySelector("meta[name=robots]");if(robots)robots.content="noindex,follow";
+  });
+ }else{
  if(initialServerRenderedCount>0){
   // The Pages Function already rendered a usable first page. Do not gate
   // visible catalogue content on a second browser-side stats request.
@@ -252,6 +294,7 @@ if(store?.source){
   });
  }
  load.addEventListener("click",()=>{autoLoadPaused=false;fetchPage(false)});setupAutomaticLoading();$("store-category-filter").addEventListener("change",applyLocalFilters);$("store-sort").addEventListener("change",applyLocalFilters);search.addEventListener("input",()=>{clearTimeout(timer);timer=setTimeout(()=>{query=search.value.trim();fetchPage(true)},350)});platform.addEventListener("change",()=>fetchPage(true));
+ }
 }
 window.addEventListener("mta:languagechange",()=>{if(store){document.title=store.name+" | MTA TECHNOLOGIES"}});
 })();
