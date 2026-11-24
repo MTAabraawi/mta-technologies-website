@@ -127,6 +127,8 @@ test('MTA AI Apps Store is searchable, server-rendered and links to official pub
   expect(await cards.count()).toBeGreaterThanOrEqual(30);
   await expect(cards.filter({ hasText: 'ChatGPT' })).toHaveCount(1);
   await expect(cards.filter({ hasText: 'Ollama' })).toHaveCount(1);
+  await expect(cards.filter({ hasText: 'Fixture Hugging Face AI Space' })).toHaveCount(1);
+  await expect(cards.filter({ hasText: 'Fixture Global AI Desktop' })).toHaveCount(1);
   const chatgptLinks = cards.filter({ hasText: 'ChatGPT' }).locator('.store-app-platform-links a');
   await expect(chatgptLinks).toHaveCount(3);
   await expect(chatgptLinks.filter({ hasText: 'Google Play' })).toHaveCount(1);
