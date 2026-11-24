@@ -76,7 +76,8 @@ function makeCard(app, storeKey, store) {
   const downloadPage = safeHttps(metadata.download_page);
   const downloadLink = downloadPage ? '<a class="store-app-download-link" href="' + escapeHtml(downloadPage) + '" target="_blank" rel="noopener noreferrer">التنزيلات الرسمية</a>' : "";
   const platformLinksHtml = platformLinks || downloadLink ? '<div class="store-app-platform-links">' + platformLinks + downloadLink + '</div>' : "";
-  return '<article class="store-app-card" data-category="' + escapeHtml(category) + '" data-platform="' + escapeHtml(String(app.platform || "").toLowerCase()) + '">' +
+  const appKey = source + "|id:" + (id || (name.toLocaleLowerCase() + "|" + String(app.platform || "").toLowerCase()));
+  return '<article class="store-app-card" data-app-key="' + escapeHtml(appKey) + '" data-category="' + escapeHtml(category) + '" data-platform="' + escapeHtml(String(app.platform || "").toLowerCase()) + '">' +
     '<div class="store-app-top">' +
       (icon ? '<img class="store-app-icon" loading="lazy" decoding="async" src="' + escapeHtml(icon) + '" alt="' + escapeHtml(name) + ' icon" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="store-app-icon-fallback" hidden aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>' :
         '<span class="store-app-icon-fallback" aria-label="' + escapeHtml(name) + ' icon">' + escapeHtml(initials) + '</span>') +
