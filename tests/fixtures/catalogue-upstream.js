@@ -35,7 +35,7 @@ http.createServer((req, res) => {
     const externalId = url.searchParams.get('external_id');
     const query = String(url.searchParams.get('q') || '').trim().toLocaleLowerCase();
     const platform = String(url.searchParams.get('platform') || '').trim().toLocaleLowerCase();
-    const sourceRows = ['huggingface-ai-spaces', 'github-ai-applications'].includes(requestedSource) ? aiRows : rows;
+    const sourceRows = ['huggingface-ai-spaces', 'github-ai-applications'].includes(requestedSource) ? aiRows.filter(row => row.source === requestedSource) : rows;
     const matched = sourceRows.filter(row => {
       const searchable = [row.name, row.developer, row.summary, row.description].join(' ').toLocaleLowerCase();
       return (!query || searchable.includes(query)) && (!platform || row.platform.toLocaleLowerCase() === platform) && (!externalId || row.external_id === externalId);
