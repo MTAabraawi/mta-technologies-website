@@ -119,7 +119,7 @@ test('MTA AI Apps Store is searchable, server-rendered and links to official pub
   await expect(card).toHaveAttribute('data-static-catalogue', 'true');
   await card.click();
   await expect(page).toHaveURL(/\/store\?store=ai-apps/);
-  await expect(page.locator('#store-title')).toHaveText('MTA AI Apps Store');
+  await expect(page.locator('#store-title')).toHaveText('متجر تطبيقات الذكاء الاصطناعي');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=ai-apps$/);
   await expect(page.locator('#store-ssr-schema')).toHaveCount(1);
@@ -127,6 +127,10 @@ test('MTA AI Apps Store is searchable, server-rendered and links to official pub
   await expect(cards).toHaveCount(30, { timeout: 30_000 });
   await expect(cards.filter({ hasText: 'ChatGPT' })).toHaveCount(1);
   await expect(cards.filter({ hasText: 'Ollama' })).toHaveCount(1);
+  const chatgptLinks = cards.filter({ hasText: 'ChatGPT' }).locator('.store-app-platform-links a');
+  await expect(chatgptLinks).toHaveCount(3);
+  await expect(chatgptLinks.filter({ hasText: 'Google Play' })).toHaveCount(1);
+  await expect(chatgptLinks.filter({ hasText: 'App Store' })).toHaveCount(1);
   const destinations = await page.locator('.store-app-link').evaluateAll(links => links.map(link => link.href));
   expect(destinations).toHaveLength(30);
   for (const destination of destinations) expect(destination).toMatch(/^https:\/\//);
