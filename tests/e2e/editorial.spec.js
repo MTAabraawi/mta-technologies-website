@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 const existingSlugs = ["ai-agents-security-governance","ai-developments-november-2026","android-app-permissions-guide","browser-privacy-tracking","choose-ai-tools-evaluate","detect-ai-generated-media","password-managers-passkeys","safe-apk-download-verification","telegram-secret-cloud-chats-explained","verify-website-trustworthiness","whatsapp-end-to-end-encrypted-backups"];
-const newSlugs = ["google-photos-free-up-space","google-drive-secure-sharing","android-private-space-guide","qr-code-scams-safety","google-admob-ai-tools-publishers","android-theft-protection-guide","google-maps-offline-maps-guide","cloudflare-one-one-one-one-warp-guide","powertoys-advanced-paste-guide","gemini-skills-gems-transition-guide"];
+const newSlugs = ["google-photos-free-up-space","google-drive-secure-sharing","android-private-space-guide","qr-code-scams-safety","google-admob-ai-tools-publishers","android-theft-protection-guide","google-maps-offline-maps-guide","cloudflare-one-one-one-one-warp-guide","powertoys-advanced-paste-guide","gemini-skills-gems-transition-guide","gemini-notebook-notebooklm-research-guide","obs-studio-screen-recording-streaming-guide","windows-sandbox-safe-app-testing-guide","github-codespaces-practical-guide-cost-control","windows-quick-assist-safe-remote-support"];
 const allSlugs = [...existingSlugs, ...newSlugs];
 
 function wordCount(section) {
@@ -11,16 +11,16 @@ function wordCount(section) {
 test('editorial collection cards, CollectionPage schema, and sitemap agree', async ({ page }) => {
   await page.goto('/articles.html');
   const cards = page.locator('.editorial-card');
-  await expect(cards).toHaveCount(21);
+  await expect(cards).toHaveCount(26);
   const hrefs = await cards.evaluateAll(nodes => nodes.map(node => node.querySelector('a')?.getAttribute('href')));
-  expect(new Set(hrefs).size).toBe(21);
+  expect(new Set(hrefs).size).toBe(26);
   expect(hrefs.every(href => href && href.startsWith('articles/'))).toBe(true);
   const metaTexts = await page.locator('.editorial-meta').allTextContents();
   expect(metaTexts.every(value => !value.includes('undefined'))).toBe(true);
   const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
   const collection = JSON.parse(jsonLd);
   expect(collection['@type']).toBe('CollectionPage');
-  expect(collection.hasPart).toHaveLength(21);
+  expect(collection.hasPart).toHaveLength(26);
   expect(new Set(collection.hasPart.map(item => item.url)).size).toBe(21);
 
   const [articleMap, storeMap, index] = await Promise.all([
@@ -34,9 +34,14 @@ test('editorial collection cards, CollectionPage schema, and sitemap agree', asy
   const articleXml = await articleMap.text();
   const storeXml = await storeMap.text();
   const indexXml = await index.text();
-  expect((articleXml.match(/<url>/g) || []).length).toBe(21);
+  expect((articleXml.match(/<url>/g) || []).length).toBe(26);
   expect(articleXml).toContain('/articles/google-admob-ai-tools-publishers');
   expect(articleXml).toContain('/articles/gemini-skills-gems-transition-guide');
+  expect(articleXml).toContain('/articles/gemini-notebook-notebooklm-research-guide');
+  expect(articleXml).toContain('/articles/obs-studio-screen-recording-streaming-guide');
+  expect(articleXml).toContain('/articles/windows-sandbox-safe-app-testing-guide');
+  expect(articleXml).toContain('/articles/github-codespaces-practical-guide-cost-control');
+  expect(articleXml).toContain('/articles/windows-quick-assist-safe-remote-support');
   expect((storeXml.match(/<url>/g) || []).length).toBe(12);
   expect(indexXml).toContain('sitemap-pages.xml');
   expect(indexXml).toContain('sitemap-articles.xml');
@@ -63,7 +68,7 @@ test('all editorial pages contain substantial Arabic and English editions, sourc
   }
 });
 
-test('the ten recently added articles meet the expanded bilingual depth threshold', async ({ page }) => {
+test('the fifteen newly added articles meet the expanded bilingual depth threshold', async ({ page }) => {
   for (const slug of newSlugs) {
     const response = await page.request.get('/articles/' + slug);
     expect(response.ok()).toBeTruthy();
