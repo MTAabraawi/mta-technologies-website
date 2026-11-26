@@ -341,6 +341,10 @@ test('connected store pages are server-rendered with a unique canonical and visi
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  const description = await page.locator('meta[name="description"]').getAttribute('content');
+  expect(description).toContain('F-Droid');
+  expect(description.length).toBeLessThanOrEqual(160);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=fdroid$/);
   await expect(page.locator('.store-app-card')).toHaveCount(12);
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
@@ -433,7 +437,13 @@ test('cinematic homepage carousel animates the MTA logo and project slides', asy
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html', { waitUntil: 'load' });
-  await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
+  // Keep the visible primary destinations explicit to catch accidental navigation regressions.
+  const navigationLinks = page.locator('.corp-page-nav a');
+  await expect(navigationLinks).toHaveCount(6);
+  const navigationHrefs = await navigationLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+  expect(navigationHrefs).toEqual([
+    'about.html', 'projects.html', 'innovation.html', 'apps.html', 'contact.html', 'contribute.html'
+  ]);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
   // The project slide is initially hidden; activate it before measuring its grid.
   await page.locator('[data-carousel-to="1"]').click();
@@ -499,7 +509,7 @@ test('homepage carousel advances automatically and supports touch swipe', async 
   await expect(slides.nth(0)).toBeVisible();
 });
 test('public content pages expose unique titles, descriptions, canonical URLs and valid JSON-LD', async ({ page }) => {
-  const paths = ['/','/about.html','/projects.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
+  const paths = ['/','/about.html','/projects.html','/apps.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
   const titles = new Set();
   const canonicals = new Set();
   for (const path of paths) {
@@ -513,6 +523,12 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
     expect(titles.has(title), path + ' duplicate title').toBe(false);
     titles.add(title);
     expect(description.length, path + ' description').toBeGreaterThan(60);
+    if (path === '/apps.html') {
+      expect(description).toContain('Android');
+      expect(description).toContain('iOS');
+      expect(description).toContain('روابط الناشرين الأصلية');
+      expect(description.length).toBeLessThanOrEqual(160);
+    }
     expect(canonical, path + ' canonical').toMatch(/^https:\/\//);
     expect(canonicals.has(canonical), path + ' duplicate canonical').toBe(false);
     canonicals.add(canonical);
