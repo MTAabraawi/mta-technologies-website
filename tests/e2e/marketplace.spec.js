@@ -341,6 +341,10 @@ test('connected store pages are server-rendered with a unique canonical and visi
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  const description = await page.locator('meta[name="description"]').getAttribute('content');
+  expect(description).toContain('F-Droid');
+  expect(description.length).toBeLessThanOrEqual(160);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /\/store\?store=fdroid$/);
   await expect(page.locator('.store-app-card')).toHaveCount(12);
   await expect(page.locator('.store-app-card').first()).toContainText('MTA Net Blocker');
