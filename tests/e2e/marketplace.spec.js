@@ -503,7 +503,7 @@ test('homepage carousel advances automatically and supports touch swipe', async 
   await expect(slides.nth(0)).toBeVisible();
 });
 test('public content pages expose unique titles, descriptions, canonical URLs and valid JSON-LD', async ({ page }) => {
-  const paths = ['/','/about.html','/projects.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
+  const paths = ['/','/about.html','/projects.html','/apps.html','/innovation.html','/knowledge.html','/gallery.html','/contact.html','/privacy-policy.html','/terms.html','/cookies.html','/disclaimer.html','/suggestions.html','/data-subject-rights.html','/app-mta-net-blocker.html'];
   const titles = new Set();
   const canonicals = new Set();
   for (const path of paths) {
@@ -517,6 +517,12 @@ test('public content pages expose unique titles, descriptions, canonical URLs an
     expect(titles.has(title), path + ' duplicate title').toBe(false);
     titles.add(title);
     expect(description.length, path + ' description').toBeGreaterThan(60);
+    if (path === '/apps.html') {
+      expect(description).toContain('Android');
+      expect(description).toContain('iOS');
+      expect(description).toContain('روابط الناشرين الأصلية');
+      expect(description.length).toBeLessThanOrEqual(160);
+    }
     expect(canonical, path + ' canonical').toMatch(/^https:\/\//);
     expect(canonicals.has(canonical), path + ' duplicate canonical').toBe(false);
     canonicals.add(canonical);
