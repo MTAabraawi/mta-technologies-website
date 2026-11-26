@@ -21,19 +21,18 @@ http.createServer((req, res) => {
   res.setHeader('content-type', 'application/json; charset=utf-8');
   res.setHeader('cache-control', 'no-store');
   if (url.pathname === '/api/v1/catalog-stats') {
-    res.end(JSON.stringify({ total, with_icon: total, without_icon: 0, platforms: { android: total }, sources: { 'fdroid': total, 'izzyondroid': total, 'apple-itunes': total, 'apple-macos': total, 'winget-run-community': total, 'flathub': total, 'snap-store': total, 'arch-linux': total, 'debian-packages': total, 'homebrew-cask': total, 'steam': total, 'mta-curated-web': total, 'bluejetty': total, 'openuse': total, 'chocolatey': total, 'ci-fixture': total }, metadata_only: true }));
+    res.end(JSON.stringify({ total, with_icon: total, without_icon: 0, platforms: { android: total }, sources: { 'fdroid': total, 'izzyondroid': total, 'apple-itunes': total, 'apple-macos': total, 'winget-run-community': total, 'flathub': total, 'snap-store': total, 'arch-linux': total, 'debian-packages': total, 'homebrew-cask': total, 'steam': total, 'mta-curated-web': total, 'bluejetty': total, 'openuse': total, 'chocolatey': total, 'fedora-packages': total, 'jetbrains-marketplace': total, 'gnome-extensions': total, 'firefox-addons': total, 'wordpress-plugins': total, 'homebrew-formulae': total, 'scoop': total, 'alpine-linux': total, 'ci-fixture': total }, metadata_only: true }));
     return;
   }
   if (url.pathname === '/api/v1/apps') {
     const limit = Math.min(200, Math.max(1, Number(url.searchParams.get('limit') || 50)));
     const offset = Math.max(0, Number(url.searchParams.get('offset') || 0));
     const requestedSource = url.searchParams.get('source');
-    const externalId = url.searchParams.get('external_id');
     const query = String(url.searchParams.get('q') || '').trim().toLocaleLowerCase();
     const platform = String(url.searchParams.get('platform') || '').trim().toLocaleLowerCase();
     const matched = rows.filter(row => {
       const searchable = [row.name, row.developer, row.summary, row.description].join(' ').toLocaleLowerCase();
-      return (!query || searchable.includes(query)) && (!platform || row.platform.toLocaleLowerCase() === platform) && (!externalId || row.external_id === externalId);
+      return (!query || searchable.includes(query)) && (!platform || row.platform.toLocaleLowerCase() === platform);
     });
     const filtered = requestedSource ? matched.map(row => ({ ...row, source: requestedSource })) : matched;
     res.setHeader('x-total-count', String(filtered.length));
