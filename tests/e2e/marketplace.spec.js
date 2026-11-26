@@ -350,7 +350,7 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   expect(detailResponse.status()).toBe(200);
   const detailHtml = await detailResponse.text();
   expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
-  const canonical = detailHtml.match(/<link\\s+rel=["']canonical["']\\s+href=["']([^"']+)["']/i);
+  const canonical = detailHtml.match(/<link\\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
   expect(canonical?.[1]).toBe(appUrl.toString());
 });
 
