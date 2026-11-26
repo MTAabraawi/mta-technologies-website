@@ -21,7 +21,7 @@ http.createServer((req, res) => {
   res.setHeader('content-type', 'application/json; charset=utf-8');
   res.setHeader('cache-control', 'no-store');
   if (url.pathname === '/api/v1/catalog-stats') {
-    res.end(JSON.stringify({ total, with_icon: total, without_icon: 0, platforms: { android: total }, sources: { 'fdroid': total, 'izzyondroid': total, 'apple-itunes': total, 'apple-macos': total, 'winget-run-community': total, 'flathub': total, 'snap-store': total, 'arch-linux': total, 'debian-packages': total, 'homebrew-cask': total, 'steam': total, 'mta-curated-web': total, 'bluejetty': total, 'openuse': total, 'chocolatey': total, 'ci-fixture': total }, metadata_only: true }));
+    res.end(JSON.stringify({ total, with_icon: total, without_icon: 0, platforms: { android: total }, sources: { 'fdroid': total, 'izzyondroid': total, 'apple-itunes': total, 'apple-macos': total, 'winget-run-community': total, 'flathub': total, 'snap-store': total, 'arch-linux': total, 'debian-packages': total, 'homebrew-cask': total, 'steam': total, 'mta-curated-web': total, 'bluejetty': total, 'openuse': total, 'chocolatey': total, 'fedora-packages': total, 'jetbrains-marketplace': total, 'gnome-extensions': total, 'firefox-addons': total, 'wordpress-plugins': total, 'homebrew-formulae': total, 'scoop': total, 'alpine-linux': total, 'ci-fixture': total }, metadata_only: true }));
     return;
   }
   if (url.pathname === '/api/v1/apps') {
