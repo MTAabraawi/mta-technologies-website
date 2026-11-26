@@ -72,6 +72,9 @@ export async function onRequest({ request, env }) {
   for (const source of Object.keys(SOURCE_TO_STORE)) {
     const total = Math.max(0, Number((stats.sources || {})[source] || 0));
     if (!Number.isFinite(total) || total <= 0) continue;
+    const quality = stats.quality?.sources?.[source]?.fields;
+    const describedRecords = Number(quality?.summary?.present || 0) + Number(quality?.description?.present || 0);
+    if (quality && describedRecords <= 0) continue;
     const pageCount = Math.ceil(total / PAGE_SIZE);
     for (let page = 0; page < pageCount && entries.length < MAX_SITEMAP_ENTRIES; page++) {
       const sitemapUrl = new URL("/sitemap-apps.xml", siteOrigin);
