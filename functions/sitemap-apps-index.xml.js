@@ -2,30 +2,16 @@ const DEFAULT_ENGINE_ORIGIN = "https://mta-applications-engine.hoaam100.workers.
 const PAGE_SIZE = 200;
 const MAX_SITEMAP_ENTRIES = 50000;
 const SOURCE_TO_STORE = {
-  "google-play": "google-play",
-  "fdroid": "fdroid",
-  "izzyondroid": "izzyondroid",
   "apple-itunes": "apple-app-store",
   "apple-macos": "mac-app-store",
   "winget-run-community": "winget",
   "flathub": "flathub",
-  "snap-store": "snap-store",
   "arch-linux": "arch-linux",
   "debian-packages": "debian-packages",
-  "homebrew-cask": "homebrew",
+  "fdroid": "fdroid",
+  "izzyondroid": "izzyondroid",
   "steam": "steam",
-  "mta-curated-web": "mta-web-apps",
-  "bluejetty": "bluejetty-app-index",
-  "openuse": "openuse",
-  "chocolatey": "chocolatey",
-  "fedora-packages": "fedora-packages",
-  "jetbrains-marketplace": "jetbrains-marketplace",
-  "gnome-extensions": "gnome-extensions",
-  "firefox-addons": "firefox-addons",
-  "wordpress-plugins": "wordpress-plugins",
-  "homebrew-formulae": "homebrew-formulae",
-  "scoop": "scoop",
-  "alpine-linux": "alpine-linux"
+  "mta-curated-web": "mta-web-apps"
 };
 
 function xmlEscape(value) {
