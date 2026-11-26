@@ -69,7 +69,7 @@ export async function onRequest({ request, env }) {
   }
 
   const entries = [];
-  for (const [source, store] of Object.entries(SOURCE_TO_STORE)) {
+  for (const source of Object.keys(SOURCE_TO_STORE)) {
     const total = Math.max(0, Number((stats.sources || {})[source] || 0));
     if (!Number.isFinite(total) || total <= 0) continue;
     const pageCount = Math.ceil(total / PAGE_SIZE);
