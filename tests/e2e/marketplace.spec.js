@@ -316,7 +316,7 @@ test('sitemap index exposes unique page, store, and article maps with canonical 
     expect(locations.length).toBeGreaterThan(0);
     allLocations.push(...locations);
   }
-  expect(allLocations.length).toBe(49);
+  expect(allLocations.length).toBe(54);
   expect(new Set(allLocations).size).toBe(allLocations.length);
   for (const location of allLocations) {
     const url = new URL(location);
@@ -730,12 +730,17 @@ const editorialSlugs = [
   'google-maps-offline-maps-guide',
   'cloudflare-one-one-one-one-warp-guide',
   'powertoys-advanced-paste-guide',
-  'gemini-skills-gems-transition-guide'
+  'gemini-skills-gems-transition-guide',
+  'gemini-notebook-notebooklm-research-guide',
+  'obs-studio-screen-recording-streaming-guide',
+  'windows-sandbox-safe-app-testing-guide',
+  'github-codespaces-practical-guide-cost-control',
+  'windows-quick-assist-safe-remote-support'
 ];
 
 test('editorial library is featured on the homepage and lists bilingual articles', async ({ page }) => {
   await page.goto('/articles.html', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('.editorial-card')).toHaveCount(21);
+  await expect(page.locator('.editorial-card')).toHaveCount(26);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('.editorial-card .en-only').first()).toBeAttached();
   for (const slug of editorialSlugs) {
