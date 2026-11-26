@@ -463,7 +463,13 @@ test('cinematic homepage carousel animates the MTA logo and project slides', asy
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html', { waitUntil: 'load' });
-  await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
+  // Keep the visible primary destinations explicit to catch accidental navigation regressions.
+  const navigationLinks = page.locator('.corp-page-nav a');
+  await expect(navigationLinks).toHaveCount(6);
+  const navigationHrefs = await navigationLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+  expect(navigationHrefs).toEqual([
+    'about.html', 'projects.html', 'innovation.html', 'apps.html', 'contact.html', 'contribute.html'
+  ]);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
   // The project slide is initially hidden; activate it before measuring its grid.
   await page.locator('[data-carousel-to="1"]').click();
