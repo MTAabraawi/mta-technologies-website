@@ -300,6 +300,12 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
   expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap-apps-index.xml');
   expect(indexXml).not.toContain('sitemap-pages.xml');
+  const staticSitemap = await page.request.get('/sitemap.xml');
+  const staticXml = await staticSitemap.text();
+  expect(staticXml).toContain('store=fdroid');
+  expect(staticXml).toContain('store=flathub');
+  expect(staticXml).not.toContain('store=snap-store');
+  expect(staticXml).not.toContain('store=homebrew');
 
   const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
   expect(sitemap.status()).toBe(200);
@@ -331,6 +337,9 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   expect(indexResponse.headers()['content-type']).toContain('xml');
   const indexXml = await indexResponse.text();
   expect(indexXml).toContain('source=fdroid');
+  expect(indexXml).toContain('source=apple-itunes');
+  expect(indexXml).not.toContain('source=snap-store');
+  expect(indexXml).not.toContain('source=homebrew');
 
   const sitemapResponse = await page.request.get('/sitemap-apps.xml?source=fdroid&offset=0');
   expect(sitemapResponse.status()).toBe(200);
@@ -350,6 +359,10 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   expect(detailResponse.status()).toBe(200);
   const detailHtml = await detailResponse.text();
   expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+  const metaDescription = detailHtml.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1] || "";
+  expect(metaDescription.length).toBeGreaterThan(60);
+  expect(metaDescription.length).toBeLessThanOrEqual(155);
+  expect(detailHtml).toContain('property="og:description"');
   const canonical = detailHtml.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
   expect(canonical?.[1].replace(/&amp;/g, '&')).toBe(appUrl.toString());
 });
