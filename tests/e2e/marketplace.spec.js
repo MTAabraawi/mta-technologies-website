@@ -433,6 +433,7 @@ test('cinematic homepage carousel animates the MTA logo and project slides', asy
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html', { waitUntil: 'load' });
+  // Keep the visible primary destinations explicit to catch accidental navigation regressions.
   const navigationLinks = page.locator('.corp-page-nav a');
   await expect(navigationLinks).toHaveCount(6);
   const navigationHrefs = await navigationLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
