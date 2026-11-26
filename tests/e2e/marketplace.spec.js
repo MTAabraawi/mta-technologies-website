@@ -85,7 +85,7 @@ test('marketplace API is served from the same origin', async ({ page }) => {
 
 test('all store cards open internal MTA store pages, never external stores directly', async ({ page }) => {
   await page.goto('/apps.html', { waitUntil: 'domcontentloaded' });
-  const cards = page.locator('.store-picker-card');
+  const cards = page.locator('#store-picker .store-picker-card');
   await expect(cards).toHaveCount(54);
   for (const card of await cards.all()) {
     const href = await card.getAttribute('href');
@@ -289,7 +289,7 @@ test('catalogue stores are separated by verified live source counts', async ({ p
   await expect(live.locator('[data-store-key="fdroid"] [data-source-count="fdroid"]')).toContainText('405');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toHaveAttribute('data-catalogue-state', 'coming-soon');
   await expect(upcoming.locator('[data-store-key="google-play"]')).toContainText('نعمل على توفيرها قريباً');
-  await expect(page.locator('.store-picker-card')).toHaveCount(54);
+  await expect(page.locator('#store-picker .store-picker-card')).toHaveCount(54);
 });
 
 test('sitemap is valid, reachable and lists pages that resolve without redirects', async ({ page }) => {
@@ -433,7 +433,13 @@ test('cinematic homepage carousel animates the MTA logo and project slides', asy
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html', { waitUntil: 'load' });
-  await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
+  // Keep the visible primary destinations explicit to catch accidental navigation regressions.
+  const navigationLinks = page.locator('.corp-page-nav a');
+  await expect(navigationLinks).toHaveCount(6);
+  const navigationHrefs = await navigationLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+  expect(navigationHrefs).toEqual([
+    'about.html', 'projects.html', 'innovation.html', 'apps.html', 'contact.html', 'contribute.html'
+  ]);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
   // The project slide is initially hidden; activate it before measuring its grid.
   await page.locator('[data-carousel-to="1"]').click();
