@@ -298,6 +298,7 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(sitemapIndex.headers()['content-type']).toContain('xml');
   const indexXml = await sitemapIndex.text();
   expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+  expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap-apps-index.xml');
   expect(indexXml).not.toContain('sitemap-pages.xml');
 
   const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -322,6 +323,35 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   const robots = await page.request.get('/robots.txt', { maxRedirects: 0 });
   expect(robots.status()).toBe(200);
   expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap-index.xml');
+});
+
+test('application sitemaps expose only substantive, indexable app profiles', async ({ page }) => {
+  const indexResponse = await page.request.get('/sitemap-apps-index.xml');
+  expect(indexResponse.status()).toBe(200);
+  expect(indexResponse.headers()['content-type']).toContain('xml');
+  const indexXml = await indexResponse.text();
+  expect(indexXml).toContain('source=fdroid');
+
+  const sitemapResponse = await page.request.get('/sitemap-apps.xml?source=fdroid&offset=0');
+  expect(sitemapResponse.status()).toBe(200);
+  expect(sitemapResponse.headers()['content-type']).toContain('xml');
+  const sitemapXml = await sitemapResponse.text();
+  const locations = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map(match => match[1].replace(/&amp;/g, '&'));
+  const appUrl = locations.map(value => new URL(value))
+    .find(value => value.pathname === '/application' && value.searchParams.get('id') === '1');
+  expect(appUrl).toBeDefined();
+  expect(appUrl.searchParams.get('source')).toBe('fdroid');
+  expect(appUrl.searchParams.get('store')).toBe('fdroid');
+  expect(appUrl.searchParams.get('name')).toBe('MTA Net Blocker');
+  expect(locations.some(value => new URL(value).searchParams.get('id') === '2')).toBe(false);
+
+  const detailResponse = await page.request.get(appUrl.pathname + appUrl.search);
+  expect(detailResponse.status()).toBe(200);
+  const detailHtml = await detailResponse.text();
+  expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+  const canonical = detailHtml.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+  expect(canonical?.[1].replace(/&amp;/g, '&')).toBe(appUrl.toString());
 });
 
 test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
@@ -433,7 +463,13 @@ test('cinematic homepage carousel animates the MTA logo and project slides', asy
 test('desktop homepage layout has a restrained navigation and spacious two-column project motion stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html', { waitUntil: 'load' });
-  await expect(page.locator('.corp-page-nav a')).toHaveCount(5);
+  // Keep the visible primary destinations explicit to catch accidental navigation regressions.
+  const navigationLinks = page.locator('.corp-page-nav a');
+  await expect(navigationLinks).toHaveCount(6);
+  const navigationHrefs = await navigationLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+  expect(navigationHrefs).toEqual([
+    'about.html', 'projects.html', 'innovation.html', 'apps.html', 'contact.html', 'contribute.html'
+  ]);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
   // The project slide is initially hidden; activate it before measuring its grid.
   await page.locator('[data-carousel-to="1"]').click();
