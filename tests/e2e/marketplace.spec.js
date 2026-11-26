@@ -302,7 +302,7 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(indexXml).toContain('/sitemap-apps.xml?source=apple-itunes');
   expect(indexXml).not.toContain('sitemap-apps-index.xml');
   expect(indexXml).not.toContain('sitemap-pages.xml');
-  const nestedIndexes = [...indexXml.matchAll(/<loc>([^<]+)<\\/loc>/g)]
+  const nestedIndexes = [...indexXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
     .map(match => match[1])
     .filter(location => location.endsWith('.xml') && !location.includes('/sitemap-apps.xml?'));
   expect(nestedIndexes).toEqual(['https://www.mtahqq.dpdns.org/sitemap.xml']);
