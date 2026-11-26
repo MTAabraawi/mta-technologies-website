@@ -298,6 +298,7 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(sitemapIndex.headers()['content-type']).toContain('xml');
   const indexXml = await sitemapIndex.text();
   expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
+  expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap-apps-index.xml');
   expect(indexXml).not.toContain('sitemap-pages.xml');
 
   const sitemap = await page.request.get('/sitemap.xml', { maxRedirects: 0 });
@@ -324,10 +325,51 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(await robots.text()).toContain('https://www.mtahqq.dpdns.org/sitemap-index.xml');
 });
 
+test('application sitemaps expose only substantive, indexable app profiles', async ({ page }) => {
+  const indexResponse = await page.request.get('/sitemap-apps-index.xml');
+  expect(indexResponse.status()).toBe(200);
+  expect(indexResponse.headers()['content-type']).toContain('xml');
+  const indexXml = await indexResponse.text();
+  expect(indexXml).toContain('source=fdroid');
+
+  const sitemapResponse = await page.request.get('/sitemap-apps.xml?source=fdroid&offset=0');
+  expect(sitemapResponse.status()).toBe(200);
+  expect(sitemapResponse.headers()['content-type']).toContain('xml');
+  const sitemapXml = await sitemapResponse.text();
+  const locations = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map(match => match[1].replace(/&amp;/g, '&'));
+  const appUrl = locations.map(value => new URL(value))
+    .find(value => value.pathname === '/application' && value.searchParams.get('id') === '1');
+  expect(appUrl).toBeDefined();
+  expect(appUrl.searchParams.get('source')).toBe('fdroid');
+  expect(appUrl.searchParams.get('store')).toBe('fdroid');
+  expect(appUrl.searchParams.get('name')).toBe('MTA Net Blocker');
+  expect(locations.some(value => new URL(value).searchParams.get('id') === '2')).toBe(false);
+
+  const detailResponse = await page.request.get(appUrl.pathname + appUrl.search);
+  expect(detailResponse.status()).toBe(200);
+  const detailHtml = await detailResponse.text();
+  expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+  const canonical = detailHtml.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+  expect(canonical?.[1].replace(/&amp;/g, '&')).toBe(appUrl.toString());
+});
+
+test('application lookup uses supported catalogue search instead of external_id filtering', async ({ page }) => {
+  const response = await page.request.get('/application?source=fdroid&store=fdroid&id=300&name=Fixture%20Application%200299');
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain('Fixture Application 0299');
+  expect(html).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
+});
+
 test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
   await page.goto('/store?store=fdroid', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('F-Droid');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'index,follow');
+  const storeDescription = await page.locator('meta[name="description"]').getAttribute('content');
+  expect(storeDescription).toContain('F-Droid');
+  expect(storeDescription.length).toBeLessThanOrEqual(160);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', storeDescription);
   await expect(page.locator('#store-editorial')).toBeVisible();
   await page.goto('/store?store=google-play', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('Google Play');
