@@ -336,7 +336,7 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   expect(sitemapResponse.status()).toBe(200);
   expect(sitemapResponse.headers()['content-type']).toContain('xml');
   const sitemapXml = await sitemapResponse.text();
-  const locations = [...sitemapXml.matchAll(/<loc>([^<]+)<\\/loc>/g)]
+  const locations = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
     .map(match => match[1].replace(/&amp;/g, '&'));
   const appUrl = locations.map(value => new URL(value))
     .find(value => value.pathname === '/application' && value.searchParams.get('id') === '1');
@@ -350,7 +350,7 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   expect(detailResponse.status()).toBe(200);
   const detailHtml = await detailResponse.text();
   expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
-  const canonical = detailHtml.match(/<link\\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
+  const canonical = detailHtml.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
   expect(canonical?.[1]).toBe(appUrl.toString());
 });
 
