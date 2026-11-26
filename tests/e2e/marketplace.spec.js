@@ -435,7 +435,8 @@ test('desktop homepage layout has a restrained navigation and spacious two-colum
   await page.goto('/index.html', { waitUntil: 'load' });
   const navigationLinks = page.locator('.corp-page-nav a');
   await expect(navigationLinks).toHaveCount(6);
-  await expect(navigationLinks).toHaveAttribute('href', [
+  const navigationHrefs = await navigationLinks.evaluateAll(links => links.map(link => link.getAttribute('href')));
+  expect(navigationHrefs).toEqual([
     'about.html', 'projects.html', 'innovation.html', 'apps.html', 'contact.html', 'contribute.html'
   ]);
   await expect(page.locator('.corp-store-link')).toHaveCount(0);
