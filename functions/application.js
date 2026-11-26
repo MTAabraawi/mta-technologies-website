@@ -24,6 +24,17 @@ function meta(html, name, value) {
   const re = new RegExp('<meta\\s+name="' + name + '"[^>]*>', "i");
   return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
 }
+function metaProperty(html, property, value) {
+  const tag = '<meta property="' + property + '" content="' + esc(value) + '">';
+  const re = new RegExp('<meta\\s+property="' + property + '"[^>]*>', "i");
+  return re.test(html) ? html.replace(re, tag) : html.replace("</head>", tag + "</head>");
+}
+function snippet(value, maximum = 155) {
+  const clean = String(value || "").replace(/\\s+/g, " ").trim();
+  if (clean.length <= maximum) return clean;
+  const boundary = clean.lastIndexOf(" ", maximum - 1);
+  return clean.slice(0, boundary > 100 ? boundary : maximum).replace(/[،,;:–—-]+$/, "").trim();
+}
 function canonical(html, url) {
   const tag = '<link rel="canonical" href="' + esc(url) + '">';
   const re = /<link\s+rel=["']canonical["'][^>]*>/i;
@@ -85,10 +96,13 @@ export async function onRequest(context) {
     const sourceDescription = [app.summary, app.description].find(value => typeof value === "string" && value.trim().length >= 40) || "";
     const hasSubstantiveContent = Boolean(sourceDescription);
     const summary = String(sourceDescription || "لم يوفر مصدر البيانات وصفاً كافياً لهذا التطبيق بعد. راجع صفحة المصدر الأصلية للتحقق من التفاصيل.").slice(0, 500);
+    const metaDescription = snippet(summary);
     const description = String(app.description || app.summary || "لا تتوفر تفاصيل وصفية كافية للفهرسة حالياً. راجع صفحة المصدر الأصلية للحصول على المعلومات المحدثة.").slice(0, 5000);
     const pageTitle = title + " | " + (STORE_NAMES[store] || "Application Directory") + " | MTA TECHNOLOGIES";
     html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + esc(pageTitle) + "</title>");
-    html = meta(html, "description", summary);
+    html = meta(html, "description", metaDescription);
+    html = metaProperty(html, "og:title", pageTitle);
+    html = metaProperty(html, "og:description", metaDescription);
     html = meta(html, "robots", hasSubstantiveContent ? "index,follow" : "noindex,follow");
     html = canonical(html, canonicalUrl);
     html = setIdText(html, "application-name", title);
@@ -125,7 +139,7 @@ export async function onRequest(context) {
     if (hasSubstantiveContent) {
       const schema = {
       "@context":"https://schema.org","@type":"SoftwareApplication",
-      "name":title,"description":summary,"url":canonicalUrl,
+      "name":title,"description":metaDescription,"url":canonicalUrl,
       "operatingSystem":String(app.platform || "Unspecified"),
       "applicationCategory":String(app.category || "Software"),
       "publisher":app.developer ? {"@type":"Organization","name":String(app.developer)} : undefined,
