@@ -351,7 +351,7 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   const detailHtml = await detailResponse.text();
   expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
   const canonical = detailHtml.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
-  expect(canonical?.[1]).toBe(appUrl.toString());
+  expect(canonical?.[1].replace(/&amp;/g, '&')).toBe(appUrl.toString());
 });
 
 test('connected store pages become indexable while unconnected stores stay out of the index', async ({ page }) => {
