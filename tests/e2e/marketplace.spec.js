@@ -370,6 +370,7 @@ test('connected store pages become indexable while unconnected stores stay out o
   expect(storeDescription).toContain('F-Droid');
   expect(storeDescription.length).toBeLessThanOrEqual(160);
   await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', storeDescription);
+  await expect(page).toHaveTitle(/F-Droid \\| دليل التطبيقات \\| MTA TECHNOLOGIES/);
   await expect(page.locator('#store-editorial')).toBeVisible();
   await page.goto('/store?store=google-play', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#store-title')).toHaveText('Google Play');
