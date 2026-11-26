@@ -127,8 +127,8 @@ export async function onRequest(context) {
         if (!appsResponse.ok) throw new Error("Catalogue apps HTTP " + appsResponse.status);
         const apps = await appsResponse.json();
         if (!Array.isArray(apps) || !apps.length) throw new Error("No server-renderable catalogue rows");
-        const description = store.description + " تصفح " + count.toLocaleString("en-US") +
-          " سجلاً مفهرساً، وابحث حسب الاسم والمنصة والتصنيف. MTA يعرض بيانات المصدر وروابط الناشر الأصلية ولا يستضيف ملفات التثبيت.";
+        const description = "دليل " + store.name + " على MTA: تصفح " + count.toLocaleString("en-US") +
+          " سجلاً مع معلومات المصدر وروابط الناشرين الأصلية.";
         const title = store.name + " | دليل التطبيقات | MTA TECHNOLOGIES";
         html = html.replace(/<title>[^<]*<\/title>/i, "<title>" + escapeHtml(title) + "</title>");
         html = setMeta(html, "description", description);
