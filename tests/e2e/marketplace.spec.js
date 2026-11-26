@@ -298,8 +298,14 @@ test('sitemap is valid, reachable and lists pages that resolve without redirects
   expect(sitemapIndex.headers()['content-type']).toContain('xml');
   const indexXml = await sitemapIndex.text();
   expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap.xml');
-  expect(indexXml).toContain('https://www.mtahqq.dpdns.org/sitemap-apps-index.xml');
+  expect(indexXml).toContain('/sitemap-apps.xml?source=fdroid');
+  expect(indexXml).toContain('/sitemap-apps.xml?source=apple-itunes');
+  expect(indexXml).not.toContain('sitemap-apps-index.xml');
   expect(indexXml).not.toContain('sitemap-pages.xml');
+  const nestedIndexes = [...indexXml.matchAll(/<loc>([^<]+)<\\/loc>/g)]
+    .map(match => match[1])
+    .filter(location => location.endsWith('.xml') && !location.includes('/sitemap-apps.xml?'));
+  expect(nestedIndexes).toEqual(['https://www.mtahqq.dpdns.org/sitemap.xml']);
   const staticSitemap = await page.request.get('/sitemap.xml');
   const staticXml = await staticSitemap.text();
   expect(staticXml).toContain('store=fdroid');
