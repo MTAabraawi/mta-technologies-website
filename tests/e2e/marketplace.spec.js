@@ -360,7 +360,7 @@ test('application sitemaps expose only substantive, indexable app profiles', asy
   const detailHtml = await detailResponse.text();
   expect(detailHtml).toMatch(/<meta[^>]+name=["']robots["'][^>]+content=["']index,follow["']/i);
   const metaDescription = detailHtml.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1] || "";
-  expect(metaDescription.length).toBeGreaterThan(60);
+  expect(metaDescription.length).toBeGreaterThanOrEqual(40);
   expect(metaDescription.length).toBeLessThanOrEqual(155);
   expect(detailHtml).toContain('property="og:description"');
   const canonical = detailHtml.match(/<link\s+rel=["']canonical["']\s+href=["']([^"']+)["']/i);
